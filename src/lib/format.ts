@@ -18,3 +18,7 @@ export function formatNumber(value: number): string {
 export function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`
 }
+
+export function formatAuthors(authors: string[] | null): string {
+  return authors && authors.length > 0 ? authors.join(", ") : ""
+}

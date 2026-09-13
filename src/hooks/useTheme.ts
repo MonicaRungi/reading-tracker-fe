@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-
-export type ThemePreference = "light" | "dark" | "auto"
+import type { ThemePreference } from "@/api/profile"
 
 const STORAGE_KEY = "rt.theme"
 

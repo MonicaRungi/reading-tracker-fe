@@ -1,5 +1,6 @@
 import { BookOpen } from "lucide-react"
 import type { LibraryItem } from "@/api/library"
+import { formatAuthors } from "@/lib/format"
 import { StatusBadge } from "./StatusBadge"
 
 export function BookCard({ item }: { item: LibraryItem }) {
@@ -21,7 +22,7 @@ export function BookCard({ item }: { item: LibraryItem }) {
       </div>
       <div>
         <p className="truncate text-sm font-medium text-foreground">{item.book.title}</p>
-        <p className="truncate text-xs text-muted-foreground">{item.book.author}</p>
+        <p className="truncate text-xs text-muted-foreground">{formatAuthors(item.book.authors)}</p>
       </div>
     </div>
   )

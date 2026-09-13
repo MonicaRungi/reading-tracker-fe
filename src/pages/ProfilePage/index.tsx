@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 import { formatNumber } from "@/lib/format"
-import type { ThemePreference } from "@/hooks/useTheme"
+import type { ThemePreference } from "@/api/profile"
 import { useProfileData } from "./hooks/useProfileData"
 
 const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [

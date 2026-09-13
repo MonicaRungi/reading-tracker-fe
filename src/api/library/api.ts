@@ -1,111 +1,133 @@
+import { supabase } from "@/lib/supabase"
+import { upsertBook } from "@/api/books"
 import type { AddLibraryItemInput, LibraryItem, ReadingStatus } from "./types"
 
-// Mock in-memory store. Le firme restano invariate quando Supabase sostituisce
-// questi corpi — vedi CLAUDE.md "Data layer convention".
-let mockLibrary: LibraryItem[] = [
-  {
-    id: "li-1",
-    book: {
-      id: "b-1",
-      isbn: "9788806219215",
-      title: "Norwegian Wood",
-      author: "Haruki Murakami",
-      coverUrl: null,
-      pageCount: 296,
-    },
-    status: "reading",
-    progressPercent: 42,
-    rating: null,
-    startedAt: "2026-08-20",
-    finishedAt: null,
-    shelfIds: [],
-  },
-  {
-    id: "li-2",
-    book: {
-      id: "b-2",
-      isbn: null,
-      title: "Le città invisibili",
-      author: "Italo Calvino",
-      coverUrl: null,
-      pageCount: 164,
-    },
-    status: "to_read",
-    progressPercent: null,
-    rating: null,
-    startedAt: null,
-    finishedAt: null,
-    shelfIds: [],
-  },
-]
+const LIBRARY_SELECT = "*, book:books(*)"
 
-function delay<T>(value: T): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(value), 300))
+function today(): string {
+  return new Date().toISOString().slice(0, 10)
 }
 
-export async function listLibrary(_userId: string): Promise<LibraryItem[]> {
-  return delay(mockLibrary)
+export async function listLibrary(): Promise<LibraryItem[]> {
+  const { data, error } = await supabase
+    .from("library_items")
+    .select(LIBRARY_SELECT)
+    .order("added_at", { ascending: false })
+  if (error) throw error
+  return (data ?? []) as LibraryItem[]
 }
 
 export async function addLibraryItem(
-  _userId: string,
+  userId: string,
   input: AddLibraryItemInput,
 ): Promise<LibraryItem> {
-  const item: LibraryItem = {
-    id: crypto.randomUUID(),
-    book: input.book,
-    status: input.status,
-    progressPercent: input.status === "reading" ? 0 : null,
-    rating: null,
-    startedAt: input.status === "reading" ? new Date().toISOString() : null,
-    finishedAt: null,
-    shelfIds: input.shelfIds,
+  const book = await upsertBook(input.book)
+
+  const { data, error } = await supabase
+    .from("library_items")
+    .insert({
+      user_id: userId,
+      book_id: book.id,
+      status: input.status,
+      started_at: input.status === "reading" ? today() : null,
+      finished_at: input.status === "read" ? today() : null,
+    })
+    .select(LIBRARY_SELECT)
+    .single()
+  if (error) throw error
+
+  if (input.shelf_ids.length > 0) {
+    const { error: shelfError } = await supabase
+      .from("shelf_items")
+      .insert(input.shelf_ids.map((shelf_id) => ({ shelf_id, library_item_id: data.id })))
+    if (shelfError) throw shelfError
   }
-  mockLibrary = [item, ...mockLibrary]
-  return delay(item)
+
+  return data as LibraryItem
 }
 
-export async function updateLibraryItemStatus(
-  _userId: string,
+export async function updateStatus(
   itemId: string,
   status: ReadingStatus,
 ): Promise<LibraryItem> {
-  const today = new Date().toISOString()
-  mockLibrary = mockLibrary.map((item) =>
-    item.id === itemId
-      ? {
-          ...item,
-          status,
-          startedAt: status === "reading" ? (item.startedAt ?? today) : item.startedAt,
-          finishedAt: status === "read" ? today : item.finishedAt,
-        }
-      : item,
-  )
-  const updated = mockLibrary.find((item) => item.id === itemId)
-  if (!updated) throw new Error(`Library item ${itemId} not found`)
-  return delay(updated)
+  const { data: current, error: fetchError } = await supabase
+    .from("library_items")
+    .select("started_at, finished_at")
+    .eq("id", itemId)
+    .single()
+  if (fetchError) throw fetchError
+
+  const { data, error } = await supabase
+    .from("library_items")
+    .update({
+      status,
+      started_at: status === "reading" ? (current.started_at ?? today()) : current.started_at,
+      finished_at: status === "read" ? today() : current.finished_at,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", itemId)
+    .select(LIBRARY_SELECT)
+    .single()
+  if (error) throw error
+  return data as LibraryItem
 }
 
-export async function updateLibraryItemProgress(
-  _userId: string,
+export async function updateProgress(
+  userId: string,
   itemId: string,
-  progressPercent: number,
+  newPage: number,
 ): Promise<LibraryItem> {
-  mockLibrary = mockLibrary.map((item) =>
-    item.id === itemId ? { ...item, progressPercent } : item,
-  )
-  const updated = mockLibrary.find((item) => item.id === itemId)
-  if (!updated) throw new Error(`Library item ${itemId} not found`)
-  return delay(updated)
+  const { data: current, error: fetchError } = await supabase
+    .from("library_items")
+    .select("current_page")
+    .eq("id", itemId)
+    .single()
+  if (fetchError) throw fetchError
+
+  const delta = newPage - (current.current_page ?? 0)
+
+  const { data, error } = await supabase
+    .from("library_items")
+    .update({ current_page: newPage, updated_at: new Date().toISOString() })
+    .eq("id", itemId)
+    .select(LIBRARY_SELECT)
+    .single()
+  if (error) throw error
+
+  if (delta > 0) await logPagesRead(userId, delta)
+
+  return data as LibraryItem
 }
 
-export async function rateLibraryItem(
-  _userId: string,
+async function logPagesRead(userId: string, delta: number): Promise<void> {
+  const log_date = today()
+  const { data: existing, error: fetchError } = await supabase
+    .from("reading_log")
+    .select("pages_read")
+    .eq("user_id", userId)
+    .eq("log_date", log_date)
+    .maybeSingle()
+  if (fetchError) throw fetchError
+
+  const { error } = await supabase
+    .from("reading_log")
+    .upsert(
+      { user_id: userId, log_date, pages_read: (existing?.pages_read ?? 0) + delta },
+      { onConflict: "user_id,log_date" },
+    )
+  if (error) throw error
+}
+
+export async function rateItem(
   itemId: string,
   rating: number,
 ): Promise<LibraryItem> {
-  mockLibrary = mockLibrary.map((item) => (item.id === itemId ? { ...item, rating } : item))
-  const updated = mockLibrary.find((item) => item.id === itemId)
-  if (!updated) throw new Error(`Library item ${itemId} not found`)
-  return delay(updated)
+  const { data, error } = await supabase
+    .from("library_items")
+    .update({ rating, updated_at: new Date().toISOString() })
+    .eq("id", itemId)
+    .select(LIBRARY_SELECT)
+    .single()
+  if (error) throw error
+  return data as LibraryItem
 }

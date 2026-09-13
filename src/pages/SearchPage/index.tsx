@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 import { SearchBar } from "@/components/shared/SearchBar"
+import { formatAuthors } from "@/lib/format"
 import { useSearchData } from "./hooks/useSearchData"
 
 export default function SearchPage() {
@@ -27,13 +28,13 @@ export default function SearchPage() {
 
       {!data.isLoading && data.results.length > 0 && (
         <ul className="space-y-3">
-          {data.results.map((book) => (
-            <li key={book.id} className="flex items-center gap-3">
+          {data.results.map((book, index) => (
+            <li key={book.isbn13 ?? `${book.title}-${index}`} className="flex items-center gap-3">
               <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
                 {book.coverUrl ? (
                   <img
                     src={book.coverUrl}
-                    alt={book.title}
+                    alt={book.title ?? ""}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -42,7 +43,7 @@ export default function SearchPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-foreground">{book.title}</p>
-                <p className="truncate text-xs text-muted-foreground">{book.author}</p>
+                <p className="truncate text-xs text-muted-foreground">{formatAuthors(book.authors)}</p>
               </div>
             </li>
           ))}
