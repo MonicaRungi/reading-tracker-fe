@@ -1,0 +1,50 @@
+export const it = {
+  nav: {
+    library: "Libreria",
+    search: "Cerca",
+    profile: "Profilo",
+  },
+  common: {
+    loading: "Caricamento…",
+    error: "Qualcosa è andato storto",
+    retry: "Riprova",
+    cancel: "Annulla",
+    save: "Salva",
+  },
+  auth: {
+    title: "Reading Tracker",
+    subtitle: "Accedi per continuare a tracciare le tue letture",
+    emailLabel: "Email",
+    emailPlaceholder: "tuemail@esempio.com",
+    sendMagicLink: "Invia il link di accesso",
+    magicLinkSent: "Controlla la tua casella email per il link di accesso",
+    continueWithGoogle: "Continua con Google",
+    signOut: "Esci",
+  },
+  library: {
+    title: "Libreria",
+    continueReading: "Continua a leggere",
+    empty: "Non hai ancora libri in libreria",
+  },
+  status: {
+    to_read: "Da leggere",
+    reading: "In lettura",
+    read: "Letto",
+    abandoned: "Abbandonato",
+  },
+  search: {
+    title: "Cerca",
+    placeholder: "Titolo, autore o ISBN",
+    empty: "Nessun risultato",
+    add: "Aggiungi",
+  },
+  profile: {
+    title: "Profilo",
+    booksRead: "Libri letti",
+    pagesRead: "Pagine lette",
+    theme: "Tema",
+    themeLight: "Chiaro",
+    themeDark: "Scuro",
+    themeAuto: "Automatico",
+  },
+} as const
