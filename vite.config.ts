@@ -14,8 +14,8 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/auth/],
       },
       manifest: {
-        name: "Reading Tracker",
-        short_name: "Reading Tracker",
+        name: "Shelfy",
+        short_name: "Shelfy",
         lang: "it",
         display: "standalone",
         theme_color: "#FBEDE8",
