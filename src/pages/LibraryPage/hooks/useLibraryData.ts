@@ -12,6 +12,7 @@ export function useLibraryData() {
   const navigate = useNavigate()
   const userId = user?.id ?? ""
   const [filter, setFilter] = useState<LibraryFilter>("all")
+  const [query, setQuery] = useState("")
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["library", userId],
@@ -21,16 +22,26 @@ export function useLibraryData() {
 
   const items = data ?? []
   const reading = items.filter((item) => item.status === "reading")
-  const grid = filter === "all"
-    ? items
-    : items.filter((item) => item.status === filter)
+
+  const normalizedQuery = query.trim().toLowerCase()
+  const matchesQuery = (item: (typeof items)[number]) =>
+    !normalizedQuery ||
+    item.book.title.toLowerCase().includes(normalizedQuery) ||
+    (item.book.authors ?? []).some((author) =>
+      author.toLowerCase().includes(normalizedQuery),
+    )
+
+  const grid = items
+    .filter((item) => filter === "all" || item.status === filter)
+    .filter(matchesQuery)
   const isEmpty = !isLoading && items.length === 0
 
   return {
     data: { reading, grid, items, isLoading, isError, isEmpty },
-    ui: { filter },
+    ui: { filter, query },
     actions: {
       setFilter: (next: LibraryFilter | "") => next && setFilter(next),
+      setQuery,
       goToSearch: () => navigate("/search"),
     },
   }

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
+import { SearchField } from "@/components/shared/SearchField";
 import type { SearchTab } from "../hooks/useSearchData";
 import { SearchModeToggle } from "./SearchModeToggle";
-import { SearchField } from "./SearchField";
 
 export function SearchHeader({
   tab,
@@ -17,7 +17,7 @@ export function SearchHeader({
   const { t } = useTranslation();
 
   return (
-    <div className="px-4 pb-3 pt-4">
+    <div className="sticky top-0 z-10 bg-background px-4 pb-3 pt-4">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-[30px] font-bold text-foreground">{t("search.title")}</h1>
       </div>
@@ -26,7 +26,13 @@ export function SearchHeader({
         <SearchModeToggle value={tab} onChange={onTabChange} />
       </div>
 
-      {tab === "search" && <SearchField value={query} onChange={onQueryChange} />}
+      {tab === "search" && (
+        <SearchField
+          value={query}
+          onChange={onQueryChange}
+          placeholder={t("search.placeholder")}
+        />
+      )}
     </div>
   );
 }

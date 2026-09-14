@@ -6,8 +6,10 @@ export function LibraryHeader() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-between px-4 pb-2 pt-4">
-      <h1 className="text-[30px] font-bold text-foreground">{t("library.title")}</h1>
+    <div className="sticky top-[-1px] z-20 flex h-16 items-center justify-between bg-background px-4">
+      <h1 className="text-[30px] font-bold text-foreground">
+        {t("library.title")}
+      </h1>
       <Button
         variant="ghost"
         size="icon"

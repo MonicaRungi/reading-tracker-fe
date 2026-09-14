@@ -15,20 +15,20 @@ export default function ProfilePage() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="px-4 pb-2 pt-4">
+      <div className="sticky top-0 z-10 space-y-4 bg-background px-4 pb-3 pt-4">
         <h1 className="text-[30px] font-bold text-foreground">
           {t("profile.title")}
         </h1>
-      </div>
 
-      <div className="flex-1 space-y-5 px-4 pb-8">
         <ProfileHeader
           avatarUrl={data.avatarUrl}
           initials={data.initials}
           displayName={data.displayName}
           email={data.email}
         />
+      </div>
 
+      <div className="flex-1 space-y-5 px-4 pb-8 pt-5">
         <ThemeSwitcher value={ui.theme} onChange={actions.setTheme} />
 
         {data.isLoading ? (

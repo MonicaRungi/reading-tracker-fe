@@ -31,6 +31,8 @@ export default function LibraryPage() {
             isLoading={data.isLoading}
             filter={ui.filter}
             onFilterChange={actions.setFilter}
+            query={ui.query}
+            onQueryChange={actions.setQuery}
           />
         </>
       )}

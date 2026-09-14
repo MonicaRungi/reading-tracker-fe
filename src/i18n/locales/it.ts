@@ -17,7 +17,13 @@ export const it = {
     heroLine2: "la tua libreria,",
     heroAccent: "sempre con te",
     heroSubtitle:
-      "Tieni traccia dei libri che leggi e costruisci la tua libreria personale.",
+      "Tieni traccia dei libri che leggi, scopri nuove storie e costruisci la tua libreria personale.",
+    featureTrackTitle: "Tieni traccia",
+    featureTrackSub: "Segna cosa leggi e i tuoi progressi.",
+    featureDiscoverTitle: "Scopri nuovi libri",
+    featureDiscoverSub: "Trova ispirazione per la tua prossima lettura.",
+    featureLibraryTitle: "La tua libreria, ovunque",
+    featureLibrarySub: "Sempre con te, su tutti i tuoi dispositivi.",
     or: "oppure",
     emailLabel: "La tua email",
     emailPlaceholder: "nome@email.it",
@@ -35,6 +41,8 @@ export const it = {
     featureSimpleSub: "Zero password",
     featureAnywhere: "Ovunque",
     featureAnywhereSub: "Su tutti i tuoi dispositivi",
+    loginHint:
+      "Accedi in modo sicuro con il tuo account Google.\nNessuna password da ricordare.",
   },
   library: {
     title: "Libreria",
@@ -48,6 +56,7 @@ export const it = {
     emptyFilter: "Nessun libro",
     emptyFilterSub: "Non hai libri in questa categoria",
     filterAll: "Tutti",
+    searchPlaceholder: "Cerca per titolo o autore",
   },
   status: {
     to_read: "Da leggere",
@@ -75,6 +84,8 @@ export const it = {
     scanBookNotFound: "Nessun libro trovato per questo codice",
     scanLookupError: "Errore durante la lettura del codice",
     manualIsbn: "Inserisci ISBN manualmente",
+    showMore: "Mostra tutto",
+    showLess: "Mostra meno",
     cameraUnavailable: "Fotocamera non disponibile",
     cameraUnavailableHint:
       "Abilita l'accesso alla fotocamera nelle impostazioni del dispositivo.",
@@ -138,7 +149,8 @@ export const it = {
     pageOf: "di {{count}}",
     rating: "Valutazione",
     ratingLockedHint: "Solo dopo aver terminato",
-    ratingLockedNote: "Potrai dare una valutazione una volta terminato il libro.",
+    ratingLockedNote:
+      "Potrai dare una valutazione una volta terminato il libro.",
     startReading: "Inizia a leggere",
     finishReading: "Ho terminato il libro",
     markAbandoned: "Segna come abbandonato",

@@ -10,7 +10,7 @@ export function Feature({
   sub: string;
 }) {
   return (
-    <div className="flex flex-col items-center gap-[5px]">
+    <div className="flex flex-col items-center gap-[5px] text-center">
       <div className="text-primary">{icon}</div>
       <span className="text-[12px] font-medium text-foreground">{title}</span>
       <span className="text-[11px] text-muted-foreground">{sub}</span>

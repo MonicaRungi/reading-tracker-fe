@@ -1,25 +1,17 @@
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import type { BookMeta } from "@/api/books";
 import type { ReadingStatus } from "@/api/library";
-import type { Shelf } from "@/api/shelves";
 import { SelectedBookSummary } from "./components/SelectedBookSummary";
+import { BookMetaDetails } from "./components/BookMetaDetails";
 import { ReadingStatusPicker } from "./components/ReadingStatusPicker";
-import { ShelfPicker } from "./components/ShelfPicker";
 
 interface AddBookSheetProps {
   book: BookMeta | null;
   status: ReadingStatus;
   onStatusChange: (status: ReadingStatus | "") => void;
-  shelves: Shelf[];
-  selectedShelfIds: string[];
-  onSelectedShelfIdsChange: (ids: string[]) => void;
-  isAddingShelf: boolean;
-  newShelfName: string;
-  onNewShelfNameChange: (name: string) => void;
-  onStartAddingShelf: () => void;
-  onConfirmNewShelf: () => void;
   isSubmitting: boolean;
   onSubmit: () => void;
   onClose: () => void;
@@ -29,57 +21,67 @@ export function AddBookSheet({
   book,
   status,
   onStatusChange,
-  shelves,
-  selectedShelfIds,
-  onSelectedShelfIdsChange,
-  isAddingShelf,
-  newShelfName,
-  onNewShelfNameChange,
-  onStartAddingShelf,
-  onConfirmNewShelf,
   isSubmitting,
   onSubmit,
   onClose,
 }: AddBookSheetProps) {
   const { t } = useTranslation();
+  const titleRef = useRef<HTMLDivElement>(null);
+  const [showStickyTitle, setShowStickyTitle] = useState(false);
+
+  // Mostra il titolo nell'header sticky solo quando il titolo grande dentro
+  // SelectedBookSummary è scrollato fuori dalla vista — altrimenti sarebbe
+  // una ripetizione inutile mentre è già visibile.
+  function handleScroll(e: React.UIEvent<HTMLDivElement>) {
+    const titleHeight = titleRef.current?.offsetHeight ?? 0;
+    setShowStickyTitle(e.currentTarget.scrollTop > titleHeight);
+  }
 
   if (!book) return null;
 
   return (
     <Sheet open={!!book} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent side="bottom" className="rounded-t-[22px] px-5 pb-safe pt-2">
-        <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-border" />
+      <SheetContent
+        side="bottom"
+        className="flex max-h-[85vh] flex-col rounded-t-[22px] pb-safe pt-2"
+      >
+        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-border" />
 
-        <h2 className="mb-5 pr-8 text-[20px] font-bold text-foreground">
-          {t("search.addBook")}
-        </h2>
+        <div className="shrink-0 border-b border-border px-5 pb-4">
+          <h2 className="pr-8 text-[20px] font-bold text-foreground">
+            {t("search.addBook")}
+          </h2>
+          {showStickyTitle && (
+            <p className="mt-1 truncate pr-8 text-[13px] text-muted-foreground">
+              {book.title}
+            </p>
+          )}
+        </div>
 
-        <SelectedBookSummary book={book} />
-
-        <p className="mb-3 text-[13px] font-bold text-foreground">
-          {t("search.readingStatus")}
-        </p>
-        <ReadingStatusPicker value={status} onChange={onStatusChange} />
-
-        <p className="mb-3 text-[13px] font-bold text-foreground">{t("search.shelves")}</p>
-        <ShelfPicker
-          shelves={shelves}
-          selectedIds={selectedShelfIds}
-          onSelectedIdsChange={onSelectedShelfIdsChange}
-          isAddingShelf={isAddingShelf}
-          newShelfName={newShelfName}
-          onNewShelfNameChange={onNewShelfNameChange}
-          onStartAddingShelf={onStartAddingShelf}
-          onConfirmNewShelf={onConfirmNewShelf}
-        />
-
-        <Button
-          onClick={onSubmit}
-          disabled={isSubmitting}
-          className="mb-4 h-auto w-full rounded-xl py-[15px] text-[15px] font-medium disabled:opacity-60"
+        <div
+          onScroll={handleScroll}
+          className="min-h-0 flex-1 overflow-y-auto px-5 pb-4 pt-4"
         >
-          {isSubmitting ? t("common.loading") : t("search.addToLibrary")}
-        </Button>
+          <div ref={titleRef}>
+            <SelectedBookSummary book={book} />
+          </div>
+          <BookMetaDetails book={book} />
+
+          <p className="mb-3 text-[13px] font-bold text-foreground">
+            {t("search.readingStatus")}
+          </p>
+          <ReadingStatusPicker value={status} onChange={onStatusChange} />
+        </div>
+
+        <div className="shrink-0 border-t border-border px-5 pb-4 pt-3">
+          <Button
+            onClick={onSubmit}
+            disabled={isSubmitting}
+            className="h-auto w-full rounded-xl py-[15px] text-[15px] font-medium disabled:opacity-60"
+          >
+            {isSubmitting ? t("common.loading") : t("search.addToLibrary")}
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
   );
