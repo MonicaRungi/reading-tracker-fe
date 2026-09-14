@@ -4,6 +4,7 @@ import { SearchHeader } from "./components/SearchHeader";
 import { BarcodeScanner } from "./components/BarcodeScanner";
 import { SearchResults } from "./components/SearchResults";
 import { AddBookSheet } from "./AddBookSheet";
+import { Button } from "@/components/ui/button";
 import { Keyboard } from "lucide-react";
 
 export default function SearchPage() {
@@ -26,13 +27,14 @@ export default function SearchPage() {
               key={ui.scanResetKey}
               onDetected={actions.handleScan}
             />
-            <button
+            <Button
+              variant="outline"
               onClick={() => actions.setTab("search")}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-[#E0644A] py-3 text-[14px] font-medium text-[#E0644A]"
+              className="h-auto w-full gap-2 rounded-full border-[#E0644A] py-3 text-[14px] font-medium text-[#E0644A]"
             >
               <Keyboard className="size-4" />
               {t("search.manualIsbn")}
-            </button>
+            </Button>
           </div>
         )}
 
@@ -50,14 +52,6 @@ export default function SearchPage() {
         book={ui.selectedBook}
         status={ui.status}
         onStatusChange={actions.setStatus}
-        shelves={data.shelves}
-        selectedShelfIds={ui.selectedShelfIds}
-        onSelectedShelfIdsChange={actions.setSelectedShelfIds}
-        isAddingShelf={ui.isAddingShelf}
-        newShelfName={ui.newShelfName}
-        onNewShelfNameChange={actions.setNewShelfName}
-        onStartAddingShelf={actions.startAddingShelf}
-        onConfirmNewShelf={actions.confirmNewShelf}
         isSubmitting={ui.isAddingBook}
         onSubmit={actions.submitAddBook}
         onClose={actions.closeSheet}

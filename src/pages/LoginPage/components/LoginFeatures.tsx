@@ -1,31 +1,34 @@
+import { Feather, ShieldCheck, Smartphone } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Card, CardContent } from "@/components/ui/card";
 import { Feature } from "./Feature";
-import { ShieldIcon } from "@/assets/icons/ShieldIcon";
-import { PenIcon } from "@/assets/icons/PenIcon";
-import { PhoneIcon } from "@/assets/icons/PhoneIcon";
 
 export function LoginFeatures() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-secondary px-7 pt-5 pb-5">
-      <div className="flex justify-around">
-        <Feature
-          icon={<ShieldIcon />}
-          title={t("auth.featureSafe")}
-          sub={t("auth.featureSafeSub")}
-        />
-        <Feature
-          icon={<PenIcon />}
-          title={t("auth.featureSimple")}
-          sub={t("auth.featureSimpleSub")}
-        />
-        <Feature
-          icon={<PhoneIcon />}
-          title={t("auth.featureAnywhere")}
-          sub={t("auth.featureAnywhereSub")}
-        />
-      </div>
+    <div className="px-4 pb-4 sm:px-5">
+      <Card className="rounded-xl border-0 bg-secondary shadow-none">
+        <CardContent className="grid grid-cols-3">
+          <Feature
+            icon={<ShieldCheck className="h-6 w-6" strokeWidth={1.8} />}
+            title={t("auth.featureSafe")}
+            sub={t("auth.featureSafeSub")}
+          />
+          <div className="border-x border-foreground/10">
+            <Feature
+              icon={<Feather className="h-6 w-6" strokeWidth={1.8} />}
+              title={t("auth.featureSimple")}
+              sub={t("auth.featureSimpleSub")}
+            />
+          </div>
+          <Feature
+            icon={<Smartphone className="h-6 w-6" strokeWidth={1.8} />}
+            title={t("auth.featureAnywhere")}
+            sub={t("auth.featureAnywhereSub")}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

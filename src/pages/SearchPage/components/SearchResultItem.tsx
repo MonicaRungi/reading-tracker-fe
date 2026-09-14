@@ -14,7 +14,10 @@ export function SearchResultItem({
   const { t } = useTranslation();
 
   return (
-    <li className="flex items-center gap-3 py-3.5">
+    <li
+      onClick={onAdd}
+      className="flex cursor-pointer items-center gap-3 py-3.5 active:bg-accent"
+    >
       <div className="h-[60px] w-[40px] shrink-0 overflow-hidden rounded-md bg-secondary">
         {book.cover_url ? (
           <img src={book.cover_url} alt="" className="h-full w-full object-cover" />
@@ -36,7 +39,10 @@ export function SearchResultItem({
 
       <Button
         variant="outline"
-        onClick={onAdd}
+        onClick={(e) => {
+          e.stopPropagation();
+          onAdd();
+        }}
         className="h-auto shrink-0 rounded-full border-primary px-4 py-1.5 text-[12px] text-primary active:bg-accent"
       >
         {t("search.add")}

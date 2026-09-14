@@ -1,31 +1,25 @@
 import { useLoginData } from "./hooks/useLoginData";
 import { LoginHero } from "./components/LoginHero";
+import { LoginFeatureList } from "./components/LoginFeatureList";
 import { LoginOptions } from "./components/LoginOptions";
-import { MagicLinkSentPanel } from "./components/MagicLinkSentPanel";
 import { LoginFeatures } from "./components/LoginFeatures";
 
 export default function LoginPage() {
-  const { data, ui, actions } = useLoginData();
+  const { actions } = useLoginData();
 
   return (
-    <div className="flex min-h-svh flex-col bg-background">
-      <LoginHero />
+    <main className="min-h-dvh bg-background text-foreground">
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-background shadow-[0_18px_70px_rgba(0,0,0,0.1)]">
+        <LoginHero />
 
-      <div className="flex flex-1 flex-col gap-5 bg-background px-7 py-8">
-        {!ui.sent ? (
-          <LoginOptions
-            email={data.email}
-            isSending={ui.isSending}
-            onEmailChange={actions.setEmail}
-            onSubmit={actions.handleMagicLinkSubmit}
-            onGoogleSignIn={actions.handleGoogleSignIn}
-          />
-        ) : (
-          <MagicLinkSentPanel email={data.email} onChangeEmail={actions.resetSent} />
-        )}
+        <div className="flex-1">
+          <LoginFeatureList />
+
+          <LoginOptions onGoogleSignIn={actions.handleGoogleSignIn} />
+        </div>
+
+        <LoginFeatures />
       </div>
-
-      <LoginFeatures />
-    </div>
+    </main>
   );
 }
