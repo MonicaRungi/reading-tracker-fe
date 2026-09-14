@@ -48,9 +48,15 @@ export function useAuth() {
     if (error) throw error;
   }
 
+  const avatarUrl =
+    (state.session?.user.user_metadata?.avatar_url as string | undefined) ??
+    (state.session?.user.user_metadata?.picture as string | undefined) ??
+    null;
+
   return {
     session: state.session,
     user: state.session?.user ?? null,
+    avatarUrl,
     isAuthenticated: Boolean(state.session),
     isLoading: state.isLoading,
     signInWithMagicLink,

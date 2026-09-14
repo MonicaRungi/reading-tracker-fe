@@ -1,68 +1,67 @@
-import { useTranslation } from "react-i18next"
-import { Button } from "@/components/ui/button"
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
-import { formatNumber } from "@/lib/format"
-import type { ThemePreference } from "@/api/profile"
-import { useProfileData } from "./hooks/useProfileData"
-
-const THEME_OPTIONS: { value: ThemePreference; labelKey: string }[] = [
-  { value: "light", labelKey: "profile.themeLight" },
-  { value: "dark", labelKey: "profile.themeDark" },
-  { value: "auto", labelKey: "profile.themeAuto" },
-]
+import { useTranslation } from "react-i18next";
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { useProfileData } from "./hooks/useProfileData";
+import { ProfileHeader } from "./components/ProfileHeader";
+import { ThemeSwitcher } from "./components/ThemeSwitcher";
+import { StatsGrid } from "./components/StatsGrid";
+import { ActivitySection } from "./components/ActivitySection";
+import { BooksReadSection } from "./components/BooksReadSection";
+import { GenresSection } from "./components/GenresSection";
+import { SignOutButton } from "./components/SignOutButton";
 
 export default function ProfilePage() {
-  const { t } = useTranslation()
-  const { data, ui, actions } = useProfileData()
+  const { t } = useTranslation();
+  const { data, ui, actions } = useProfileData();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-foreground">{t("profile.title")}</h1>
-        <p className="text-sm text-muted-foreground">{data.email}</p>
+    <div className="flex min-h-full flex-col">
+      <div className="px-4 pb-2 pt-4">
+        <h1 className="text-[30px] font-bold text-foreground">
+          {t("profile.title")}
+        </h1>
       </div>
 
-      {data.isLoading ? (
-        <div className="flex justify-center py-8">
-          <LoadingSpinner />
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-2xl font-semibold text-foreground">
-              {formatNumber(data.stats?.total_books_read ?? 0)}
-            </p>
-            <p className="text-xs text-muted-foreground">{t("profile.booksRead")}</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-2xl font-semibold text-foreground">
-              {formatNumber(data.stats?.total_pages_read ?? 0)}
-            </p>
-            <p className="text-xs text-muted-foreground">{t("profile.pagesRead")}</p>
-          </div>
-        </div>
-      )}
+      <div className="flex-1 space-y-5 px-4 pb-8">
+        <ProfileHeader
+          avatarUrl={data.avatarUrl}
+          initials={data.initials}
+          displayName={data.displayName}
+          email={data.email}
+        />
 
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">{t("profile.theme")}</p>
-        <div className="flex gap-2">
-          {THEME_OPTIONS.map(({ value, labelKey }) => (
-            <Button
-              key={value}
-              type="button"
-              variant={ui.theme === value ? "default" : "outline"}
-              size="sm"
-              onClick={() => actions.setTheme(value)}
-            >
-              {t(labelKey)}
-            </Button>
-          ))}
-        </div>
+        <ThemeSwitcher value={ui.theme} onChange={actions.setTheme} />
+
+        {data.isLoading ? (
+          <div className="flex justify-center py-8">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          data.stats && (
+            <>
+              <StatsGrid stats={data.stats} />
+
+              <ActivitySection
+                view={ui.activityView}
+                onViewChange={actions.setActivityView}
+                data={data.activityChartData}
+                total={data.activityTotal}
+              />
+
+              <BooksReadSection
+                view={ui.booksView}
+                onViewChange={actions.setBooksView}
+                data={data.booksChartData}
+              />
+
+              {data.stats.genres.length > 0 && (
+                <GenresSection genres={data.stats.genres} />
+              )}
+            </>
+          )
+        )}
+
+        <SignOutButton onClick={actions.signOut} />
       </div>
-
-      <Button type="button" variant="outline" onClick={() => actions.signOut()}>
-        {t("auth.signOut")}
-      </Button>
     </div>
-  )
+  );
 }
