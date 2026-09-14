@@ -22,7 +22,7 @@ export function StatusCta({
     <Button
       disabled={isUpdating}
       onClick={() => onAdvance(nextStatus)}
-      className="h-auto w-full rounded-2xl py-4 text-[15px] font-medium disabled:opacity-60"
+      className="h-auto w-full rounded-xl py-4 text-[15px] font-medium disabled:opacity-60"
     >
       {isUpdating ? t("common.loading") : label}
     </Button>

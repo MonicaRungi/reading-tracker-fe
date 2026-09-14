@@ -16,7 +16,7 @@ export function DateBox({
   return (
     <button
       onClick={onTap}
-      className="flex flex-1 flex-col gap-1 rounded-2xl border border-border px-4 py-3 text-left"
+      className="flex flex-1 flex-col gap-1 rounded-xl border border-border px-4 py-3 text-left"
     >
       <span className="flex items-center gap-1.5 text-[11px] text-hint">
         <Calendar className="size-3" />

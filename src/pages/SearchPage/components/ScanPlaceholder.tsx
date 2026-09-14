@@ -6,7 +6,7 @@ export function ScanPlaceholder() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-      <div className="rounded-2xl bg-secondary p-6">
+      <div className="rounded-xl bg-secondary p-6">
         <BookOpen className="size-12 text-muted-foreground" />
       </div>
       <p className="text-[15px] font-medium text-foreground">

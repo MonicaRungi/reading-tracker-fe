@@ -34,7 +34,7 @@ export function MagicLinkForm({
       <button
         type="submit"
         disabled={isSending}
-        className="w-full rounded-2xl bg-primary py-[15px] text-[15px] font-medium text-primary-foreground transition-opacity disabled:opacity-60 active:opacity-80"
+        className="w-full rounded-xl bg-primary py-[15px] text-[15px] font-medium text-primary-foreground transition-opacity disabled:opacity-60 active:opacity-80"
       >
         {isSending ? t("common.loading") : t("auth.sendMagicLink")}
       </button>

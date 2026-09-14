@@ -76,7 +76,7 @@ export function AddBookSheet({
         <Button
           onClick={onSubmit}
           disabled={isSubmitting}
-          className="mb-4 h-auto w-full rounded-2xl py-[15px] text-[15px] font-medium disabled:opacity-60"
+          className="mb-4 h-auto w-full rounded-xl py-[15px] text-[15px] font-medium disabled:opacity-60"
         >
           {isSubmitting ? t("common.loading") : t("search.addToLibrary")}
         </Button>

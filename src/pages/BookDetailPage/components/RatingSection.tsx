@@ -15,7 +15,7 @@ export function RatingSection({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-3 rounded-2xl border border-border bg-card p-4">
+    <div className="space-y-3 rounded-xl border border-border bg-card p-4">
       <div className="flex items-center justify-between">
         <span className="text-[15px] font-semibold text-foreground">
           {t("bookDetail.rating")}

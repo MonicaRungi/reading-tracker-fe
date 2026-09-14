@@ -12,7 +12,7 @@ export function SearchField({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center gap-2 rounded-2xl bg-secondary px-4 py-3">
+    <div className="flex items-center gap-2 rounded-xl bg-secondary px-4 py-3">
       <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
       <Input
         type="search"

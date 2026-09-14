@@ -57,7 +57,7 @@ export function EmptyState({
       {action ? (
         <Button
           onClick={action.onClick}
-          className="mt-2 h-auto rounded-2xl px-8 py-3 text-[15px] font-medium"
+          className="mt-2 h-auto rounded-xl px-8 py-3 text-[15px] font-medium"
         >
           {action.label}
         </Button>
