@@ -40,6 +40,15 @@ export function useSearchData() {
     enabled: !!user,
   });
 
+  const closeSheet = useCallback(() => {
+    setSelectedBook(null);
+    // Forza il remount di BarcodeScanner (via key) così la fotocamera, ferma
+    // dopo un rilevamento, riparte per scansionare il prossimo libro. Non ha
+    // effetto se lo sheet non è stato aperto dal flusso di scansione: in quel
+    // caso il componente non è nemmeno montato (tab diverso da "scan").
+    setScanResetKey((k) => k + 1);
+  }, []);
+
   const { mutate: addBook, isPending: isAddingBook } = useMutation({
     mutationFn: () =>
       addLibraryItem(user!.id, {
@@ -51,7 +60,7 @@ export function useSearchData() {
       queryClient.invalidateQueries({ queryKey: ["library", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["stats", user?.id] });
       toast.success(t("search.bookAdded"));
-      setSelectedBook(null);
+      closeSheet();
     },
     onError: () => toast.error(t("common.error")),
   });
@@ -81,15 +90,6 @@ export function useSearchData() {
     setNewShelfName("");
     setIsAddingShelf(false);
     setSelectedBook(book);
-  }, []);
-
-  const closeSheet = useCallback(() => {
-    setSelectedBook(null);
-    // Forza il remount di BarcodeScanner (via key) così la fotocamera, ferma
-    // dopo un rilevamento, riparte per scansionare il prossimo libro. Non ha
-    // effetto se lo sheet non è stato aperto dal flusso di scansione: in quel
-    // caso il componente non è nemmeno montato (tab diverso da "scan").
-    setScanResetKey((k) => k + 1);
   }, []);
 
   const { mutate: handleScan } = useMutation({
