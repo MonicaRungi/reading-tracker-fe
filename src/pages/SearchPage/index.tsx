@@ -1,54 +1,50 @@
-import { BookOpen, Search as SearchIcon } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import { EmptyState } from "@/components/shared/EmptyState"
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
-import { SearchBar } from "@/components/shared/SearchBar"
-import { formatAuthors } from "@/lib/format"
-import { useSearchData } from "./hooks/useSearchData"
+import { useSearchData } from "./hooks/useSearchData";
+import { SearchHeader } from "./components/SearchHeader";
+import { ScanPlaceholder } from "./components/ScanPlaceholder";
+import { SearchResults } from "./components/SearchResults";
+import { AddBookSheet } from "./AddBookSheet";
 
 export default function SearchPage() {
-  const { t } = useTranslation()
-  const { data, ui, actions } = useSearchData()
+  const { data, ui, actions } = useSearchData();
 
   return (
-    <div className="space-y-5">
-      <h1 className="text-xl font-semibold text-foreground">{t("search.title")}</h1>
+    <div className="flex min-h-full flex-col">
+      <SearchHeader
+        tab={ui.tab}
+        query={ui.query}
+        onTabChange={actions.setTab}
+        onQueryChange={actions.setQuery}
+      />
 
-      <SearchBar value={ui.query} onChange={actions.setQuery} />
+      <div className="flex-1 px-4">
+        {ui.tab === "scan" && <ScanPlaceholder />}
 
-      {data.isLoading && (
-        <div className="flex justify-center py-8">
-          <LoadingSpinner />
-        </div>
-      )}
+        {ui.tab === "search" && (
+          <SearchResults
+            isLoading={data.isLoading}
+            hasQuery={data.hasQuery}
+            results={data.results}
+            onAddBook={actions.openSheet}
+          />
+        )}
+      </div>
 
-      {!data.isLoading && data.hasQuery && data.results.length === 0 && (
-        <EmptyState icon={SearchIcon} title={t("search.empty")} />
-      )}
-
-      {!data.isLoading && data.results.length > 0 && (
-        <ul className="space-y-3">
-          {data.results.map((book, index) => (
-            <li key={book.isbn13 ?? `${book.title}-${index}`} className="flex items-center gap-3">
-              <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
-                {book.coverUrl ? (
-                  <img
-                    src={book.coverUrl}
-                    alt={book.title ?? ""}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <BookOpen className="size-6 text-hint" aria-hidden="true" />
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">{book.title}</p>
-                <p className="truncate text-xs text-muted-foreground">{formatAuthors(book.authors)}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <AddBookSheet
+        book={ui.selectedBook}
+        status={ui.status}
+        onStatusChange={actions.setStatus}
+        shelves={data.shelves}
+        selectedShelfIds={ui.selectedShelfIds}
+        onSelectedShelfIdsChange={actions.setSelectedShelfIds}
+        isAddingShelf={ui.isAddingShelf}
+        newShelfName={ui.newShelfName}
+        onNewShelfNameChange={actions.setNewShelfName}
+        onStartAddingShelf={actions.startAddingShelf}
+        onConfirmNewShelf={actions.confirmNewShelf}
+        isSubmitting={ui.isAddingBook}
+        onSubmit={actions.submitAddBook}
+        onClose={actions.closeSheet}
+      />
     </div>
-  )
+  );
 }

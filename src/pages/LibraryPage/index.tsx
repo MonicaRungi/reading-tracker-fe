@@ -1,43 +1,39 @@
-import { BookOpen } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import { BookCard } from "@/components/shared/BookCard"
-import { BookCardSkeleton } from "@/components/shared/BookCardSkeleton"
-import { EmptyState } from "@/components/shared/EmptyState"
-import { ReadingCard } from "@/components/shared/ReadingCard"
-import { useLibraryData } from "./hooks/useLibraryData"
+import { BookOpen } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { useLibraryData } from "./hooks/useLibraryData";
+import { LibraryHeader } from "./components/LibraryHeader";
+import { ContinueReadingSection } from "./components/ContinueReadingSection";
+import { MyLibrarySection } from "./components/MyLibrarySection";
 
 export default function LibraryPage() {
-  const { t } = useTranslation()
-  const { data } = useLibraryData()
+  const { t } = useTranslation();
+  const { data, ui, actions } = useLibraryData();
 
   return (
-    <div className="space-y-5">
-      <h1 className="text-xl font-semibold text-foreground">{t("library.title")}</h1>
+    <div className="flex min-h-full flex-col">
+      <LibraryHeader />
 
-      {data.reading.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">
-            {t("library.continueReading")}
-          </h2>
-          <div className="flex gap-3 overflow-x-auto pb-1 [scroll-snap-type:x_mandatory]">
-            {data.reading.map((item) => (
-              <ReadingCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
-      )}
+      {data.isEmpty ? (
+        <EmptyState
+          size="lg"
+          icon={BookOpen}
+          title={t("library.emptyTitle")}
+          description={t("library.emptySubtitle")}
+          action={{ label: t("library.emptyCta"), onClick: actions.goToSearch }}
+        />
+      ) : (
+        <>
+          {data.reading.length > 0 && <ContinueReadingSection items={data.reading} />}
 
-      <section className="grid grid-cols-2 gap-4">
-        {data.isLoading &&
-          Array.from({ length: 4 }).map((_, index) => <BookCardSkeleton key={index} />)}
-
-        {!data.isLoading &&
-          data.grid.map((item) => <BookCard key={item.id} item={item} />)}
-      </section>
-
-      {!data.isLoading && data.reading.length === 0 && data.grid.length === 0 && (
-        <EmptyState icon={BookOpen} title={t("library.empty")} />
+          <MyLibrarySection
+            items={data.grid}
+            isLoading={data.isLoading}
+            filter={ui.filter}
+            onFilterChange={actions.setFilter}
+          />
+        </>
       )}
     </div>
-  )
+  );
 }

@@ -4,9 +4,31 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#E0644A" />
-    <title>Reading Tracker</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="#FBE9E3" />
+    <title>Shelfy</title>
+    <!-- Applica il tema prima del render per evitare il flash -->
+    <script>
+      (function () {
+        const ACCENT_LIGHT = "#FBE9E3";
+        const ACCENT_DARK = "#3D1A12";
+        const theme = localStorage.getItem("rt.theme") || "auto";
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        const isDark = theme === "dark" || (theme === "auto" && prefersDark);
+        if (isDark) {
+          document.documentElement.classList.add("dark");
+        }
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", isDark ? ACCENT_DARK : ACCENT_LIGHT);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

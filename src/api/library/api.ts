@@ -57,10 +57,14 @@ export async function updateStatus(
     .single()
   if (fetchError) throw fetchError
 
+  // Se si torna a to_read o reading, azzera il voto (altrimenti viola il check constraint)
+  const resetRating = status === "to_read" || status === "reading"
+
   const { data, error } = await supabase
     .from("library_items")
     .update({
       status,
+      rating: resetRating ? null : undefined,
       started_at: status === "reading" ? (current.started_at ?? today()) : current.started_at,
       finished_at: status === "read" ? today() : current.finished_at,
       updated_at: new Date().toISOString(),

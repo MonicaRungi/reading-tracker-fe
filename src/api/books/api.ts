@@ -1,22 +1,28 @@
-import { supabase } from "@/lib/supabase"
-import type { Book, BookMeta } from "./types"
+import { supabase } from "@/lib/supabase";
+import type { Book, BookMeta } from "./types";
 
 /** Cerca libri per titolo, autore o ISBN tramite Edge Function. */
 export async function searchBooks(query: string): Promise<BookMeta[]> {
-  const { data, error } = await supabase.functions.invoke<BookMeta[]>("book-search", {
-    body: { q: query },
-  })
-  if (error) throw error
-  return data ?? []
+  const { data, error } = await supabase.functions.invoke<BookMeta[]>(
+    "book-search",
+    {
+      body: { q: query },
+    },
+  );
+  if (error) throw error;
+  return data ?? [];
 }
 
 /** Lookup preciso per ISBN (usato dallo scanner). */
 export async function lookupBookByIsbn(isbn: string): Promise<BookMeta | null> {
-  const { data, error } = await supabase.functions.invoke<BookMeta>("book-lookup", {
-    body: { isbn },
-  })
-  if (error) throw error
-  return data ?? null
+  const { data, error } = await supabase.functions.invoke<BookMeta>(
+    "book-lookup",
+    {
+      body: { isbn },
+    },
+  );
+  if (error) throw error;
+  return data ?? null;
 }
 
 /**
@@ -29,9 +35,9 @@ export async function upsertBook(meta: BookMeta): Promise<Book> {
       .from("books")
       .select("*")
       .eq("isbn13", meta.isbn13)
-      .maybeSingle()
-    if (error) throw error
-    if (existing) return existing
+      .maybeSingle();
+    if (error) throw error;
+    if (existing) return existing;
   }
 
   const { data, error } = await supabase
@@ -49,7 +55,21 @@ export async function upsertBook(meta: BookMeta): Promise<Book> {
       source: meta.source,
     })
     .select("*")
-    .single()
-  if (error) throw error
-  return data
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateBookPageCount(
+  bookId: string,
+  pageCount: number,
+): Promise<Book> {
+  const { data, error } = await supabase
+    .from("books")
+    .update({ page_count: pageCount })
+    .eq("id", bookId)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data;
 }

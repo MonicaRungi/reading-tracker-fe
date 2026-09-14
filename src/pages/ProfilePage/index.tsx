@@ -30,13 +30,13 @@ export default function ProfilePage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-xl border border-border bg-card p-4">
             <p className="text-2xl font-semibold text-foreground">
-              {formatNumber(data.stats?.totalBooksRead ?? 0)}
+              {formatNumber(data.stats?.total_books_read ?? 0)}
             </p>
             <p className="text-xs text-muted-foreground">{t("profile.booksRead")}</p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
             <p className="text-2xl font-semibold text-foreground">
-              {formatNumber(data.stats?.totalPagesRead ?? 0)}
+              {formatNumber(data.stats?.total_pages_read ?? 0)}
             </p>
             <p className="text-xs text-muted-foreground">{t("profile.pagesRead")}</p>
           </div>

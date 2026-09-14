@@ -3,12 +3,19 @@ import type { ThemePreference } from "@/api/profile"
 
 const STORAGE_KEY = "rt.theme"
 
+function syncThemeColorMeta() {
+  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()
+  const meta = document.querySelector('meta[name="theme-color"]')
+  if (meta && accent) meta.setAttribute("content", accent)
+}
+
 function applyTheme(preference: ThemePreference) {
   const root = document.documentElement
   const isDark =
     preference === "dark" ||
     (preference === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches)
   root.classList.toggle("dark", isDark)
+  syncThemeColorMeta()
 }
 
 function readStoredPreference(): ThemePreference {

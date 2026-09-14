@@ -1,19 +1,19 @@
-import { Home, Search, User } from "lucide-react"
-import { NavLink } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import { cn } from "@/lib/utils"
+import { Home, Search, User } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 const TABS = [
   { to: "/library", icon: Home, labelKey: "nav.library" },
   { to: "/search", icon: Search, labelKey: "nav.search" },
   { to: "/profile", icon: User, labelKey: "nav.profile" },
-] as const
+] as const;
 
 export function BottomNav() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-10 flex h-16 items-center border-t border-border bg-card pb-safe">
+    <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-border bg-card py-3">
       {TABS.map(({ to, icon: Icon, labelKey }) => (
         <NavLink
           key={to}
@@ -30,5 +30,5 @@ export function BottomNav() {
         </NavLink>
       ))}
     </nav>
-  )
+  );
 }
