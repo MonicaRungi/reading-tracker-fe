@@ -72,8 +72,18 @@ export const it = {
     emptyInitialSub: "Cerca per titolo, autore o ISBN",
     emptyResults: "Nessun risultato",
     emptyResultsSub: "Prova con un altro titolo o autore",
-    scannerComingSoon: "Scanner in arrivo",
-    scannerHint: "Inquadra il codice a barre sul retro del libro",
+    scanBookNotFound: "Nessun libro trovato per questo codice",
+    scanLookupError: "Errore durante la lettura del codice",
+    manualIsbn: "Inserisci ISBN manualmente",
+    cameraUnavailable: "Fotocamera non disponibile",
+    cameraUnavailableHint:
+      "Abilita l'accesso alla fotocamera nelle impostazioni del dispositivo.",
+    scanHint: "Inquadra il codice a barre",
+    scanHintSub: "Scansiona l'ISBN sul retro del libro",
+    scanDetected: "ISBN rilevato",
+    scanSearching: "Ricerca in corso…",
+    torchOn: "Accendi torcia",
+    torchOff: "Spegni torcia",
   },
   profile: {
     title: "Profilo",
@@ -133,5 +143,10 @@ export const it = {
     finishReading: "Ho terminato il libro",
     markAbandoned: "Segna come abbandonato",
     resetToToRead: "Reimposta a Da leggere",
+    removeFromLibrary: "Rimuovi dalla libreria",
+    removeBookTitle: "Rimuovi libro",
+    removeBookConfirm:
+      "Sei sicuro di voler rimuovere questo libro dalla tua libreria? L'azione non è reversibile.",
+    remove: "Rimuovi",
   },
 } as const;

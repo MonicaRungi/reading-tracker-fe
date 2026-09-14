@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAuth } from "@/hooks/useAuth";
-import { searchBooks } from "@/api/books";
+import { searchBooks, lookupBookByIsbn } from "@/api/books";
 import type { BookMeta } from "@/api/books";
 import { addLibraryItem } from "@/api/library";
 import type { ReadingStatus } from "@/api/library";
@@ -24,6 +24,7 @@ export function useSearchData() {
   const [selectedShelfIds, setSelectedShelfIds] = useState<string[]>([]);
   const [newShelfName, setNewShelfName] = useState("");
   const [isAddingShelf, setIsAddingShelf] = useState(false);
+  const [scanResetKey, setScanResetKey] = useState(0);
 
   const debouncedQuery = useDebounce(query, 400);
 
@@ -82,7 +83,30 @@ export function useSearchData() {
     setSelectedBook(book);
   }, []);
 
-  const closeSheet = useCallback(() => setSelectedBook(null), []);
+  const closeSheet = useCallback(() => {
+    setSelectedBook(null);
+    // Forza il remount di BarcodeScanner (via key) così la fotocamera, ferma
+    // dopo un rilevamento, riparte per scansionare il prossimo libro. Non ha
+    // effetto se lo sheet non è stato aperto dal flusso di scansione: in quel
+    // caso il componente non è nemmeno montato (tab diverso da "scan").
+    setScanResetKey((k) => k + 1);
+  }, []);
+
+  const { mutate: handleScan } = useMutation({
+    mutationFn: (isbn: string) => lookupBookByIsbn(isbn),
+    onSuccess: (book) => {
+      if (book) {
+        openSheet(book);
+      } else {
+        toast.error(t("search.scanBookNotFound"));
+      }
+    },
+    onError: () => toast.error(t("search.scanLookupError")),
+  });
+
+  const handleScanError = useCallback(() => {
+    toast.error(t("search.scanLookupError"));
+  }, [t]);
 
   const confirmNewShelf = useCallback(() => {
     if (newShelfName.trim()) addShelf();
@@ -106,12 +130,15 @@ export function useSearchData() {
       isAddingShelf,
       isAddingBook,
       isCreatingShelf,
+      scanResetKey,
     },
     actions: {
       setTab,
       setQuery,
       openSheet,
       closeSheet,
+      handleScan,
+      handleScanError,
       setStatus,
       setSelectedShelfIds,
       setNewShelfName,

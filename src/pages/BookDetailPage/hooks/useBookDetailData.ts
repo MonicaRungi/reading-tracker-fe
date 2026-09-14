@@ -12,6 +12,7 @@ import {
 } from "@/api/library";
 import type { ReadingStatus } from "@/api/library";
 import { updateBookPageCount } from "@/api/books";
+import { deleteLibraryItem } from "@/api/library";
 
 export function useBookDetailData() {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +34,13 @@ export function useBookDetailData() {
   });
 
   const item = items.find((i) => i.id === id);
+
+  const currentPage = progressInput ?? item?.current_page ?? 0;
+  const pageCount = item?.book.page_count ?? 0;
+  const percent =
+    pageCount > 0
+      ? Math.min(100, Math.round((currentPage / pageCount) * 100))
+      : 0;
 
   function invalidate() {
     return Promise.all([
@@ -87,12 +95,14 @@ export function useBookDetailData() {
     onError: () => toast.error("Errore nel salvataggio della data"),
   });
 
-  const currentPage = progressInput ?? item?.current_page ?? 0;
-  const pageCount = item?.book.page_count ?? 0;
-  const percent =
-    pageCount > 0
-      ? Math.min(100, Math.round((currentPage / pageCount) * 100))
-      : 0;
+  const { mutate: mutateDelete, isPending: isDeleting } = useMutation({
+    mutationFn: () => deleteLibraryItem(id!),
+    onSuccess: async () => {
+      await invalidate();
+      navigate(-1); // torna alla libreria dopo la cancellazione
+    },
+    onError: () => toast.error("Errore nella rimozione del libro"),
+  });
 
   return {
     data: { item, isLoading, percent, currentPage, pageCount, pageCountInput },
@@ -105,6 +115,7 @@ export function useBookDetailData() {
       updatePageCount: mutateSavePageCount,
       saveDate: (field: "started" | "finished", date: string) =>
         mutateDate({ field, date }),
+      deleteItem: mutateDelete,
       setProgressInput,
       setShowDatePicker,
       setShowMenu,
@@ -113,6 +124,7 @@ export function useBookDetailData() {
       isUpdatingStatus,
       isUpdatingProgress,
       isRating,
+      isDeleting,
     },
   };
 }

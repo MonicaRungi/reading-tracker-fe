@@ -163,3 +163,11 @@ export async function rateItem(
   if (error) throw error;
   return data as LibraryItem;
 }
+
+export async function deleteLibraryItem(itemId: string): Promise<void> {
+  const { error } = await supabase
+    .from("library_items")
+    .delete()
+    .eq("id", itemId);
+  if (error) throw error;
+}

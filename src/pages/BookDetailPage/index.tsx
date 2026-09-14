@@ -109,6 +109,10 @@ export default function BookDetailPage() {
           actions.updateStatus("to_read");
           actions.setShowMenu(false);
         }}
+        onDelete={() => {
+          actions.deleteItem();
+          actions.setShowMenu(false);
+        }}
       />
 
       <DatePickerSheet

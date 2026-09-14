@@ -176,3 +176,22 @@
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+@keyframes scan {
+  0% {
+    top: 10%;
+  }
+  50% {
+    top: 85%;
+  }
+  100% {
+    top: 10%;
+  }
+}
+
+.animate-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  animation: scan 2.5s ease-in-out infinite;
+}
