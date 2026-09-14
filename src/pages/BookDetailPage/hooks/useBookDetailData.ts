@@ -8,6 +8,7 @@ import {
   updateStatus,
   updateProgress,
   rateItem,
+  updateDate,
 } from "@/api/library";
 import type { ReadingStatus } from "@/api/library";
 import { updateBookPageCount } from "@/api/books";
@@ -71,6 +72,21 @@ export function useBookDetailData() {
       onError: () => toast.error("Errore nel salvataggio"),
     });
 
+  const { mutate: mutateDate } = useMutation({
+    mutationFn: ({
+      field,
+      date,
+    }: {
+      field: "started" | "finished";
+      date: string;
+    }) => updateDate(id!, field, date),
+    onSuccess: () => {
+      void invalidate();
+      setShowDatePicker(null);
+    },
+    onError: () => toast.error("Errore nel salvataggio della data"),
+  });
+
   const currentPage = progressInput ?? item?.current_page ?? 0;
   const pageCount = item?.book.page_count ?? 0;
   const percent =
@@ -87,6 +103,8 @@ export function useBookDetailData() {
       updateProgress: mutateProgress,
       rate: mutateRating,
       updatePageCount: mutateSavePageCount,
+      saveDate: (field: "started" | "finished", date: string) =>
+        mutateDate({ field, date }),
       setProgressInput,
       setShowDatePicker,
       setShowMenu,

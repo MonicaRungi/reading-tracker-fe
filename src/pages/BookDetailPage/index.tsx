@@ -11,6 +11,7 @@ import { ProgressSection } from "./components/ProgressSection";
 import { RatingSection } from "./components/RatingSection";
 import { StatusCta } from "./components/StatusCta";
 import { BookMenuSheet } from "./components/BookMenuSheet";
+import { DatePickerSheet } from "./components/DatePickerSheet";
 
 export default function BookDetailPage() {
   const { t } = useTranslation();
@@ -27,7 +28,11 @@ export default function BookDetailPage() {
   if (!data.item) {
     return (
       <div className="flex min-h-svh flex-col">
-        <EmptyState size="lg" icon={BookOpen} title={t("bookDetail.notFound")} />
+        <EmptyState
+          size="lg"
+          icon={BookOpen}
+          title={t("bookDetail.notFound")}
+        />
       </div>
     );
   }
@@ -39,7 +44,10 @@ export default function BookDetailPage() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <BookDetailHeader onBack={actions.goBack} onOpenMenu={() => actions.setShowMenu(true)} />
+      <BookDetailHeader
+        onBack={actions.goBack}
+        onOpenMenu={() => actions.setShowMenu(true)}
+      />
 
       <div className={cn("flex-1 space-y-5 px-4 pb-8", showCta && "pb-28")}>
         <BookHero item={item} />
@@ -66,7 +74,11 @@ export default function BookDetailPage() {
           />
         )}
 
-        <RatingSection rating={item.rating} canRate={canRate} onRate={actions.rate} />
+        <RatingSection
+          rating={item.rating}
+          canRate={canRate}
+          onRate={actions.rate}
+        />
 
         {item.book.description && (
           <p className="text-[15px] leading-relaxed text-foreground">
@@ -97,6 +109,14 @@ export default function BookDetailPage() {
           actions.updateStatus("to_read");
           actions.setShowMenu(false);
         }}
+      />
+
+      <DatePickerSheet
+        open={ui.showDatePicker}
+        startedAt={item.started_at}
+        finishedAt={item.finished_at}
+        onClose={() => actions.setShowDatePicker(null)}
+        onSave={actions.saveDate}
       />
     </div>
   );

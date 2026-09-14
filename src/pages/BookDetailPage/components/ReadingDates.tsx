@@ -15,7 +15,7 @@ export function ReadingDates({
   const { t } = useTranslation();
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-col gap-3">
       <DateBox label={t("bookDetail.started")} value={startedAt} onTap={onTapStarted} />
       <DateBox label={t("bookDetail.finished")} value={finishedAt} onTap={onTapFinished} />
     </div>

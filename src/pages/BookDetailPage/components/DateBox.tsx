@@ -1,4 +1,4 @@
-import { Calendar } from "lucide-react";
+import { Calendar, Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@/lib/format";
 
@@ -22,8 +22,11 @@ export function DateBox({
         <Calendar className="size-3" />
         {label}
       </span>
-      <span className={`text-[15px] ${value ? "text-foreground" : "text-hint"}`}>
-        {value ? formatDate(value) : t("bookDetail.noDate")}
+      <span className="flex items-center justify-between gap-2">
+        <span className={`text-[15px] ${value ? "text-foreground" : "text-hint"}`}>
+          {value ? formatDate(value) : t("bookDetail.noDate")}
+        </span>
+        <Pencil className="size-3.5 shrink-0 text-primary" />
       </span>
     </button>
   );
