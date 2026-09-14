@@ -40,14 +40,18 @@ export function useSearchData() {
     enabled: !!user,
   });
 
-  const closeSheet = useCallback(() => {
-    setSelectedBook(null);
-    // Forza il remount di BarcodeScanner (via key) così la fotocamera, ferma
-    // dopo un rilevamento, riparte per scansionare il prossimo libro. Non ha
-    // effetto se lo sheet non è stato aperto dal flusso di scansione: in quel
-    // caso il componente non è nemmeno montato (tab diverso da "scan").
+  // Forza il remount di BarcodeScanner (via key) così la fotocamera, ferma dopo
+  // un rilevamento, riparte per scansionare il prossimo libro — sia dopo una
+  // chiusura riuscita dello sheet, sia dopo un errore/ISBN non trovato. Non ha
+  // effetto se lo scanner non è montato (tab diverso da "scan").
+  const resetScanner = useCallback(() => {
     setScanResetKey((k) => k + 1);
   }, []);
+
+  const closeSheet = useCallback(() => {
+    setSelectedBook(null);
+    resetScanner();
+  }, [resetScanner]);
 
   const { mutate: addBook, isPending: isAddingBook } = useMutation({
     mutationFn: () =>
@@ -99,14 +103,19 @@ export function useSearchData() {
         openSheet(book);
       } else {
         toast.error(t("search.scanBookNotFound"));
+        resetScanner();
       }
     },
-    onError: () => toast.error(t("search.scanLookupError")),
+    onError: () => {
+      toast.error(t("search.scanLookupError"));
+      resetScanner();
+    },
   });
 
   const handleScanError = useCallback(() => {
     toast.error(t("search.scanLookupError"));
-  }, [t]);
+    resetScanner();
+  }, [t, resetScanner]);
 
   const confirmNewShelf = useCallback(() => {
     if (newShelfName.trim()) addShelf();
