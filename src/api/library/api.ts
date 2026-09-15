@@ -12,6 +12,7 @@ export async function listLibrary(): Promise<LibraryItem[]> {
   const { data, error } = await supabase
     .from("library_items")
     .select(LIBRARY_SELECT)
+    .order("finished_at", { ascending: false, nullsFirst: false })
     .order("added_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as LibraryItem[];
