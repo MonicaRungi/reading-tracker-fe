@@ -88,7 +88,7 @@ export default function BookDetailPage() {
       </div>
 
       {showCta && (
-        <div className="fixed inset-x-0 bottom-20 z-10 px-4">
+        <div className="fixed inset-x-0 bottom-16 py-4 z-10 px-4 bg-background">
           <StatusCta
             status={item.status}
             isUpdating={actions.isUpdatingStatus}

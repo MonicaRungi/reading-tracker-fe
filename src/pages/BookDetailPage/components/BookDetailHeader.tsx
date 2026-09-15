@@ -12,7 +12,7 @@ export function BookDetailHeader({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-between px-4 pb-2 pt-4">
+    <div className="flex sticky top-[-1px] z-10 bg-background items-center justify-between px-4 pb-2 pt-4">
       <Button
         variant="ghost"
         onClick={onBack}

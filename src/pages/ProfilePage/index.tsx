@@ -8,9 +8,12 @@ import { ActivitySection } from "./components/ActivitySection";
 import { BooksReadSection } from "./components/BooksReadSection";
 import { GenresSection } from "./components/GenresSection";
 import { SignOutButton } from "./components/SignOutButton";
+import { useNavigate } from "react-router-dom";
+import { ImportButton } from "./components/ImportButton";
 
 export default function ProfilePage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { data, ui, actions } = useProfileData();
 
   return (
@@ -60,6 +63,10 @@ export default function ProfilePage() {
           )
         )}
 
+        <ImportButton
+          onClick={() => navigate("/profile/import-goodreads")}
+          source="goodreads"
+        />
         <SignOutButton onClick={actions.signOut} />
       </div>
     </div>

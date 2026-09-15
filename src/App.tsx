@@ -7,6 +7,7 @@ import LoginPage from "@/pages/LoginPage";
 import ProfilePage from "@/pages/ProfilePage";
 import SearchPage from "@/pages/SearchPage";
 import BookDetailPage from "@/pages/BookDetailPage";
+import GoodreadsImportPage from "@/pages/GoodreadsImportPage";
 import { useTheme } from "./hooks/useTheme";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/book/:id" element={<BookDetailPage />} />
+          <Route path="/profile/import-goodreads" element={<GoodreadsImportPage />} />
         </Route>
       </Route>
 
