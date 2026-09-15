@@ -25,6 +25,7 @@ export function useSearchData() {
   const [newShelfName, setNewShelfName] = useState("");
   const [isAddingShelf, setIsAddingShelf] = useState(false);
   const [scanResetKey, setScanResetKey] = useState(0);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const debouncedQuery = useDebounce(query, 400);
 
@@ -82,6 +83,7 @@ export function useSearchData() {
 
   const setTab = useCallback((next: SearchTab | "") => {
     if (next) setTabState(next);
+    if (next === "scan") setScannerOpen(true);
   }, []);
 
   const setStatus = useCallback((next: ReadingStatus | "") => {
@@ -121,6 +123,12 @@ export function useSearchData() {
     if (newShelfName.trim()) addShelf();
   }, [addShelf, newShelfName]);
 
+  async function handleDetected(isbn: string) {
+    setScannerOpen(false);
+
+    await handleScan(isbn);
+  }
+
   return {
     data: {
       results: data ?? [],
@@ -140,13 +148,14 @@ export function useSearchData() {
       isAddingBook,
       isCreatingShelf,
       scanResetKey,
+      scannerOpen,
     },
     actions: {
       setTab,
       setQuery,
       openSheet,
       closeSheet,
-      handleScan,
+      handleDetected,
       handleScanError,
       setStatus,
       setSelectedShelfIds,

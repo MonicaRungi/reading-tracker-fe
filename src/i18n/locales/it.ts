@@ -41,8 +41,6 @@ export const it = {
     featureSimpleSub: "Zero password",
     featureAnywhere: "Ovunque",
     featureAnywhereSub: "Su tutti i tuoi dispositivi",
-    loginHint:
-      "Accedi in modo sicuro con il tuo account Google.\nNessuna password da ricordare.",
   },
   library: {
     title: "Libreria",
