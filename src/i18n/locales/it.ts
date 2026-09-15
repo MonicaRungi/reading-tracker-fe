@@ -96,6 +96,47 @@ export const it = {
     torchOn: "Accendi torcia",
     torchOff: "Spegni torcia",
   },
+  import: {
+    goodreads: "Importa da Goodreads",
+    storygraph: "Importa da StoryGraph",
+    connectTitle: "Importa la tua libreria",
+    connectDescription:
+      "Sincronizza i libri dal tuo account Goodreads e aggiungili alla tua libreria.",
+    featureBooks: "Importa libri letti, in lettura e da leggere",
+    featureRatings: "Mantieni valutazioni e date di lettura",
+    featurePrivacy: "I tuoi dati restano privati",
+    connectCta: "Importa CSV",
+    fileError: "Impossibile leggere il file CSV",
+    previewTitle: "Anteprima import",
+    previewSubtitle: "Ecco cosa verrà importato dal tuo account.",
+    statsTotal: "Libri totali",
+    statsRead: "Letti",
+    statsReading: "In lettura",
+    statsToRead: "Da leggere",
+    duplicatesFound_one: "{{count}} duplicato trovato",
+    duplicatesFound_other: "{{count}} duplicati trovati",
+    duplicatesFoundDescription:
+      "Se un libro è già nella tua libreria, non verrà importato di nuovo.",
+    noDuplicates: "Nessun duplicato trovato",
+    noDuplicatesDescription:
+      "Se un libro è già nella tua libreria, non verrà importato di nuovo. Potrai comunque aggiornare i dati esistenti.",
+    afterImportTitle: "Dopo l'import",
+    afterImportDescription:
+      "Potrai rivedere e modificare i libri importati prima di aggiungerli definitivamente alla tua libreria.",
+    continueCta: "Continua",
+    importingTitle: "Importazione in corso…",
+    importingSubtitle: "Potrebbe richiedere qualche secondo.",
+    doneTitle: "Import completato!",
+    statImported: "Importati",
+    statSkipped: "Saltati",
+    statFailed: "Falliti",
+    notImportedTitle: "Libri non importati",
+    moreErrors: "+{{count}} altri",
+    goToLibrary: "Vai alla libreria",
+    errorTitle: "Qualcosa è andato storto",
+    invalidFile:
+      "Il file non sembra un export di Goodreads. Assicurati di esportare la libreria da goodreads.com → My Books → Import/Export.",
+  },
   profile: {
     title: "Profilo",
     booksRead: "Libri letti",
@@ -132,6 +173,9 @@ export const it = {
   },
   bookDetail: {
     notFound: "Libro non trovato",
+    incompleteData: "Dati incompleti",
+    incompleteDataHint:
+      "Per questo libro manca l'ISBN: potrebbe essere un errore di import o un momentaneo problema delle API. Prova a rimuovere il libro e importarlo di nuovo; se il problema persiste, il catalogo da cui prendiamo i dati non possiede questo testo.",
     back: "Indietro",
     started: "Iniziato",
     finished: "Finito",

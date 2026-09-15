@@ -73,3 +73,18 @@ export async function updateBookPageCount(
   if (error) throw error;
   return data;
 }
+
+export async function enrichBookCover(
+  bookId: string,
+  isbn13: string,
+): Promise<void> {
+  const { data } = await supabase.functions.invoke("book-lookup", {
+    body: { isbn: isbn13 },
+  });
+  if (!data?.cover_url) return;
+
+  await supabase
+    .from("books")
+    .update({ cover_url: data.cover_url })
+    .eq("id", bookId);
+}
