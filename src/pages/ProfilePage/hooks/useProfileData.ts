@@ -70,11 +70,13 @@ export function useProfileData() {
 
   const booksChartData: ChartPoint[] =
     booksView === "year"
-      ? (stats?.books_by_year.map((y) => ({
-          label: String(y.year),
-          value: y.count,
-          isActive: y.year === currentYear,
-        })) ?? [])
+      ? (stats?.books_by_year
+          .slice(-8)
+          .map((y) => ({
+            label: String(y.year),
+            value: y.count,
+            isActive: y.year === currentYear,
+          })) ?? [])
       : (stats?.books_by_month.map((m) => ({
           label: monthLabels[m.month],
           value: m.count,
