@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { it } from "date-fns/locale";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -31,6 +31,16 @@ export function DatePickerSheet({
     currentValue ? new Date(currentValue) : undefined,
   );
 
+  // Riallinea la data selezionata al campo interessato ogni volta che lo sheet si
+  // apre (il componente resta montato tra un'apertura e l'altra, quindi lo state
+  // non si reinizializza da solo).
+  useEffect(() => {
+    if (open) {
+      setSelected(currentValue ? new Date(currentValue) : undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, currentValue]);
+
   function handleSave() {
     if (!selected || !open) return;
     // Formato YYYY-MM-DD senza problemi di timezone
@@ -53,23 +63,23 @@ export function DatePickerSheet({
           {label}
         </h2>
 
-        <div className="flex justify-center">
-          <Calendar
-            mode="single"
-            selected={selected}
-            onSelect={setSelected}
-            locale={it}
-            disabled={
-              open === "finished" && startedAt
-                ? { before: new Date(startedAt) }
-                : undefined
-            }
-            classNames={{
-              selected: "bg-primary text-primary-foreground hover:bg-primary focus:bg-primary",
-              today: "text-primary font-semibold",
-            }}
-          />
-        </div>
+        <Calendar
+          key={open}
+          mode="single"
+          selected={selected}
+          onSelect={setSelected}
+          defaultMonth={selected}
+          locale={it}
+          disabled={
+            open === "finished" && startedAt
+              ? { before: new Date(startedAt) }
+              : undefined
+          }
+          classNames={{
+            selected: "bg-primary text-primary-foreground hover:bg-primary focus:bg-primary",
+            today: "text-primary font-semibold",
+          }}
+        />
 
         <Button
           onClick={handleSave}
