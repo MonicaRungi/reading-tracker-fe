@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import {
 import type { ReadingStatus } from "@/api/library";
 import { updateBookPageCount } from "@/api/books";
 import { deleteLibraryItem } from "@/api/library";
+import { enrichBookCover } from "@/api/books";
 
 export function useBookDetailData() {
   const { id } = useParams<{ id: string }>();
@@ -104,6 +105,14 @@ export function useBookDetailData() {
     onError: () => toast.error("Errore nella rimozione del libro"),
   });
 
+  const { mutate: enrichCover } = useMutation({
+    mutationFn: () => enrichBookCover(item!.book.id, item!.book.isbn13!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["library", user?.id] });
+    },
+    // silenzioso su errore — non blocca nulla
+  });
+
   return {
     data: { item, isLoading, percent, currentPage, pageCount, pageCountInput },
     ui: { progressInput, showDatePicker, showMenu },
@@ -116,6 +125,7 @@ export function useBookDetailData() {
       saveDate: (field: "started" | "finished", date: string) =>
         mutateDate({ field, date }),
       deleteItem: mutateDelete,
+      enrichCover,
       setProgressInput,
       setShowDatePicker,
       setShowMenu,

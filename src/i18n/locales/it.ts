@@ -173,6 +173,9 @@ export const it = {
   },
   bookDetail: {
     notFound: "Libro non trovato",
+    incompleteData: "Dati incompleti",
+    incompleteDataHint:
+      "Per questo libro manca l'ISBN: potrebbe essere un errore di import o un momentaneo problema delle API. Prova a rimuovere il libro e importarlo di nuovo; se il problema persiste, il catalogo da cui prendiamo i dati non possiede questo testo.",
     back: "Indietro",
     started: "Iniziato",
     finished: "Finito",

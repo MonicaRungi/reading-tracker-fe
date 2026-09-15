@@ -6,16 +6,27 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { useBookDetailData } from "./hooks/useBookDetailData";
 import { BookDetailHeader } from "./components/BookDetailHeader";
 import { BookHero } from "./components/BookHero";
+import { IncompleteDataBadge } from "./components/IncompleteDataBadge";
 import { ReadingDates } from "./components/ReadingDates";
 import { ProgressSection } from "./components/ProgressSection";
 import { RatingSection } from "./components/RatingSection";
 import { StatusCta } from "./components/StatusCta";
 import { BookMenuSheet } from "./components/BookMenuSheet";
 import { DatePickerSheet } from "./components/DatePickerSheet";
+import { useEffect } from "react";
 
 export default function BookDetailPage() {
   const { t } = useTranslation();
   const { data, ui, actions } = useBookDetailData();
+
+  // Arricchimento copertina lazy
+  useEffect(() => {
+    if (!data.item) return;
+    if (data.item.book.cover_url) return;
+    if (!data.item.book.isbn13) return;
+    if (data.item.book.source !== "goodreads") return;
+    actions.enrichCover();
+  }, [data.item?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (data.isLoading) {
     return (
@@ -51,6 +62,8 @@ export default function BookDetailPage() {
 
       <div className={cn("flex-1 space-y-5 px-4 pb-8", showCta && "pb-28")}>
         <BookHero item={item} />
+
+        {!item.book.isbn13 && <IncompleteDataBadge />}
 
         <ReadingDates
           startedAt={item.started_at}
