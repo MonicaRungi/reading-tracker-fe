@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 export function BookMenuSheet({
   open,
@@ -52,13 +53,18 @@ export function BookMenuSheet({
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="w-full rounded-xl px-4 py-3.5 text-left text-[15px] font-medium text-red-500 active:bg-[#F1EFEC]">
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 rounded-xl px-4 py-3.5 text-left text-[15px] font-medium text-red-500 active:bg-[#F1EFEC]"
+              >
                 {t("bookDetail.removeFromLibrary")}
-              </button>
+              </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>{t("bookDetail.removeBookTitle")}</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {t("bookDetail.removeBookTitle")}
+                </AlertDialogTitle>
                 <AlertDialogDescription>
                   {t("bookDetail.removeBookConfirm")}
                 </AlertDialogDescription>

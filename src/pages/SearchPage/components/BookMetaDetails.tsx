@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import type { BookMeta } from "@/api/books";
+import { Button } from "@/components/ui/button";
 
 export function BookMetaDetails({ book }: { book: BookMeta }) {
   const { t } = useTranslation();
@@ -44,12 +45,13 @@ export function BookMetaDetails({ book }: { book: BookMeta }) {
           >
             {book.description}
           </p>
-          <button
+          <Button
+            variant="link"
             onClick={() => setDescriptionExpanded((v) => !v)}
             className="mt-1 text-[12px] font-medium text-primary"
           >
             {descriptionExpanded ? t("search.showLess") : t("search.showMore")}
-          </button>
+          </Button>
         </div>
       )}
     </div>

@@ -7,6 +7,7 @@ import {
 } from "@zxing/library";
 import { Zap, ZapOff, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 
 // L'ISBN sul retro dei libri è sempre codificato come EAN-13: limitare i formati
 // evita a zxing di provare ~20 decoder diversi (QR, DataMatrix, Code128, ecc.) ad
@@ -119,12 +120,14 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
         <p className="text-[13px] text-[#938C84]">
           {t("search.cameraUnavailableHint")}
         </p>
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={retry}
           className="mt-1 rounded-full border border-[#E0644A] px-4 py-2 text-[13px] font-medium text-[#E0644A]"
         >
           {t("common.retry")}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -193,13 +196,15 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 
       {/* Torcia */}
       {!detectedIsbn && (
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={toggleTorch}
           className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white"
           aria-label={torch ? t("search.torchOff") : t("search.torchOn")}
         >
           {torch ? <ZapOff className="size-5" /> : <Zap className="size-5" />}
-        </button>
+        </Button>
       )}
     </div>
   );

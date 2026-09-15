@@ -39,7 +39,7 @@ export function PageCountPrompt({
             placeholder={t("bookDetail.pageCountPlaceholder")}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="h-auto border-0 bg-transparent p-0 text-[14px] shadow-none focus-visible:ring-0"
+            className="h-auto border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
           />
           <span className="h-4 w-px shrink-0 bg-border" />
           <span className="shrink-0 text-[13px] text-muted-foreground">
