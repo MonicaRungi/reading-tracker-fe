@@ -1,19 +1,18 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
+import { enrichBookCover, updateBookPageCount } from "@/api/books";
+import type { ReadingStatus } from "@/api/library";
 import {
+  deleteLibraryItem,
   listLibrary,
-  updateStatus,
-  updateProgress,
   rateItem,
   updateDate,
+  updateProgress,
+  updateStatus,
 } from "@/api/library";
-import type { ReadingStatus } from "@/api/library";
-import { updateBookPageCount } from "@/api/books";
-import { deleteLibraryItem } from "@/api/library";
-import { enrichBookCover } from "@/api/books";
+import { useAuth } from "@/hooks/useAuth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 export function useBookDetailData() {
   const { id } = useParams<{ id: string }>();
