@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { LibraryFilter } from "../hooks/useLibraryData";
 
-const FILTERS: LibraryFilter[] = ["all", "reading", "read"];
+const FILTERS: LibraryFilter[] = ["all", "reading", "read", "to_read"];
 
 export function LibraryFilters({
   value,
