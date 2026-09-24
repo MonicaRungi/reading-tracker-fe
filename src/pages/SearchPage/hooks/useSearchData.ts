@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -6,16 +7,24 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useAuth } from "@/hooks/useAuth";
 import { searchBooks, lookupBookByIsbn } from "@/api/books";
 import type { BookMeta } from "@/api/books";
-import { addLibraryItem } from "@/api/library";
-import type { ReadingStatus } from "@/api/library";
+import { addLibraryItem, listLibrary } from "@/api/library";
+import type { LibraryItem, ReadingStatus } from "@/api/library";
+import { createLibraryMatcher } from "@/lib/bookMatch";
+import { hapticFeedback } from "@/lib/haptics";
 import { listShelves, createShelf } from "@/api/shelves";
 
 export type SearchTab = "search" | "scan";
+
+export interface SearchResult {
+  book: BookMeta;
+  libraryItem: LibraryItem | null;
+}
 
 export function useSearchData() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const [tab, setTabState] = useState<SearchTab>("search");
   const [query, setQuery] = useState("");
@@ -40,6 +49,26 @@ export function useSearchData() {
     queryFn: () => listShelves(),
     enabled: !!user,
   });
+
+  const { data: libraryItems = [] } = useQuery({
+    queryKey: ["library", user?.id],
+    queryFn: () => listLibrary(),
+    enabled: !!user,
+  });
+
+  const findInLibrary = useMemo(
+    () => createLibraryMatcher(libraryItems),
+    [libraryItems],
+  );
+
+  const results = useMemo<SearchResult[]>(
+    () =>
+      (data ?? []).map((book) => ({
+        book,
+        libraryItem: findInLibrary(book),
+      })),
+    [data, findInLibrary],
+  );
 
   // Forza il remount di BarcodeScanner (via key) così la fotocamera, ferma dopo
   // un rilevamento, riparte per scansionare il prossimo libro — sia dopo una
@@ -98,14 +127,29 @@ export function useSearchData() {
     setSelectedBook(book);
   }, []);
 
+  // Libro già in libreria → apri il dettaglio invece di riaggiungerlo.
+  const selectResult = useCallback(
+    ({ book, libraryItem }: SearchResult) => {
+      if (libraryItem) navigate(`/book/${libraryItem.id}`);
+      else openSheet(book);
+    },
+    [navigate, openSheet],
+  );
+
   const { mutate: handleScan } = useMutation({
     mutationFn: (isbn: string) => lookupBookByIsbn(isbn),
     onSuccess: (book) => {
-      if (book) {
-        openSheet(book);
-      } else {
+      if (!book) {
         toast.error(t("search.scanBookNotFound"));
         resetScanner();
+        return;
+      }
+      const libraryItem = findInLibrary(book);
+      if (libraryItem) {
+        toast.info(t("search.alreadyInLibrary"));
+        navigate(`/book/${libraryItem.id}`);
+      } else {
+        openSheet(book);
       }
     },
     onError: () => {
@@ -124,6 +168,7 @@ export function useSearchData() {
   }, [addShelf, newShelfName]);
 
   async function handleDetected(isbn: string) {
+    hapticFeedback();
     setScannerOpen(false);
 
     await handleScan(isbn);
@@ -131,7 +176,7 @@ export function useSearchData() {
 
   return {
     data: {
-      results: data ?? [],
+      results,
       isLoading,
       isError,
       hasQuery: debouncedQuery.trim().length >= 2,
@@ -154,6 +199,7 @@ export function useSearchData() {
       setTab,
       setQuery,
       openSheet,
+      selectResult,
       closeSheet,
       handleDetected,
       handleScanError,

@@ -7,8 +7,9 @@ che Claude Code ha identificato e fornisce il contratto reale di schema e API.
 
 ## Cosa è
 
-App mobile-first (PWA) per tracciare i libri letti. Multi-utente, autenticazione Supabase
-(magic link + Google OAuth). Stack: Vite + React 19 + TypeScript + shadcn/ui + Tailwind v4 +
+App mobile-first (PWA) per tracciare i libri letti, nome prodotto **Shelfy**. Multi-utente,
+autenticazione Supabase **solo Google OAuth** (il magic link è stato rimosso: incompatibile
+con la PWA installata su iOS). Stack: Vite + React 19 + TypeScript + shadcn/ui + Tailwind v4 +
 TanStack Query v5 + react-router-dom v7 + supabase-js + i18next + sonner + vite-plugin-pwa.
 
 ---
@@ -269,40 +270,49 @@ somma il delta, update.
 
 ## Stato attuale del frontend
 
-Il progetto Vite è stato creato e Claude Code ha già scaffoldato:
-- Struttura cartelle (src/api/, src/components/, src/pages/, ecc.)
-- shadcn/ui inizializzato
-- TanStack Query configurato
-- react-router-dom configurato
-- i18next con `src/i18n/locales/it.ts`
+**MVP completo.** Tutto ciò che segue è stato implementato e verificato in sessioni successive
+allo scaffolding iniziale di Claude Code (che invece lasciava mock e schermate vuote — se stai
+leggendo suggerimenti "da fare" più vecchi di questa sezione, sono superati):
+
+- Struttura cartelle secondo `CLAUDE.md` (src/api/, src/components/, src/pages/, ecc.)
+- shadcn/ui, TanStack Query, react-router-dom, i18next (`src/i18n/locales/it.ts`) configurati
 - supabase-js client in `src/lib/supabase.ts`
-- Mock in `src/api/` per library, books, shelves, stats, profile
+- **Auth reale**: `useAuth` collegato a `supabase.auth.getSession` + `onAuthStateChange`,
+  `AuthGuard`, solo Google OAuth (niente più magic link/route `/auth/callback` per OTP)
+- **PWA**: manifest configurato (nome corretto "Shelfy", non più "Reading Tracker"), icone reali
+  in `public/` (`pwa-192x192.png`, `pwa-512x512.png`, `apple-touch-icon.png`)
+- **Data layer reale** in `src/api/` — mock sostituiti con chiamate Supabase per
+  `library`, `shelves`, `stats`, `books` (quest'ultimo wrappa le Edge Function
+  `book-search`/`book-lookup`)
+- **Schermate**: `BarcodeScanner`, `AddBookSheet`, Dettaglio libro (flusso a stati §6 di
+  DESIGN.md) tutte implementate
+- **Pagine**: `LoginPage`, `LibraryPage`, `SearchPage`, `ProfilePage` complete secondo mockup
+- **Componenti shared**: `BookCard`, `ReadingCard`, `StatusBadge`, `RatingStars`, `ProgressBar`,
+  grafici profilo (`ActivityChart`, `BooksChart`, `GenresChart`)
+- Allineamento snake_case con i tipi generati (`supabase gen types typescript`) — niente più
+  mapping manuale a camelCase
+- Ottimismo TanStack Query (`onMutate`/`onError`) per cambio stato e avanzamento
 
-### Prossimi passi (in ordine)
+Se in una sessione futura risulta che qualcosa sopra non è in realtà completo/funzionante,
+correggi questa sezione di conseguenza invece di fidarti ciecamente.
 
-1. **PWA** — installare `vite-plugin-pwa`, configurare manifest con icone reali
-   (`public/pwa-192x192.png`, `public/pwa-512x512.png`, `public/apple-touch-icon.png`)
+- **Import Goodreads**: fatto — non come bottom sheet ma come pagina dedicata
+  `src/pages/GoodreadsImportPage/` (header, preview dati, stato importazione, gestione errori,
+  risultato finale), raggiungibile da `ImportButton` in `ProfilePage`. È predisposto anche un
+  secondo import da **StoryGraph** (icona + entry i18n già presenti in `ImportButton`), ma senza
+  logica dedicata verificata — probabilmente solo un placeholder per ora, da confermare.
 
-2. **Auth reale** — collegare `useAuth` hook a Supabase (`supabase.auth.getSession`,
-   `onAuthStateChange`), implementare pagina Login con magic link + Google OAuth,
-   route `/auth/callback` per il magic link
+### Sviluppi futuri (post-MVP)
 
-3. **Supabase reale** — sostituire i mock con chiamate Supabase reali in `src/api/`:
-   - `api/library/api.ts` — list (con join a books), add, update status/progress, rate
-   - `api/shelves/api.ts` — list, create, add/remove items
-   - `api/stats/api.ts` — query aggregate per grafici profilo
-   - `api/books/api.ts` — wrappa le Edge Function book-search e book-lookup
+In ordine di priorità non definito — da discutere quando si riprende in mano il progetto:
 
-4. **Schermate mancanti**:
-   - `BarcodeScanner` — viewfinder con @zxing/library, scan line animata
-   - `AddBookSheet` — bottom sheet stato + scaffali, chiamato da Cerca
-   - Dettaglio libro — flusso a stati guidato (DESIGN.md §6)
-
-5. **Ottimismo TanStack Query** — `onMutate/onError` per cambio stato e avanzamento
-   (DESIGN.md §10)
-
-6. **Icone PWA** — generare e mettere in `public/`:
-   `pwa-192x192.png`, `pwa-512x512.png`, `apple-touch-icon.png` (180×180)
+1. **Obiettivi di lettura con badge** — reading goals (es. libri/anno, pagine/settimana) con
+   achievement da sbloccare
+2. **Note e citazioni per libro** — appunti e passaggi salvabili legati a un `library_item`
+3. **Scaffali personalizzati** — l'idea "malsana" di scaffali custom oltre a quelli base
+   (dettagli da definire, intenzionalmente rimandata)
+4. **Import StoryGraph** — da verificare se è solo un placeholder UI (icona + stringa i18n) o se
+   c'è già logica dietro; se manca, replicare il pattern di `GoodreadsImportPage`
 
 ---
 

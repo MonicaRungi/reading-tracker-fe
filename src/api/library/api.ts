@@ -56,13 +56,19 @@ export async function updateStatus(
 ): Promise<LibraryItem> {
   const { data: current, error: fetchError } = await supabase
     .from("library_items")
-    .select("started_at, finished_at")
+    .select("user_id, started_at, finished_at, current_page, book:books(page_count)")
     .eq("id", itemId)
     .single();
   if (fetchError) throw fetchError;
 
   // Se si torna a to_read o reading, azzera il voto (altrimenti viola il check constraint)
   const resetRating = status === "to_read" || status === "reading";
+
+  // Segnando il libro come letto, le pagine non ancora registrate contano come
+  // lette oggi: porta current_page al totale e aggiorna il reading_log.
+  const pageCount = current.book?.page_count ?? 0;
+  const missingPages =
+    status === "read" ? Math.max(0, pageCount - (current.current_page ?? 0)) : 0;
 
   const { data, error } = await supabase
     .from("library_items")
@@ -74,12 +80,16 @@ export async function updateStatus(
           ? (current.started_at ?? today())
           : current.started_at,
       finished_at: status === "read" ? today() : current.finished_at,
+      current_page: missingPages > 0 ? pageCount : undefined,
       updated_at: new Date().toISOString(),
     })
     .eq("id", itemId)
     .select(LIBRARY_SELECT)
     .single();
   if (error) throw error;
+
+  if (missingPages > 0) await logPagesRead(current.user_id, missingPages);
+
   return data as LibraryItem;
 }
 

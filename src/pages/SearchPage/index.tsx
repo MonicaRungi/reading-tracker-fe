@@ -43,7 +43,7 @@ export default function SearchPage() {
             isLoading={data.isLoading}
             hasQuery={data.hasQuery}
             results={data.results}
-            onAddBook={actions.openSheet}
+            onSelect={actions.selectResult}
           />
         )}
       </div>

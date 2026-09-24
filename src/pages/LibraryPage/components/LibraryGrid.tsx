@@ -19,7 +19,7 @@ export function LibraryGrid({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+      <div className="grid grid-cols-3 gap-x-4 gap-y-5">
         {Array.from({ length: 4 }).map((_, i) => (
           <BookCardSkeleton key={i} />
         ))}
@@ -38,7 +38,7 @@ export function LibraryGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+    <div className="grid grid-cols-3 gap-x-4 gap-y-5">
       {items.map((item) => (
         <BookCard key={item.id} item={item} />
       ))}
