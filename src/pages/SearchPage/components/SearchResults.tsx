@@ -2,19 +2,20 @@ import { Search, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import type { BookMeta } from "@/api/books";
+import type { ReadingStatus } from "@/api/library";
+import type { SearchResult } from "../hooks/useSearchData";
 import { SearchResultItem } from "./SearchResultItem";
 
 export function SearchResults({
   isLoading,
   hasQuery,
   results,
-  onAddBook,
+  onSelect,
 }: {
   isLoading: boolean;
   hasQuery: boolean;
-  results: BookMeta[];
-  onAddBook: (book: BookMeta) => void;
+  results: SearchResult[];
+  onSelect: (result: SearchResult) => void;
 }) {
   const { t } = useTranslation();
 
@@ -48,11 +49,14 @@ export function SearchResults({
 
   return (
     <ul className="divide-y divide-border">
-      {results.map((book, index) => (
+      {results.map((result, index) => (
         <SearchResultItem
-          key={book.isbn13 ?? `${book.title}-${index}`}
-          book={book}
-          onAdd={() => onAddBook(book)}
+          key={result.book.isbn13 ?? `${result.book.title}-${index}`}
+          book={result.book}
+          libraryStatus={
+            (result.libraryItem?.status as ReadingStatus | undefined) ?? null
+          }
+          onSelect={() => onSelect(result)}
         />
       ))}
     </ul>

@@ -2,20 +2,24 @@ import { BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { formatAuthors } from "@/lib/format";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import type { BookMeta } from "@/api/books";
+import type { ReadingStatus } from "@/api/library";
 
 export function SearchResultItem({
   book,
-  onAdd,
+  libraryStatus,
+  onSelect,
 }: {
   book: BookMeta;
-  onAdd: () => void;
+  libraryStatus: ReadingStatus | null;
+  onSelect: () => void;
 }) {
   const { t } = useTranslation();
 
   return (
     <li
-      onClick={onAdd}
+      onClick={onSelect}
       className="flex cursor-pointer items-center gap-3 py-3.5 active:bg-accent"
     >
       <div className="h-[60px] w-[40px] shrink-0 overflow-hidden rounded-md bg-secondary">
@@ -37,16 +41,20 @@ export function SearchResultItem({
         </p>
       </div>
 
-      <Button
-        variant="outline"
-        onClick={(e) => {
-          e.stopPropagation();
-          onAdd();
-        }}
-        className="h-auto shrink-0 rounded-full border-primary px-4 py-1.5 text-[12px] text-primary active:bg-accent"
-      >
-        {t("search.add")}
-      </Button>
+      {libraryStatus ? (
+        <StatusBadge status={libraryStatus} className="shrink-0" />
+      ) : (
+        <Button
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect();
+          }}
+          className="h-auto shrink-0 rounded-full border-primary px-4 py-1.5 text-[12px] text-primary active:bg-accent"
+        >
+          {t("search.add")}
+        </Button>
+      )}
     </li>
   );
 }

@@ -11,6 +11,7 @@ export const it = {
     cancel: "Annulla",
     save: "Salva",
     confirm: "Ok",
+    clear: "Cancella",
   },
   auth: {
     heroLine1: "Shelfy:",
@@ -71,6 +72,7 @@ export const it = {
     addBook: "Aggiungi libro",
     addToLibrary: "Aggiungi alla mia libreria",
     bookAdded: "Libro aggiunto alla libreria",
+    alreadyInLibrary: "Questo libro è già nella tua libreria",
     readingStatus: "Stato di lettura",
     shelves: "Scaffali",
     newShelf: "Nuovo scaffale…",
@@ -138,7 +140,6 @@ export const it = {
   profile: {
     title: "Profilo",
     booksRead: "Libri letti",
-    pagesRead: "Pagine lette",
     avgRating: "Media voti",
     inReading: "In lettura",
     theme: "Tema",
