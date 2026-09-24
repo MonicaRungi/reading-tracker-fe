@@ -5,6 +5,8 @@ import { updateProfileTheme, type ThemePreference } from "@/api/profile";
 import { getStats } from "@/api/stats";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
+import { useNavigate } from "react-router-dom";
+import { useBadges } from "@/hooks/useBadges";
 
 export type BooksView = "year" | "month";
 export type ActivityView = "day" | "week";
@@ -34,6 +36,9 @@ export function useProfileData() {
     queryFn: () => getStats(),
     enabled: Boolean(userId),
   });
+
+  const navigate = useNavigate();
+  const badges = useBadges(userId);
 
   const setTheme = useCallback(
     (next: ThemePreference) => {
@@ -97,8 +102,27 @@ export function useProfileData() {
       activityChartData,
       activityTotal,
       booksChartData,
+      featuredBadges: badges.data.featuredBadges,
+      maxFeatured: badges.data.maxFeatured,
+      canFeatureMore: badges.data.canFeatureMore,
+      selectedBadge: badges.data.selectedBadge,
+      selectedBadgeProgress: badges.data.selectedBadgeProgress,
     },
-    ui: { theme, booksView, activityView },
-    actions: { setTheme, setBooksView, setActivityView, signOut },
+    ui: {
+      theme,
+      booksView,
+      activityView,
+      isTogglingFeatured: badges.ui.isTogglingFeatured,
+    },
+    actions: {
+      setTheme,
+      setBooksView,
+      setActivityView,
+      signOut,
+      openBadge: badges.actions.openBadge,
+      closeBadge: badges.actions.closeBadge,
+      toggleBadgeFeatured: badges.actions.toggleBadgeFeatured,
+      goToBadges: () => navigate("/profile/badges"),
+    },
   };
 }

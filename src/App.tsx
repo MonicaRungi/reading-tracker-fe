@@ -11,6 +11,7 @@ import SearchPage from "@/pages/SearchPage";
 import BookDetailPage from "@/pages/BookDetailPage";
 import GoodreadsImportPage from "@/pages/GoodreadsImportPage";
 import GoalOnboardingPage from "@/pages/GoalOnboardingPage";
+import BadgesPage from "@/pages/BadgesPage";
 import { useTheme } from "./hooks/useTheme";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/book/:id" element={<BookDetailPage />} />
           <Route path="/profile/import-goodreads" element={<GoodreadsImportPage />} />
+          <Route path="/profile/badges" element={<BadgesPage />} />
         </Route>
 
         <Route element={<FullScreenLayout />}>

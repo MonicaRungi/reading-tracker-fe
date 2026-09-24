@@ -24,9 +24,14 @@ export interface BadgeWithStatus extends Badge {
   is_featured: boolean
   progress: number | null // 0-1, null per i badge binari (annuali)
   current: number | null // valore corrente della metrica, null per gli annuali
-  /** Solo annuali: anno passato non ottenuto, non più recuperabile. */
-  is_expired: boolean
 }
 
 /** Valori correnti delle metriche su cui si basano le soglie. */
 export type UserProgress = Record<BadgeMetric, number>
+
+/** Avanzamento mostrato nel dettaglio di un badge a soglia. */
+export interface BadgeProgressInfo {
+  metric: BadgeMetric
+  current: number
+  target: number
+}
