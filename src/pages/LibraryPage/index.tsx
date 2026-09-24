@@ -5,6 +5,7 @@ import { useLibraryData } from "./hooks/useLibraryData";
 import { LibraryHeader } from "./components/LibraryHeader";
 import { ContinueReadingSection } from "./components/ContinueReadingSection";
 import { MyLibrarySection } from "./components/MyLibrarySection";
+import { ReadingGoalSection } from "./components/ReadingGoalSection";
 
 export default function LibraryPage() {
   const { t } = useTranslation();
@@ -13,6 +14,15 @@ export default function LibraryPage() {
   return (
     <div className="flex min-h-full flex-col">
       <LibraryHeader />
+
+      {!data.isLoadingGoals && (
+        <ReadingGoalSection
+          goal={data.primaryGoal}
+          current={data.primaryGoalCurrent}
+          year={data.year}
+          onCreateGoal={actions.goToGoalOnboarding}
+        />
+      )}
 
       {data.isEmpty ? (
         <EmptyState

@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { FullScreenLayout } from "@/components/layout/FullScreenLayout";
 import { AuthGuard } from "@/components/layout/AuthGuard";
+import { GoalOnboardingGuard } from "@/components/layout/GoalOnboardingGuard";
 import AuthCallbackPage from "@/pages/AuthCallbackPage";
 import LibraryPage from "@/pages/LibraryPage";
 import LoginPage from "@/pages/LoginPage";
@@ -8,6 +10,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import SearchPage from "@/pages/SearchPage";
 import BookDetailPage from "@/pages/BookDetailPage";
 import GoodreadsImportPage from "@/pages/GoodreadsImportPage";
+import GoalOnboardingPage from "@/pages/GoalOnboardingPage";
 import { useTheme } from "./hooks/useTheme";
 
 function App() {
@@ -26,6 +29,12 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/book/:id" element={<BookDetailPage />} />
           <Route path="/profile/import-goodreads" element={<GoodreadsImportPage />} />
+        </Route>
+
+        <Route element={<FullScreenLayout />}>
+          <Route element={<GoalOnboardingGuard />}>
+            <Route path="/goals/onboarding" element={<GoalOnboardingPage />} />
+          </Route>
         </Route>
       </Route>
 

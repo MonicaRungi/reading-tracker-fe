@@ -11,6 +11,7 @@ import { addLibraryItem, listLibrary } from "@/api/library";
 import type { LibraryItem, ReadingStatus } from "@/api/library";
 import { createLibraryMatcher } from "@/lib/bookMatch";
 import { hapticFeedback } from "@/lib/haptics";
+import { invalidateProgressQueries } from "@/lib/progressQueries";
 import { listShelves, createShelf } from "@/api/shelves";
 
 export type SearchTab = "search" | "scan";
@@ -93,6 +94,7 @@ export function useSearchData() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["library", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["stats", user?.id] });
+      void invalidateProgressQueries(queryClient, user?.id);
       toast.success(t("search.bookAdded"));
       closeSheet();
     },
