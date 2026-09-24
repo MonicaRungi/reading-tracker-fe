@@ -9,6 +9,7 @@ import {
   updateStatus,
 } from "@/api/library";
 import { useAuth } from "@/hooks/useAuth";
+import { invalidateProgressQueries } from "@/lib/progressQueries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -46,6 +47,7 @@ export function useBookDetailData() {
     return Promise.all([
       queryClient.invalidateQueries({ queryKey: ["library", user?.id] }),
       queryClient.invalidateQueries({ queryKey: ["stats", user?.id] }),
+      invalidateProgressQueries(queryClient, user?.id),
     ]);
   }
 
