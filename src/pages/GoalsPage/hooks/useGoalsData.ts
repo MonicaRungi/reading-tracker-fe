@@ -181,6 +181,12 @@ export function useGoalsData() {
       renewStartLabel: renewTarget
         ? startLabel(nextSecondaryStart(goals, renewTarget.type as SecondaryGoalType))
         : "",
+      // Avanzamento della settimana in corso per il goal in modifica; null se
+      // il goal è programmato (non si chiude prima del suo periodo).
+      editCurrent:
+        editTarget && isGoalInCurrentPeriod(editTarget)
+          ? (progress[editTarget.id] ?? 0)
+          : null,
       pickerTypes: addableTypes,
       pickerStartLabels: pickerStarts.map(startLabel),
     },

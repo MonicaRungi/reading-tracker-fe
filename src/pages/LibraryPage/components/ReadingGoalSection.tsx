@@ -22,21 +22,9 @@ export function ReadingGoalSection({
 
   return (
     <section className="px-4 pb-4 pt-1">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-[17px] font-bold text-foreground">
-          {t("goals.librarySectionTitle")}
-        </h2>
-        {goal && (
-          <Button
-            variant="link"
-            onClick={onOpenGoals}
-            className="h-auto gap-0.5 p-0 text-[13px] font-medium text-muted-foreground"
-          >
-            {t("goals.seeDetails")}
-            <ChevronRight className="size-4" aria-hidden="true" />
-          </Button>
-        )}
-      </div>
+      <h2 className="mb-3 text-[17px] font-bold text-foreground">
+        {t("goals.librarySectionTitle")}
+      </h2>
 
       {goal ? (
         <Button

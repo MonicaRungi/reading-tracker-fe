@@ -133,6 +133,7 @@ export default function GoalsPage() {
       <EditGoalTargetSheet
         goal={ui.editTarget}
         value={ui.editValue}
+        current={data.editCurrent}
         isSaving={ui.isSavingTarget}
         onChange={actions.setEditValue}
         onSave={actions.saveEdit}

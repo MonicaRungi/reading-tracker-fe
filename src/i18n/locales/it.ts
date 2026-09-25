@@ -209,7 +209,8 @@ export const it = {
     booksValue_other: "{{count}} libri",
     daysValue_one: "{{count}} giorno",
     daysValue_other: "{{count}} giorni",
-    pagesValue: "{{count}} pagine",
+    pagesValue_one: "{{count}} pagina",
+    pagesValue_other: "{{count}} pagine",
     perWeek: "a settimana",
     customHint: "Il tuo obiettivo su misura",
     lockNotice:
@@ -226,7 +227,6 @@ export const it = {
     annualGoalReached: "Obiettivo annuale raggiunto!",
     emptyTitle: "Nessun obiettivo per il {{year}}",
     emptySubtitle: "Decidi quanti libri vuoi leggere quest'anno.",
-    seeDetails: "Vedi dettagli",
     secondaryDaysHint: "Scegli quanti giorni dedicare alla lettura.",
     secondaryPagesHint: "Scegli quante pagine leggere ogni settimana.",
     // Pagina di dettaglio
@@ -292,6 +292,8 @@ export const it = {
       // Modifica e archiviazione
       editSheetTitle: "Modifica obiettivo",
       editSave: "Salva",
+      editWillComplete:
+        "Con questo target l'obiettivo risulterà raggiunto: questa settimana hai già {{progress}}.",
       archiveTitle: "Archiviare l'obiettivo?",
       archiveDescription:
         "L'obiettivo non sarà più attivo e non conterà come completato. Un nuovo obiettivo dello stesso tipo potrà partire dalla settimana successiva.",
