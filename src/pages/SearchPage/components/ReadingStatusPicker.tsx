@@ -24,7 +24,7 @@ export function ReadingStatusPicker({
       type="single"
       value={value}
       onValueChange={onChange}
-      className="mb-5 grid w-full grid-cols-4 gap-2"
+      className="isolate mb-5 grid w-full grid-cols-4 gap-2"
     >
       {STATUSES.map((s) => (
         <ToggleGroupItem

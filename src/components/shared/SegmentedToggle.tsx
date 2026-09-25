@@ -7,6 +7,10 @@ export interface SegmentedToggleOption<T extends string> {
   icon?: React.ReactNode
 }
 
+/**
+ * `isolate`: gli item di ToggleGroup hanno `focus:z-10`; senza un contesto di
+ * stacking proprio, un item con il focus scorrerebbe sopra gli header sticky (z-10).
+ */
 export function SegmentedToggle<T extends string>({
   value,
   options,
@@ -27,7 +31,7 @@ export function SegmentedToggle<T extends string>({
       onValueChange={(next) => {
         if (next) onChange(next as T)
       }}
-      className={cn("w-full gap-0 rounded-full bg-secondary p-1", size === "sm" && "p-0.5", className)}
+      className={cn("isolate w-full gap-0 rounded-full bg-secondary p-1", size === "sm" && "p-0.5", className)}
     >
       {options.map((option) => (
         <ToggleGroupItem

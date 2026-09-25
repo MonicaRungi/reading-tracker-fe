@@ -155,6 +155,8 @@ export const it = {
     activityThisWeek: "Questa settimana · {{count}} pagine",
     activityLast6Weeks: "Ultime 6 settimane · {{count}} pagine",
     genres: "Generi",
+    genresShowAll: "Vedi tutti ({{count}})",
+    genresShowLess: "Mostra meno",
     dayLabels: ["lun", "mar", "mer", "gio", "ven", "sab", "dom"],
     monthLabels: [
       "gen",
