@@ -324,8 +324,13 @@ export type Database = {
     }
     Functions: {
       cleanup_reading_log: { Args: never; Returns: undefined }
+      close_expired_reading_goals: { Args: never; Returns: undefined }
       increment_total_pages_read: {
         Args: { p_delta: number; p_user_id: string }
+        Returns: undefined
+      }
+      unlock_badge: {
+        Args: { p_badge_key: string; p_user_id: string }
         Returns: undefined
       }
     }
@@ -461,7 +466,11 @@ export const Constants = {
   },
 } as const
 
-
+// ---------------------------------------------------------------------------
+// Tutto quello che sta sopra è generato: `supabase gen types typescript
+// --project-id ekpyxrjjwbiklnmyiswu --schema public`. Rigenerando, conservare
+// questo blocco di alias in fondo al file (la generazione lo cancella).
+// ---------------------------------------------------------------------------
 // Alias comodi per usare i tipi Row/Insert/Update nei file api
 export type BookRow = Database["public"]["Tables"]["books"]["Row"]
 export type BookInsert = Database["public"]["Tables"]["books"]["Insert"]
