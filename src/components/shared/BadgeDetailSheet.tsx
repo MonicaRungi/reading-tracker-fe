@@ -4,12 +4,8 @@ import type { BadgeProgressInfo, BadgeWithStatus } from "@/api/badges";
 import { BadgeIcon } from "@/components/shared/BadgeIcon";
 import { ProgressBar } from "@/components/shared/ProgressBar";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { formatDate, formatNumber, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -39,12 +35,9 @@ export function BadgeDetailSheet({
 
   return (
     <Sheet open={!!badge} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="max-h-[85vh] gap-0 overflow-y-auto rounded-t-[22px] px-5 pb-safe pt-2"
+      <BottomSheetContent
+        className="max-h-[85vh] gap-0 overflow-y-auto px-5"
       >
-        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-border" />
-
         <div className="flex items-center gap-4 pb-5 pr-6">
           <BadgeIcon
             iconKey={badge.icon_key}
@@ -132,7 +125,7 @@ export function BadgeDetailSheet({
             </p>
           </div>
         )}
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

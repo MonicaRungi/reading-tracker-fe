@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import type { BadgeWithStatus } from "@/api/badges";
 import { BadgeGrid } from "@/components/shared/BadgeGrid";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetTitle } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 
 export function FeaturedBadgesSheet({
   open,
@@ -29,13 +30,11 @@ export function FeaturedBadgesSheet({
 
   return (
     <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
-      <SheetContent
-        side="bottom"
+      <BottomSheetContent
         showCloseButton={false}
-        className="flex max-h-[90vh] flex-col gap-0 rounded-t-[22px] pb-safe pt-2"
+        className="flex max-h-[90vh] flex-col gap-0"
+        handleClassName="mb-3"
       >
-        <div className="mx-auto mb-3 h-1 w-9 shrink-0 rounded-full bg-border" />
-
         <div className="flex shrink-0 items-center justify-between px-3 pb-3">
           <Button
             variant="ghost"
@@ -89,7 +88,7 @@ export function FeaturedBadgesSheet({
             }}
           />
         </div>
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

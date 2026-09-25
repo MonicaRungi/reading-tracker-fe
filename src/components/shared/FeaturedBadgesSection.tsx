@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { EmptyState } from "@/components/shared/EmptyState";
 import type { BadgeWithStatus } from "@/api/badges";
 import { BadgeGrid } from "@/components/shared/BadgeGrid";
 import { Button } from "@/components/ui/button";
@@ -37,9 +38,10 @@ export function FeaturedBadgesSection({
       {badges.length > 0 ? (
         <BadgeGrid badges={badges} onSelect={onSelect} showFeaturedMark={false} />
       ) : (
-        <p className="rounded-2xl bg-card px-4 py-5 text-center text-[13px] text-muted-foreground">
-          {t("badges.featuredEmpty", { count: maxFeatured })}
-        </p>
+        <EmptyState
+          size="inline"
+          title={t("badges.featuredEmpty", { count: maxFeatured })}
+        />
       )}
     </section>
   );

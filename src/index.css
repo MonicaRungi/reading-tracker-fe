@@ -167,6 +167,11 @@
   html {
     @apply font-sans;
   }
+  /* Niente pull-to-refresh/rimbalzo nativo: lo gestisce l'app (PullToRefresh). */
+  html,
+  body {
+    overscroll-behavior-y: contain;
+  }
 }
 
 @utility pt-safe {

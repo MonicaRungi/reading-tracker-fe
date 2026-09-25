@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { ReadingGoal } from "@/api/goals";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetTitle } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { formatDayMonth } from "@/lib/format";
 import { SecondaryGoalIcon } from "./components/SecondaryGoalIcon";
 
@@ -17,11 +18,9 @@ export function ArchivedGoalsSheet({
 
   return (
     <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="max-h-[80vh] gap-0 overflow-y-auto rounded-t-[22px] px-5 pb-safe pt-2"
+      <BottomSheetContent
+        className="max-h-[80vh] gap-0 overflow-y-auto px-5"
       >
-        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-border" />
         <SheetTitle className="pb-4 pr-8 text-[20px] font-bold text-foreground">
           {t("goals.detail.archivedSheetTitle")}
         </SheetTitle>
@@ -46,7 +45,7 @@ export function ArchivedGoalsSheet({
             </li>
           ))}
         </ul>
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

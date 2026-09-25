@@ -2,12 +2,8 @@ import { CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { ReadingGoal } from "@/api/goals";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { SecondaryGoalIcon } from "./components/SecondaryGoalIcon";
 
 export function RenewGoalSheet({
@@ -29,11 +25,9 @@ export function RenewGoalSheet({
 
   return (
     <Sheet open={!!goal} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="gap-0 rounded-t-[22px] px-5 pb-safe pt-2"
+      <BottomSheetContent
+        className="gap-0 px-5"
       >
-        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-border" />
         {goal && (
           <div className="space-y-4 pb-5">
             <div className="space-y-1 pr-8">
@@ -81,7 +75,7 @@ export function RenewGoalSheet({
             </div>
           </div>
         )}
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

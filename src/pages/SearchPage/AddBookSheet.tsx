@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { Button } from "@/components/ui/button";
 import type { BookMeta } from "@/api/books";
 import type { ReadingStatus } from "@/api/library";
@@ -41,12 +42,9 @@ export function AddBookSheet({
 
   return (
     <Sheet open={!!book} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="flex max-h-[85vh] flex-col rounded-t-[22px] pb-safe pt-2"
+      <BottomSheetContent
+        className="flex max-h-[85vh] flex-col"
       >
-        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-border" />
-
         <div className="shrink-0 border-b border-border px-5 pb-4">
           <h2 className="pr-8 text-[20px] font-bold text-foreground">
             {t("search.addBook")}
@@ -82,7 +80,7 @@ export function AddBookSheet({
             {isSubmitting ? t("common.loading") : t("search.addToLibrary")}
           </Button>
         </div>
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

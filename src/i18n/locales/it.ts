@@ -12,6 +12,7 @@ export const it = {
     save: "Salva",
     confirm: "Ok",
     clear: "Cancella",
+    refreshing: "Aggiornamento in corso…",
   },
   auth: {
     heroLine1: "Shelfy:",

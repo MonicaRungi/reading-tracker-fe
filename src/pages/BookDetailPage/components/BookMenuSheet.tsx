@@ -1,17 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { MenuAction } from "./MenuAction";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 
 export function BookMenuSheet({
@@ -33,11 +24,9 @@ export function BookMenuSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="bottom"
-        className="rounded-t-[22px] px-5 pb-safe pt-2"
+      <BottomSheetContent
+        className="px-5"
       >
-        <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-border" />
         <div className="space-y-1 pb-4">
           {status !== "abandoned" && status !== "read" && (
             <MenuAction
@@ -51,37 +40,22 @@ export function BookMenuSheet({
               onClick={onResetToToRead}
             />
           )}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+          <ConfirmDialog
+            trigger={
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-3 rounded-xl px-4 py-3.5 text-left text-[15px] font-medium text-red-500 active:bg-[#F1EFEC]"
               >
                 {t("bookDetail.removeFromLibrary")}
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  {t("bookDetail.removeBookTitle")}
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  {t("bookDetail.removeBookConfirm")}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={onDelete}
-                  className="bg-red-500 hover:bg-red-600"
-                >
-                  {t("bookDetail.remove")}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            }
+            title={t("bookDetail.removeBookTitle")}
+            description={t("bookDetail.removeBookConfirm")}
+            confirmLabel={t("bookDetail.remove")}
+            onConfirm={onDelete}
+          />
         </div>
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

@@ -1,6 +1,8 @@
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { BackHeader } from "@/components/shared/BackHeader";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { useGoalsData } from "./hooks/useGoalsData";
@@ -12,7 +14,6 @@ import { ArchivedGoalsRow } from "./components/ArchivedGoalsRow";
 import { RenewGoalSheet } from "./RenewGoalSheet";
 import { SecondaryGoalsSheet } from "./SecondaryGoalsSheet";
 import { EditGoalTargetSheet } from "./EditGoalTargetSheet";
-import { ArchiveGoalDialog } from "./ArchiveGoalDialog";
 import { ArchivedGoalsSheet } from "./ArchivedGoalsSheet";
 
 export default function GoalsPage() {
@@ -83,9 +84,7 @@ export default function GoalsPage() {
             ))}
 
             {data.secondaries.length === 0 && data.renewals.length === 0 && (
-              <p className="rounded-2xl bg-card px-4 py-5 text-center text-[13px] text-muted-foreground">
-                {t("goals.detail.secondaryEmpty")}
-              </p>
+              <EmptyState size="inline" title={t("goals.detail.secondaryEmpty")} />
             )}
 
             {data.canAddSecondary && (
@@ -140,11 +139,14 @@ export default function GoalsPage() {
         onClose={actions.closeEdit}
       />
 
-      <ArchiveGoalDialog
-        goal={ui.archiveTarget}
-        isArchiving={ui.isArchiving}
+      <ConfirmDialog
+        open={ui.archiveTarget !== null}
+        onOpenChange={(open) => !open && actions.cancelArchive()}
+        title={t("goals.detail.archiveTitle")}
+        description={t("goals.detail.archiveDescription")}
+        confirmLabel={t("goals.detail.archiveConfirm")}
+        isPending={ui.isArchiving}
         onConfirm={actions.confirmArchive}
-        onCancel={actions.cancelArchive}
       />
 
       <ArchivedGoalsSheet

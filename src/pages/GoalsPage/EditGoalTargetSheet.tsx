@@ -2,7 +2,8 @@ import { useTranslation } from "react-i18next";
 import type { ReadingGoal, SecondaryGoalType } from "@/api/goals";
 import { GoalSlider } from "@/components/shared/GoalSlider";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetTitle } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { SECONDARY_GOAL_SLIDERS } from "@/lib/goals";
 
 export function EditGoalTargetSheet({
@@ -25,11 +26,9 @@ export function EditGoalTargetSheet({
 
   return (
     <Sheet open={!!goal} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="gap-0 rounded-t-[22px] px-5 pb-safe pt-2"
+      <BottomSheetContent
+        className="gap-0 px-5"
       >
-        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-border" />
         {goal && type && (
           <div className="space-y-4 pb-5">
             <SheetTitle className="pr-8 text-[20px] font-bold text-foreground">
@@ -57,7 +56,7 @@ export function EditGoalTargetSheet({
             </Button>
           </div>
         )}
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

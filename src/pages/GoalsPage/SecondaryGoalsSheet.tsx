@@ -1,14 +1,11 @@
 import { CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { EmptyState } from "@/components/shared/EmptyState";
 import type { SecondaryGoalType } from "@/api/goals";
 import { SecondaryGoalsPicker } from "@/components/shared/SecondaryGoalsPicker";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 
 export function SecondaryGoalsSheet({
   open,
@@ -37,12 +34,9 @@ export function SecondaryGoalsSheet({
 
   return (
     <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="flex max-h-[90vh] flex-col gap-0 rounded-t-[22px] pb-safe pt-2"
+      <BottomSheetContent
+        className="flex max-h-[90vh] flex-col gap-0"
       >
-        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-border" />
-
         <div className="shrink-0 space-y-1 px-5 pb-4 pr-12">
           <SheetTitle className="text-[20px] font-bold text-foreground">
             {t("goals.detail.pickerTitle")}
@@ -64,9 +58,10 @@ export function SecondaryGoalsSheet({
               onTargetChange={onTargetChange}
             />
           ) : (
-            <p className="rounded-2xl bg-card px-4 py-5 text-center text-[13px] text-muted-foreground">
-              {t("goals.detail.pickerNothingAvailable")}
-            </p>
+            <EmptyState
+              size="inline"
+              title={t("goals.detail.pickerNothingAvailable")}
+            />
           )}
 
           {startLabels.length > 0 && (
@@ -95,7 +90,7 @@ export function SecondaryGoalsSheet({
             {isSaving ? t("common.loading") : t("goals.detail.pickerSave")}
           </Button>
         </div>
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { it } from "date-fns/locale";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 
@@ -51,12 +52,9 @@ export function DatePickerSheet({
 
   return (
     <Sheet open={open !== null} onOpenChange={(next) => !next && close()}>
-      <SheetContent
-        side="bottom"
-        className="rounded-t-[22px] px-5 pb-safe pt-2"
+      <BottomSheetContent
+        className="px-5"
       >
-        <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-border" />
-
         <h2 className="mb-5 pr-8 text-[20px] font-bold text-foreground">
           {label}
         </h2>
@@ -86,7 +84,7 @@ export function DatePickerSheet({
         >
           {t("bookDetail.confirmDate")}
         </Button>
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }
