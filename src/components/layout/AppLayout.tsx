@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
-import { useBadgeUnlockToast } from "@/hooks/useBadgeUnlockToast";
+import { useNotificationsRealtime } from "@/hooks/useNotificationsRealtime";
 import { PullToRefresh } from "./PullToRefresh";
 import { BottomNav } from "./BottomNav";
 
 export function AppLayout() {
-  useBadgeUnlockToast();
+  useNotificationsRealtime();
 
   return (
     <div className="min-h-svh bg-background pt-safe">

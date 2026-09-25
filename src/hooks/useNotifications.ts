@@ -1,24 +1,22 @@
-import { useSyncExternalStore } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { listNotifications } from "@/api/notifications";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  getNotifications,
-  markAllNotificationsRead,
-  subscribeNotifications,
-} from "@/lib/notifications";
 
-/** Notifiche in-app dell'utente corrente (solo locali, vedi `lib/notifications.ts`). */
+/** Notifiche dell'utente (tabella `notifications`), aggiornate via realtime. */
 export function useNotifications() {
   const { user } = useAuth();
   const userId = user?.id ?? "";
 
-  const notifications = useSyncExternalStore(subscribeNotifications, () =>
-    getNotifications(userId),
-  );
+  const { data: notifications = [], isLoading } = useQuery({
+    queryKey: ["notifications", userId],
+    queryFn: () => listNotifications(),
+    enabled: Boolean(userId),
+  });
 
   return {
     userId,
     notifications,
-    unreadCount: notifications.filter((n) => !n.read).length,
-    markAllRead: () => markAllNotificationsRead(userId),
+    isLoading,
+    unreadCount: notifications.filter((n) => !n.read_at).length,
   };
 }

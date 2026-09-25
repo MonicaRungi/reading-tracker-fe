@@ -37,7 +37,20 @@ export async function upsertBook(meta: BookMeta): Promise<Book> {
       .eq("isbn13", meta.isbn13)
       .maybeSingle();
     if (error) throw error;
-    if (existing) return existing;
+    if (existing) {
+      // Libro già a catalogo senza data completa: la aggiunge se ora la fonte
+      // la fornisce (serve al promemoria di uscita).
+      if (!existing.published_date && meta.published_date) {
+        const { data: updated } = await supabase
+          .from("books")
+          .update({ published_date: meta.published_date })
+          .eq("id", existing.id)
+          .select("*")
+          .maybeSingle();
+        return updated ?? existing;
+      }
+      return existing;
+    }
   }
 
   const { data, error } = await supabase
@@ -49,6 +62,7 @@ export async function upsertBook(meta: BookMeta): Promise<Book> {
       cover_url: meta.cover_url,
       page_count: meta.page_count,
       published_year: meta.published_year,
+      published_date: meta.published_date ?? null,
       publisher: meta.publisher,
       description: meta.description,
       genres: meta.genres,

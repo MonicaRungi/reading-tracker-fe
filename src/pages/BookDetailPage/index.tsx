@@ -13,6 +13,7 @@ import { RatingSection } from "./components/RatingSection";
 import { StatusCta } from "./components/StatusCta";
 import { BookMenuSheet } from "./components/BookMenuSheet";
 import { DatePickerSheet } from "./components/DatePickerSheet";
+import { ReleaseReminderCard } from "@/components/shared/ReleaseReminderCard";
 import { useEffect } from "react";
 
 export default function BookDetailPage() {
@@ -64,6 +65,15 @@ export default function BookDetailPage() {
         <BookHero item={item} />
 
         {!item.book.isbn13 && <IncompleteDataBadge />}
+
+        {data.releaseDate && (
+          <ReleaseReminderCard
+            releaseDate={data.releaseDate}
+            active={data.hasReminder}
+            isPending={actions.isTogglingReminder}
+            onToggle={actions.toggleReminder}
+          />
+        )}
 
         <ReadingDates
           startedAt={item.started_at}

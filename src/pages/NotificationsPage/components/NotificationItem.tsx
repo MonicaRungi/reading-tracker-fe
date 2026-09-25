@@ -1,45 +1,71 @@
 import { useTranslation } from "react-i18next";
-import { BadgeIcon } from "@/components/shared/BadgeIcon";
+import type { AppNotification } from "@/api/notifications";
 import { Button } from "@/components/ui/button";
-import type { AppNotification } from "@/lib/notifications";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { NotificationIcon } from "./NotificationIcon";
 
 export function NotificationItem({
   notification,
-  onSelect,
+  onOpen,
 }: {
   notification: AppNotification;
-  onSelect: () => void;
+  onOpen: () => void;
 }) {
   const { t } = useTranslation();
+  const isUnread = !notification.read_at;
+
+  const { label, title } = (() => {
+    switch (notification.type) {
+      case "badge_unlocked":
+        return {
+          label: t("notifications.badgeUnlocked"),
+          title: notification.payload.badge_title || t("notifications.badgeUnlockedGeneric"),
+        };
+      case "goal_renewal":
+        return {
+          label:
+            notification.payload.status === "achieved"
+              ? t("notifications.goalRenewalAchieved")
+              : t("notifications.goalRenewalConcluded"),
+          title: t(`goals.detail.goalTitle.${notification.payload.goal_type}`, {
+            count: notification.payload.target,
+          }),
+        };
+      case "book_release":
+        return {
+          label: t("notifications.bookRelease"),
+          title: notification.payload.book_title,
+        };
+    }
+  })();
+
+  const hint =
+    notification.type === "goal_renewal" ? t("notifications.goalRenewalHint") : null;
 
   return (
     <Button
       variant="ghost"
-      onClick={onSelect}
+      onClick={onOpen}
       className={cn(
-        "h-auto w-full justify-start gap-3 whitespace-normal rounded-2xl px-3 py-3 text-left font-normal",
-        notification.read ? "hover:bg-secondary" : "bg-accent hover:bg-accent",
+        "h-auto w-full justify-start gap-3 whitespace-normal rounded-none px-4 py-3.5 text-left font-normal",
+        isUnread ? "bg-accent hover:bg-accent" : "hover:bg-secondary",
       )}
     >
-      <BadgeIcon
-        iconKey={notification.icon_key}
-        locked={false}
-        className="size-12"
-      />
+      <NotificationIcon notification={notification} />
       <span className="min-w-0 flex-1">
-        <span className="block text-[12px] text-muted-foreground">
-          {t("notifications.badgeUnlocked")}
-        </span>
+        <span className="block text-[12px] text-muted-foreground">{label}</span>
         <span className="block truncate text-[15px] font-semibold text-foreground">
-          {notification.title || t("notifications.badgeUnlockedGeneric")}
+          {title}
         </span>
+        {hint && (
+          <span className="block text-[12px] text-muted-foreground">{hint}</span>
+        )}
         <span className="block text-[12px] text-muted-foreground">
           {formatDate(notification.created_at)}
         </span>
       </span>
-      {!notification.read && (
+      {isUnread && (
         <span className="size-2 shrink-0 rounded-full bg-primary" aria-hidden="true" />
       )}
     </Button>

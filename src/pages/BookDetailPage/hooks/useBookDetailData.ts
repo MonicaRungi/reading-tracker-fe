@@ -8,16 +8,24 @@ import {
   updateProgress,
   updateStatus,
 } from "@/api/library";
+import {
+  createReminder,
+  deleteReminder,
+  getReminderForBook,
+} from "@/api/releaseReminders";
 import { useAuth } from "@/hooks/useAuth";
+import { upcomingReleaseDate } from "@/lib/releaseDate";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export function useBookDetailData() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -35,6 +43,33 @@ export function useBookDetailData() {
   });
 
   const item = items.find((i) => i.id === id);
+
+  // --- Promemoria di uscita (solo libri con data completa nel futuro) ------
+  const releaseDate = upcomingReleaseDate(item?.book.published_date);
+  const bookId = item?.book.id;
+  const reminderKey = ["release-reminder", user?.id, bookId];
+
+  const { data: reminder } = useQuery({
+    queryKey: reminderKey,
+    queryFn: () => getReminderForBook(bookId!),
+    enabled: Boolean(user && bookId && releaseDate),
+  });
+
+  const { mutate: toggleReminder, isPending: isTogglingReminder } = useMutation({
+    mutationFn: async () => {
+      if (reminder) await deleteReminder(bookId!);
+      else await createReminder(user!.id, bookId!, releaseDate!);
+    },
+    onSuccess: () => {
+      toast.success(
+        reminder
+          ? t("notifications.reminderDisabled")
+          : t("notifications.reminderEnabled"),
+      );
+      void queryClient.invalidateQueries({ queryKey: reminderKey });
+    },
+    onError: () => toast.error(t("common.error")),
+  });
 
   const currentPage = progressInput ?? item?.current_page ?? 0;
   const pageCount = item?.book.page_count ?? 0;
@@ -115,7 +150,16 @@ export function useBookDetailData() {
   });
 
   return {
-    data: { item, isLoading, percent, currentPage, pageCount, pageCountInput },
+    data: {
+      item,
+      isLoading,
+      percent,
+      currentPage,
+      pageCount,
+      pageCountInput,
+      releaseDate,
+      hasReminder: Boolean(reminder),
+    },
     ui: { progressInput, showDatePicker, showMenu },
     actions: {
       goBack: () => navigate(-1),
@@ -127,6 +171,8 @@ export function useBookDetailData() {
         mutateDate({ field, date }),
       deleteItem: mutateDelete,
       enrichCover,
+      toggleReminder: () => toggleReminder(),
+      isTogglingReminder,
       setProgressInput,
       setShowDatePicker,
       setShowMenu,

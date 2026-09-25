@@ -63,6 +63,7 @@ export type Database = {
           id: string
           isbn13: string | null
           page_count: number | null
+          published_date: string | null
           published_year: number | null
           publisher: string | null
           source: string | null
@@ -77,6 +78,7 @@ export type Database = {
           id?: string
           isbn13?: string | null
           page_count?: number | null
+          published_date?: string | null
           published_year?: number | null
           publisher?: string | null
           source?: string | null
@@ -91,6 +93,7 @@ export type Database = {
           id?: string
           isbn13?: string | null
           page_count?: number | null
+          published_date?: string | null
           published_year?: number | null
           publisher?: string | null
           source?: string | null
@@ -144,6 +147,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          payload: Json
+          read_at: string | null
+          title: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          payload?: Json
+          read_at?: string | null
+          title?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          payload?: Json
+          read_at?: string | null
+          title?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -235,6 +271,38 @@ export type Database = {
         }
         Relationships: []
       }
+      release_reminders: {
+        Row: {
+          book_id: string
+          created_at: string
+          id: string
+          release_date: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string
+          id?: string
+          release_date: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string
+          id?: string
+          release_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "release_reminders_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shelf_items: {
         Row: {
           added_at: string
@@ -325,6 +393,8 @@ export type Database = {
     Functions: {
       cleanup_reading_log: { Args: never; Returns: undefined }
       close_expired_reading_goals: { Args: never; Returns: undefined }
+      delete_old_notifications: { Args: never; Returns: undefined }
+      fire_due_release_reminders: { Args: never; Returns: undefined }
       increment_total_pages_read: {
         Args: { p_delta: number; p_user_id: string }
         Returns: undefined
@@ -482,3 +552,5 @@ export type ReadingLogRow = Database["public"]["Tables"]["reading_log"]["Row"]
 export type ReadingGoalRow = Database["public"]["Tables"]["reading_goals"]["Row"]
 export type BadgeRow = Database["public"]["Tables"]["badges"]["Row"]
 export type UserBadgeRow = Database["public"]["Tables"]["user_badges"]["Row"]
+export type NotificationRow = Database["public"]["Tables"]["notifications"]["Row"]
+export type ReleaseReminderRow = Database["public"]["Tables"]["release_reminders"]["Row"]

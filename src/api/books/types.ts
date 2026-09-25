@@ -13,6 +13,8 @@ export interface BookMeta {
   cover_url: string | null
   page_count: number | null
   published_year: number | null
+  /** 'YYYY' | 'YYYY-MM' | 'YYYY-MM-DD', con la granularità data dalla fonte */
+  published_date: string | null
   publisher: string | null
   description: string | null
   genres: string[] | null
