@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { BadgeDetailSheet } from "@/components/shared/BadgeDetailSheet";
 import { FeaturedBadgesSection } from "@/components/shared/FeaturedBadgesSection";
+import { BackHeader } from "@/components/shared/BackHeader";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { useBadgesData } from "./hooks/useBadgesData";
-import { BadgesHeader } from "./components/BadgesHeader";
 import { AllBadgesSection } from "./components/AllBadgesSection";
 import { FeaturedBadgesSheet } from "./FeaturedBadgesSheet";
 
@@ -13,7 +13,7 @@ export default function BadgesPage() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <BadgesHeader onBack={actions.goBack} />
+      <BackHeader title={t("badges.pageTitle")} onBack={actions.goBack} />
 
       {data.isLoadingBadges ? (
         <div className="flex justify-center py-16">

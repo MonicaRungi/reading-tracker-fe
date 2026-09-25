@@ -2,14 +2,12 @@ import {
   endOfMonth,
   endOfWeek,
   endOfYear,
-  format,
   startOfMonth,
   startOfWeek,
   startOfYear,
 } from "date-fns";
 import type { GoalPeriod, ReadingGoal } from "@/api/goals";
-
-const DATE_FORMAT = "yyyy-MM-dd";
+import { toISODate } from "@/lib/format";
 
 /** Limiti del periodo corrente (ora locale). La settimana parte dal lunedì. */
 export function getPeriodBounds(
@@ -26,9 +24,18 @@ export function getPeriodBounds(
             endOfWeek(date, { weekStartsOn: 1 }),
           ];
   return {
-    period_start: format(start, DATE_FORMAT),
-    period_end: format(end, DATE_FORMAT),
+    period_start: toISODate(start),
+    period_end: toISODate(end),
   };
+}
+
+/** Il periodo del goal include oggi (ora locale, come getPeriodBounds). */
+export function isGoalInCurrentPeriod(
+  goal: ReadingGoal,
+  date: Date = new Date(),
+): boolean {
+  const today = toISODate(date);
+  return goal.period_start <= today && today <= goal.period_end;
 }
 
 export function goalYear(goal: ReadingGoal): number {

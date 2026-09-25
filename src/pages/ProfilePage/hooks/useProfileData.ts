@@ -5,6 +5,7 @@ import { updateProfileTheme, type ThemePreference } from "@/api/profile";
 import { getStats } from "@/api/stats";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
+import { toISODate } from "@/lib/format";
 import { useNavigate } from "react-router-dom";
 import { useBadges } from "@/hooks/useBadges";
 
@@ -53,7 +54,7 @@ export function useProfileData() {
     returnObjects: true,
   }) as string[];
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = toISODate();
 
   const activityChartData: ChartPoint[] =
     activityView === "day"

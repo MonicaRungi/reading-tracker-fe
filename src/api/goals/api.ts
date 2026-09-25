@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { computeGoalProgress } from "@/lib/goals";
+import { computeGoalProgress, isGoalInCurrentPeriod } from "@/lib/goals";
 import type {
   CreateGoalInput,
   GoalProgressMap,
@@ -123,4 +123,32 @@ export async function getGoalsProgress(
       computeGoalProgress(goal, finishedDates, logRows.data),
     ]),
   );
+}
+
+/**
+ * Chiusura "attiva": segna come 'achieved' gli obiettivi attivi del periodo
+ * corrente che hanno già raggiunto il target. L'update fa scattare lato DB lo
+ * sblocco dei badge obiettivi e dell'annuale. Il job notturno resta la rete di
+ * sicurezza per chi arriva a fine periodo senza altre azioni.
+ * Restituisce gli obiettivi appena chiusi.
+ */
+export async function syncGoalAchievements(): Promise<ReadingGoal[]> {
+  const active = (await getActiveGoals()).filter((g) => isGoalInCurrentPeriod(g));
+  if (active.length === 0) return [];
+
+  const progress = await getGoalsProgress(active);
+  const reached = active.filter((g) => (progress[g.id] ?? 0) >= g.target);
+  if (reached.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("reading_goals")
+    .update({ status: "achieved" })
+    .in(
+      "id",
+      reached.map((g) => g.id),
+    )
+    .eq("status", "active")
+    .select("*");
+  if (error) throw error;
+  return (data ?? []) as ReadingGoal[];
 }

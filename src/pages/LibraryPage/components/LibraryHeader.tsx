@@ -2,7 +2,13 @@ import { Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
-export function LibraryHeader() {
+export function LibraryHeader({
+  unreadCount,
+  onOpenNotifications,
+}: {
+  unreadCount: number;
+  onOpenNotifications: () => void;
+}) {
   const { t } = useTranslation();
 
   return (
@@ -13,10 +19,21 @@ export function LibraryHeader() {
       <Button
         variant="ghost"
         size="icon"
-        aria-label="Notifiche"
-        className="h-9 w-9 rounded-full bg-secondary text-muted-foreground"
+        onClick={onOpenNotifications}
+        aria-label={
+          unreadCount > 0
+            ? t("notifications.bellUnread", { count: unreadCount })
+            : t("notifications.bell")
+        }
+        className="relative h-9 w-9 rounded-full bg-secondary text-muted-foreground"
       >
         <Bell className="size-5" />
+        {unreadCount > 0 && (
+          <span
+            aria-hidden="true"
+            className="absolute right-1.5 top-1.5 size-2.5 rounded-full bg-primary ring-2 ring-secondary"
+          />
+        )}
       </Button>
     </div>
   );

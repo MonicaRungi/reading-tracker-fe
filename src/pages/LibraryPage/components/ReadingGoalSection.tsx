@@ -30,6 +30,7 @@ export function ReadingGoalSection({
           <div className="min-w-0">
             <p className="text-[20px] font-bold text-foreground">
               {t("goals.primaryProgress", {
+                count: goal.target,
                 current: formatNumber(current),
                 target: formatNumber(goal.target),
               })}

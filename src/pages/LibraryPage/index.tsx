@@ -13,7 +13,10 @@ export default function LibraryPage() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <LibraryHeader />
+      <LibraryHeader
+        unreadCount={data.unreadNotifications}
+        onOpenNotifications={actions.goToNotifications}
+      />
 
       {!data.isLoadingGoals && (
         <ReadingGoalSection

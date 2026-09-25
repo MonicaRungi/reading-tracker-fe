@@ -2,7 +2,14 @@ import { ChevronLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
-export function BadgesHeader({ onBack }: { onBack: () => void }) {
+/** Header sticky delle pagine di dettaglio: freccia indietro + titolo. */
+export function BackHeader({
+  title,
+  onBack,
+}: {
+  title: string;
+  onBack: () => void;
+}) {
   const { t } = useTranslation();
 
   return (
@@ -16,9 +23,7 @@ export function BadgesHeader({ onBack }: { onBack: () => void }) {
       >
         <ChevronLeft className="size-5" />
       </Button>
-      <h1 className="text-[18px] font-bold text-foreground">
-        {t("badges.pageTitle")}
-      </h1>
+      <h1 className="text-[18px] font-bold text-foreground">{title}</h1>
     </div>
   );
 }

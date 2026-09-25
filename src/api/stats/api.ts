@@ -1,3 +1,4 @@
+import { toISODate } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
 import type { Stats } from "./types";
 
@@ -86,7 +87,7 @@ export async function getStats(): Promise<Stats> {
   const last7 = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
-    return d.toISOString().slice(0, 10);
+    return toISODate(d);
   });
   const logMap = new Map(
     activityRows.data.map((r) => [
@@ -107,8 +108,8 @@ export async function getStats(): Promise<Stats> {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
     return {
-      start: weekStart.toISOString().slice(0, 10),
-      end: weekEnd.toISOString().slice(0, 10),
+      start: toISODate(weekStart),
+      end: toISODate(weekEnd),
       label: `${weekStart.getDate()}/${weekStart.getMonth() + 1}`,
     };
   });

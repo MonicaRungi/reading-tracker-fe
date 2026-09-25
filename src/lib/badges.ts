@@ -74,11 +74,11 @@ export function combineBadges(
   });
 }
 
-/** Badge presenti in `after` ma non in `before` (per la celebrazione). */
+/** Badge sbloccati non ancora presenti tra quelli già visti (per la celebrazione). */
 export function findNewlyUnlocked(
-  before: UserBadge[],
-  after: UserBadge[],
+  seenIds: string[],
+  userBadges: UserBadge[],
 ): UserBadge[] {
-  const known = new Set(before.map((ub) => ub.badge_id));
-  return after.filter((ub) => !known.has(ub.badge_id));
+  const seen = new Set(seenIds);
+  return userBadges.filter((ub) => !seen.has(ub.badge_id));
 }

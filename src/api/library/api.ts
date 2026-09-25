@@ -1,11 +1,12 @@
 import { supabase } from "@/lib/supabase";
 import { upsertBook } from "@/api/books";
+import { toISODate } from "@/lib/format";
 import type { AddLibraryItemInput, LibraryItem, ReadingStatus } from "./types";
 
 const LIBRARY_SELECT = "*, book:books(*)";
 
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toISODate();
 }
 
 export async function listLibrary(): Promise<LibraryItem[]> {

@@ -5,6 +5,7 @@ import { listLibrary } from "@/api/library"
 import { getGoalsProgress, listGoals } from "@/api/goals"
 import { findPrimaryGoalForYear } from "@/lib/goals"
 import { useAuth } from "@/hooks/useAuth"
+import { useNotifications } from "@/hooks/useNotifications"
 import type { ReadingStatus } from "@/api/library"
 
 export type LibraryFilter = "all" | ReadingStatus
@@ -15,6 +16,7 @@ export function useLibraryData() {
   const userId = user?.id ?? ""
   const [filter, setFilter] = useState<LibraryFilter>("all")
   const [query, setQuery] = useState("")
+  const { unreadCount } = useNotifications()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["library", userId],
@@ -69,6 +71,7 @@ export function useLibraryData() {
       primaryGoal,
       primaryGoalCurrent,
       isLoadingGoals,
+      unreadNotifications: unreadCount,
     },
     ui: { filter, query },
     actions: {
@@ -76,6 +79,7 @@ export function useLibraryData() {
       setQuery,
       goToSearch: () => navigate("/search"),
       goToGoalOnboarding: () => navigate("/goals/onboarding"),
+      goToNotifications: () => navigate("/notifications"),
     },
   }
 }
