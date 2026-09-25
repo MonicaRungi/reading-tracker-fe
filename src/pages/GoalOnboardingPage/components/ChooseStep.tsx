@@ -1,22 +1,13 @@
 import { BookOpen, Target } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import {
-  DAYS_RANGE,
-  PAGES_RANGE,
-  PAGES_TICKS,
-  type PrimaryChoice,
-  type SecondaryGoal,
-  type SecondaryType,
-} from "../hooks/useGoalOnboardingData";
+import type { SecondaryGoalChoice, SecondaryGoalType } from "@/api/goals";
+import { SecondaryGoalsPicker } from "@/components/shared/SecondaryGoalsPicker";
+import type { PrimaryChoice } from "../hooks/useGoalOnboardingData";
 import { OnboardingIntro } from "./OnboardingIntro";
 import { SectionHeading } from "./SectionHeading";
 import { PrimaryGoalPicker } from "./PrimaryGoalPicker";
-import { SecondaryGoalOption } from "./SecondaryGoalOption";
-import { GoalSlider } from "./GoalSlider";
 import { JourneySummary } from "./JourneySummary";
-
-const DAYS_TICKS = [1, 2, 3, 4, 5, 6, 7] as const;
 
 export function ChooseStep({
   primaryChoice,
@@ -24,29 +15,25 @@ export function ChooseStep({
   primaryTarget,
   secondaryTypes,
   secondaryGoals,
-  daysTarget,
-  pagesTarget,
+  secondaryTargets,
   canContinue,
   onSelectPrimary,
   onCustomTargetChange,
   onToggleSecondary,
-  onDaysChange,
-  onPagesChange,
+  onSecondaryTargetChange,
   onContinue,
 }: {
   primaryChoice: PrimaryChoice;
   customTarget: string;
   primaryTarget: number | null;
-  secondaryTypes: SecondaryType[];
-  secondaryGoals: SecondaryGoal[];
-  daysTarget: number;
-  pagesTarget: number;
+  secondaryTypes: SecondaryGoalType[];
+  secondaryGoals: SecondaryGoalChoice[];
+  secondaryTargets: Record<SecondaryGoalType, number>;
   canContinue: boolean;
   onSelectPrimary: (value: PrimaryChoice) => void;
   onCustomTargetChange: (value: string) => void;
-  onToggleSecondary: (value: SecondaryType) => void;
-  onDaysChange: (value: number) => void;
-  onPagesChange: (value: number) => void;
+  onToggleSecondary: (type: SecondaryGoalType) => void;
+  onSecondaryTargetChange: (type: SecondaryGoalType, target: number) => void;
   onContinue: () => void;
 }) {
   const { t } = useTranslation();
@@ -75,41 +62,12 @@ export function ChooseStep({
           title={t("goals.secondaryQuestion")}
           subtitle={t("goals.secondarySubtitle")}
         />
-        <div className="space-y-2.5">
-          <SecondaryGoalOption
-            id="secondary-goal-days"
-            label={t("goals.secondaryDays")}
-            illustration="calendar"
-            checked={secondaryTypes.includes("days")}
-            onToggle={() => onToggleSecondary("days")}
-          >
-            <GoalSlider
-              id="secondary-goal-days-slider"
-              label={t("goals.daysSliderLabel")}
-              value={daysTarget}
-              {...DAYS_RANGE}
-              ticks={DAYS_TICKS}
-              onChange={onDaysChange}
-            />
-          </SecondaryGoalOption>
-
-          <SecondaryGoalOption
-            id="secondary-goal-pages"
-            label={t("goals.secondaryPages")}
-            illustration="pages"
-            checked={secondaryTypes.includes("pages")}
-            onToggle={() => onToggleSecondary("pages")}
-          >
-            <GoalSlider
-              id="secondary-goal-pages-slider"
-              label={t("goals.pagesSliderLabel")}
-              value={pagesTarget}
-              {...PAGES_RANGE}
-              ticks={PAGES_TICKS}
-              onChange={onPagesChange}
-            />
-          </SecondaryGoalOption>
-        </div>
+        <SecondaryGoalsPicker
+          selected={secondaryTypes}
+          targets={secondaryTargets}
+          onToggle={onToggleSecondary}
+          onTargetChange={onSecondaryTargetChange}
+        />
       </section>
 
       <JourneySummary

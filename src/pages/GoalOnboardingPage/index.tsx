@@ -31,14 +31,12 @@ export default function GoalOnboardingPage() {
           primaryTarget={data.primaryTarget}
           secondaryTypes={ui.secondaryTypes}
           secondaryGoals={data.secondaryGoals}
-          daysTarget={ui.daysTarget}
-          pagesTarget={ui.pagesTarget}
+          secondaryTargets={ui.secondaryTargets}
           canContinue={data.canContinue}
           onSelectPrimary={actions.selectPrimary}
           onCustomTargetChange={actions.setCustomTarget}
           onToggleSecondary={actions.toggleSecondary}
-          onDaysChange={actions.setDaysTarget}
-          onPagesChange={actions.setPagesTarget}
+          onSecondaryTargetChange={actions.setSecondaryTarget}
           onContinue={actions.goToReview}
         />
       )}

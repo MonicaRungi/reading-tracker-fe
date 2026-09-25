@@ -80,6 +80,7 @@ export function useLibraryData() {
       goToSearch: () => navigate("/search"),
       goToGoalOnboarding: () => navigate("/goals/onboarding"),
       goToNotifications: () => navigate("/notifications"),
+      goToGoals: () => navigate("/goals"),
     },
   }
 }

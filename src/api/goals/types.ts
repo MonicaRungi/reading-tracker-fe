@@ -4,6 +4,7 @@ export type GoalType = "books" | "days" | "pages"
 export type GoalRole = "primary" | "secondary"
 export type GoalPeriod = "year" | "month" | "week"
 export type GoalStatus = "active" | "achieved" | "failed" | "archived"
+export type SecondaryGoalType = Extract<GoalType, "days" | "pages">
 
 export interface ReadingGoal
   extends Omit<ReadingGoalRow, "type" | "role" | "period" | "status"> {
@@ -24,3 +25,9 @@ export interface CreateGoalInput {
 
 /** Avanzamento corrente per goal: goalId → valore (libri, giorni o pagine). */
 export type GoalProgressMap = Record<string, number>
+
+/** Scelta di un obiettivo secondario nei flussi di creazione (onboarding, rinnovo). */
+export interface SecondaryGoalChoice {
+  type: SecondaryGoalType
+  target: number
+}

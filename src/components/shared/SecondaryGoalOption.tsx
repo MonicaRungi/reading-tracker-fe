@@ -8,6 +8,7 @@ import {
 export function SecondaryGoalOption({
   id,
   label,
+  hint,
   illustration,
   checked,
   onToggle,
@@ -15,6 +16,7 @@ export function SecondaryGoalOption({
 }: {
   id: string;
   label: string;
+  hint?: string;
   illustration: IllustrationName;
   checked: boolean;
   onToggle: () => void;
@@ -37,8 +39,15 @@ export function SecondaryGoalOption({
           onCheckedChange={onToggle}
           className="size-5 rounded-md border-muted-foreground/50"
         />
-        <span className="min-w-0 flex-1 text-[14px] font-semibold leading-snug text-foreground">
-          {label}
+        <span className="min-w-0 flex-1">
+          <span className="block text-[14px] font-semibold leading-snug text-foreground">
+            {label}
+          </span>
+          {hint && (
+            <span className="mt-0.5 block text-[12px] text-muted-foreground">
+              {hint}
+            </span>
+          )}
         </span>
         <Illustration name={illustration} className="-my-1 size-10" />
       </label>

@@ -13,6 +13,7 @@ import GoodreadsImportPage from "@/pages/GoodreadsImportPage";
 import GoalOnboardingPage from "@/pages/GoalOnboardingPage";
 import BadgesPage from "@/pages/BadgesPage";
 import NotificationsPage from "@/pages/NotificationsPage";
+import GoalsPage from "@/pages/GoalsPage";
 import { useTheme } from "./hooks/useTheme";
 
 function App() {
@@ -30,12 +31,18 @@ function App() {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/book/:id" element={<BookDetailPage />} />
-          <Route path="/profile/import-goodreads" element={<GoodreadsImportPage />} />
+          <Route
+            path="/profile/import-goodreads"
+            element={<GoodreadsImportPage />}
+          />
           <Route path="/profile/badges" element={<BadgesPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
         </Route>
 
         <Route element={<FullScreenLayout />}>
+          <Route path="/goals" element={<GoalsPage />} />
+          {/* Il guard vale solo per l'onboarding: rimanda a /library se il
+              principale dell'anno esiste già. */}
           <Route element={<GoalOnboardingGuard />}>
             <Route path="/goals/onboarding" element={<GoalOnboardingPage />} />
           </Route>

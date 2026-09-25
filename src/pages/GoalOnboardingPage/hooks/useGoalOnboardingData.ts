@@ -4,25 +4,23 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createGoals } from "@/api/goals";
-import type { CreateGoalInput } from "@/api/goals";
+import type {
+  CreateGoalInput,
+  SecondaryGoalChoice,
+  SecondaryGoalType,
+} from "@/api/goals";
 import { useAuth } from "@/hooks/useAuth";
-import { getPeriodBounds } from "@/lib/goals";
+import {
+  DEFAULT_SECONDARY_TARGETS,
+  SECONDARY_GOAL_TYPES,
+  getPeriodBounds,
+} from "@/lib/goals";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
 
 export const PRIMARY_PRESETS = [6, 12, 24] as const;
 export type PrimaryChoice = (typeof PRIMARY_PRESETS)[number] | "custom";
-export const SECONDARY_TYPES = ["days", "pages"] as const;
-export type SecondaryType = (typeof SECONDARY_TYPES)[number];
-export interface SecondaryGoal {
-  type: SecondaryType;
-  target: number;
-}
 export type OnboardingStep = "choose" | "review";
 export const ONBOARDING_STEPS: OnboardingStep[] = ["choose", "review"];
-
-export const DAYS_RANGE = { min: 1, max: 7, step: 1 } as const;
-export const PAGES_RANGE = { min: 25, max: 300, step: 25 } as const;
-export const PAGES_TICKS = [25, 50, 100, 150, 200, 250, 300] as const;
 
 const UNIQUE_VIOLATION = "23505";
 
@@ -35,9 +33,10 @@ export function useGoalOnboardingData() {
   const [step, setStep] = useState<OnboardingStep>("choose");
   const [primaryChoice, setPrimaryChoice] = useState<PrimaryChoice>(12);
   const [customTarget, setCustomTarget] = useState("");
-  const [secondaryTypes, setSecondaryTypes] = useState<SecondaryType[]>([]);
-  const [daysTarget, setDaysTarget] = useState(4);
-  const [pagesTarget, setPagesTarget] = useState(100);
+  const [secondaryTypes, setSecondaryTypes] = useState<SecondaryGoalType[]>([]);
+  const [secondaryTargets, setSecondaryTargets] = useState(
+    DEFAULT_SECONDARY_TARGETS,
+  );
 
   const year = new Date().getFullYear();
   const customValue = Number.parseInt(customTarget, 10);
@@ -47,12 +46,9 @@ export function useGoalOnboardingData() {
         ? customValue
         : null
       : primaryChoice;
-  const secondaryGoals: SecondaryGoal[] = SECONDARY_TYPES.filter((type) =>
-    secondaryTypes.includes(type),
-  ).map((type) => ({
-    type,
-    target: type === "days" ? daysTarget : pagesTarget,
-  }));
+  const secondaryGoals: SecondaryGoalChoice[] = SECONDARY_GOAL_TYPES.filter(
+    (type) => secondaryTypes.includes(type),
+  ).map((type) => ({ type, target: secondaryTargets[type] }));
   const canContinue = primaryTarget !== null;
 
   const { mutate: submit, isPending: isSubmitting } = useMutation({
@@ -102,22 +98,21 @@ export function useGoalOnboardingData() {
       primaryChoice,
       customTarget,
       secondaryTypes,
-      daysTarget,
-      pagesTarget,
+      secondaryTargets,
       isSubmitting,
     },
     actions: {
       selectPrimary: setPrimaryChoice,
       setCustomTarget: (value: string) =>
         setCustomTarget(value.replace(/\D/g, "")),
-      toggleSecondary: (type: SecondaryType) =>
+      toggleSecondary: (type: SecondaryGoalType) =>
         setSecondaryTypes((current) =>
           current.includes(type)
             ? current.filter((t) => t !== type)
             : [...current, type],
         ),
-      setDaysTarget,
-      setPagesTarget,
+      setSecondaryTarget: (type: SecondaryGoalType, target: number) =>
+        setSecondaryTargets((current) => ({ ...current, [type]: target })),
       goToReview: () => {
         if (!canContinue) return;
         setStep("review");

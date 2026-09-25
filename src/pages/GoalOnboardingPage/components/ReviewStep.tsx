@@ -1,9 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import type {
-  PrimaryChoice,
-  SecondaryGoal,
-} from "../hooks/useGoalOnboardingData";
+import type { SecondaryGoalChoice } from "@/api/goals";
+import type { PrimaryChoice } from "../hooks/useGoalOnboardingData";
 import { GoalSummaryRow } from "./GoalSummaryRow";
 import { OnboardingIntro } from "./OnboardingIntro";
 import { LockNotice } from "./LockNotice";
@@ -20,7 +18,7 @@ export function ReviewStep({
   year: number;
   primaryChoice: PrimaryChoice;
   primaryTarget: number;
-  secondaryGoals: SecondaryGoal[];
+  secondaryGoals: SecondaryGoalChoice[];
   isSubmitting: boolean;
   onSubmit: () => void;
   onBack: () => void;

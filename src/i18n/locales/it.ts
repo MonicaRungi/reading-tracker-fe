@@ -223,6 +223,87 @@ export const it = {
     annualGoalReached: "Obiettivo annuale raggiunto!",
     emptyTitle: "Nessun obiettivo per il {{year}}",
     emptySubtitle: "Decidi quanti libri vuoi leggere quest'anno.",
+    seeDetails: "Vedi dettagli",
+    secondaryDaysHint: "Scegli quanti giorni dedicare alla lettura.",
+    secondaryPagesHint: "Scegli quante pagine leggere ogni settimana.",
+    // Pagina di dettaglio
+    detail: {
+      title: "Obiettivi di lettura",
+      primaryTitle: "Obiettivo principale",
+      primaryHeading_one: "{{count}} libro nel {{year}}",
+      primaryHeading_other: "{{count}} libri nel {{year}}",
+      primaryDescription_one: "Leggi {{count}} libro entro il {{date}}.",
+      primaryDescription_other: "Leggi {{count}} libri entro il {{date}}.",
+      primaryLocked: "Confermato · non modificabile",
+      primaryReached: "Obiettivo raggiunto!",
+      primaryEmptyTitle: "Nessun obiettivo per il {{year}}",
+      primaryEmptyCta: "Crea il tuo obiettivo",
+      secondaryTitle: "Obiettivi secondari",
+      secondarySubtitle:
+        "Obiettivi aggiuntivi per rendere la tua esperienza di lettura ancora più ricca.",
+      secondaryEmpty: "Nessun obiettivo secondario in corso.",
+      goalTitle: {
+        days_one: "{{count}} giorno a settimana",
+        days_other: "{{count}} giorni a settimana",
+        pages_one: "{{count}} pagina a settimana",
+        pages_other: "{{count}} pagine a settimana",
+      },
+      goalDescription: {
+        days: "Costruisci una routine di lettura costante.",
+        pages: "Aumenta, settimana dopo settimana, le pagine lette.",
+      },
+      progress: {
+        days_one: "{{current}} di {{target}} giorno",
+        days_other: "{{current}} di {{target}} giorni",
+        pages_one: "{{current}} di {{target}} pagina",
+        pages_other: "{{current}} di {{target}} pagine",
+      },
+      reachedThisWeek: "Raggiunto questa settimana",
+      scheduled: "Programmato",
+      startsOn: "Parte {{date}}",
+      startedOn: "Attivo da {{date}}",
+      edit: "Modifica",
+      archive: "Archivia",
+      addSecondary: "Aggiungi obiettivo secondario",
+      archivedRow: "Obiettivi archiviati ({{count}})",
+      // Invito al rinnovo
+      renewalTitle: "Il tuo obiettivo settimanale è concluso",
+      renewalConcluded: "Concluso il {{date}}",
+      renew: "Rinnova",
+      change: "Cambia",
+      dismiss: "Chiudi",
+      // Foglio "Rinnova"
+      renewSheetTitle: "Rinnova obiettivo secondario",
+      renewSheetDescription:
+        "Vuoi rinnovare questo obiettivo con lo stesso target del precedente?",
+      renewSameTarget: "Stesso target del precedente obiettivo",
+      renewConfirm: "Conferma rinnovo",
+      // Foglio "Scegli i nuovi obiettivi secondari"
+      pickerTitle: "Scegli i nuovi obiettivi secondari",
+      pickerDescription:
+        "I nuovi obiettivi inizieranno nella prima settimana disponibile, senza sovrapporsi con quelli attivi.",
+      pickerStart: "Partenza",
+      pickerSave: "Salva obiettivi",
+      pickerNothingAvailable:
+        "Hai già programmato un obiettivo per ogni tipo.",
+      // Modifica e archiviazione
+      editSheetTitle: "Modifica obiettivo",
+      editSave: "Salva",
+      archiveTitle: "Archiviare l'obiettivo?",
+      archiveDescription:
+        "L'obiettivo non sarà più attivo e non conterà come completato. Un nuovo obiettivo dello stesso tipo potrà partire dalla settimana successiva.",
+      archiveConfirm: "Archivia",
+      archivedSheetTitle: "Obiettivi archiviati",
+      archivedPeriod: "{{start}} – {{end}}",
+      // Feedback
+      renewedTitle: "Obiettivo rinnovato",
+      savedTitle: "Obiettivi salvati",
+      bannerFuture: "Il tuo obiettivo di {{title}} inizierà {{date}}.",
+      bannerNow: "Il tuo obiettivo di {{title}} è attivo da {{date}}.",
+      bannerClose: "Chiudi",
+      updated: "Obiettivo aggiornato",
+      archived: "Obiettivo archiviato",
+    },
   },
   badges: {
     pageTitle: "Badge",

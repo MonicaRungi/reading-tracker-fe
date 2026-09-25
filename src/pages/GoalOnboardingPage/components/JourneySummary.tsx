@@ -1,13 +1,13 @@
 import { BookOpen, CalendarDays, FileText, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { SecondaryGoal } from "../hooks/useGoalOnboardingData";
+import type { SecondaryGoalChoice } from "@/api/goals";
 
 export function JourneySummary({
   primaryTarget,
   secondaryGoals,
 }: {
   primaryTarget: number | null;
-  secondaryGoals: SecondaryGoal[];
+  secondaryGoals: SecondaryGoalChoice[];
 }) {
   const { t } = useTranslation();
 

@@ -10,24 +10,42 @@ export function ReadingGoalSection({
   current,
   year,
   onCreateGoal,
+  onOpenGoals,
 }: {
   goal: ReadingGoal | null;
   current: number;
   year: number;
   onCreateGoal: () => void;
+  onOpenGoals: () => void;
 }) {
   const { t } = useTranslation();
 
   return (
     <section className="px-4 pb-4 pt-1">
-      <h2 className="mb-3 text-[17px] font-bold text-foreground">
-        {t("goals.librarySectionTitle")}
-      </h2>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-[17px] font-bold text-foreground">
+          {t("goals.librarySectionTitle")}
+        </h2>
+        {goal && (
+          <Button
+            variant="link"
+            onClick={onOpenGoals}
+            className="h-auto gap-0.5 p-0 text-[13px] font-medium text-muted-foreground"
+          >
+            {t("goals.seeDetails")}
+            <ChevronRight className="size-4" aria-hidden="true" />
+          </Button>
+        )}
+      </div>
 
       {goal ? (
-        <div className="flex items-center gap-4 rounded-2xl bg-accent px-4 py-4">
+        <Button
+          variant="ghost"
+          onClick={onOpenGoals}
+          className="h-auto w-full justify-start gap-4 whitespace-normal rounded-2xl bg-accent px-4 py-4 text-left font-normal hover:bg-accent active:opacity-80"
+        >
           <GoalProgressRing ratio={current / goal.target} />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-[20px] font-bold text-foreground">
               {t("goals.primaryProgress", {
                 count: goal.target,
@@ -41,7 +59,11 @@ export function ReadingGoalSection({
                 : t("goals.annualGoal")}
             </p>
           </div>
-        </div>
+          <ChevronRight
+            className="size-5 shrink-0 text-muted-foreground"
+            aria-hidden="true"
+          />
+        </Button>
       ) : (
         <Button
           variant="ghost"
