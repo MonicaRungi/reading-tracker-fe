@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { hapticFeedback } from "@/lib/haptics";
+import { isStandalonePwa } from "@/lib/pwa";
 
 /** Trascinamento (px, già con resistenza) oltre il quale si aggiorna. */
 export const PULL_THRESHOLD = 70;
@@ -14,7 +15,8 @@ const DIRECTION_LOCK_PX = 10;
  * Pull-to-refresh sulla pagina (scroll della window). Parte solo con la pagina
  * in cima, un dito e un gesto verticale; si ignora se è aperto un dialog o un
  * bottom sheet, o se il tocco parte da un elemento `[data-no-pull-refresh]`.
- * Serve soprattutto nella PWA installata su iOS, dove Safari non lo offre.
+ * Attivo **solo nella PWA installata**, dove il browser non offre il suo: in una
+ * scheda del browser restano il pull-to-refresh e il rimbalzo nativi.
  */
 export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
   const [pull, setPull] = useState(0);
@@ -26,6 +28,8 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
   });
 
   useEffect(() => {
+    if (!isStandalonePwa()) return;
+
     let start: { x: number; y: number } | null = null;
     let isPulling = false;
     let current = 0;

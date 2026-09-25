@@ -44,7 +44,7 @@ export function BookMenuSheet({
             trigger={
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 rounded-xl px-4 py-3.5 text-left text-[15px] font-medium text-red-500 active:bg-[#F1EFEC]"
+                className="w-full justify-start gap-3 rounded-xl px-4 py-3.5 text-left text-[15px] font-medium text-destructive hover:text-destructive active:bg-secondary"
               >
                 {t("bookDetail.removeFromLibrary")}
               </Button>

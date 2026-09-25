@@ -9,8 +9,9 @@ import { cn } from "@/lib/utils";
 const INDICATOR_SIZE = 40;
 
 /**
- * Indicatore di pull-to-refresh dell'app shell. Aggiornare = chiusura attiva
- * degli obiettivi raggiunti + refetch di tutte le query attive (niente reload).
+ * Indicatore di pull-to-refresh dell'app shell, solo nella PWA installata (nel
+ * browser resta quello nativo). Aggiornare = chiusura attiva degli obiettivi
+ * raggiunti + refetch di tutte le query attive (niente reload).
  */
 export function PullToRefresh() {
   const { t } = useTranslation();
