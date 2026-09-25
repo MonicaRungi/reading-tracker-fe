@@ -13,6 +13,7 @@ import {
   type SecondaryGoalChoice,
   type SecondaryGoalType,
 } from "@/api/goals";
+import { markRenewalNotificationsRead } from "@/api/notifications";
 import { useAuth } from "@/hooks/useAuth";
 import { formatWeekdayDate, toISODate } from "@/lib/format";
 import {
@@ -125,6 +126,12 @@ export function useGoalsData() {
       );
       setRenewTarget(null);
       setPicker(null);
+      // Gli inviti di rinnovo per i tipi appena ricreati non servono più.
+      const renewedGoalIds = renewals
+        .filter(({ goal }) => choices.some((c) => c.type === goal.type))
+        .map(({ goal }) => goal.id);
+      await markRenewalNotificationsRead(renewedGoalIds).catch(() => undefined);
+      void queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
       await invalidateProgressQueries(queryClient, userId);
     },
     onError: () => toast.error(t("common.error")),

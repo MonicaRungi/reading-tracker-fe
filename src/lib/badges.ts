@@ -73,12 +73,3 @@ export function combineBadges(
     return (a.threshold ?? 0) - (b.threshold ?? 0);
   });
 }
-
-/** Badge sbloccati non ancora presenti tra quelli già visti (per la celebrazione). */
-export function findNewlyUnlocked(
-  seenIds: string[],
-  userBadges: UserBadge[],
-): UserBadge[] {
-  const seen = new Set(seenIds);
-  return userBadges.filter((ub) => !seen.has(ub.badge_id));
-}

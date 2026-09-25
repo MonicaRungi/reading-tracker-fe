@@ -13,6 +13,8 @@ import { createLibraryMatcher } from "@/lib/bookMatch";
 import { hapticFeedback } from "@/lib/haptics";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
 import { listShelves, createShelf } from "@/api/shelves";
+import { createReminder } from "@/api/releaseReminders";
+import { upcomingReleaseDate } from "@/lib/releaseDate";
 
 export type SearchTab = "search" | "scan";
 
@@ -36,6 +38,7 @@ export function useSearchData() {
   const [isAddingShelf, setIsAddingShelf] = useState(false);
   const [scanResetKey, setScanResetKey] = useState(0);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [remindRelease, setRemindRelease] = useState(false);
 
   const debouncedQuery = useDebounce(query, 400);
 
@@ -84,13 +87,23 @@ export function useSearchData() {
     resetScanner();
   }, [resetScanner]);
 
+  const releaseDate = upcomingReleaseDate(selectedBook?.published_date);
+
   const { mutate: addBook, isPending: isAddingBook } = useMutation({
-    mutationFn: () =>
-      addLibraryItem(user!.id, {
+    mutationFn: async () => {
+      const item = await addLibraryItem(user!.id, {
         book: selectedBook!,
         status,
         shelf_ids: selectedShelfIds,
-      }),
+      });
+      if (remindRelease && releaseDate) {
+        // il libro è già in libreria: un errore qui non deve annullare l'aggiunta
+        await createReminder(user!.id, item.book.id, releaseDate).catch(() =>
+          toast.error(t("common.error")),
+        );
+      }
+      return item;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["library", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["stats", user?.id] });
@@ -126,6 +139,7 @@ export function useSearchData() {
     setSelectedShelfIds([]);
     setNewShelfName("");
     setIsAddingShelf(false);
+    setRemindRelease(false);
     setSelectedBook(book);
   }, []);
 
@@ -196,6 +210,8 @@ export function useSearchData() {
       isCreatingShelf,
       scanResetKey,
       scannerOpen,
+      releaseDate,
+      remindRelease,
     },
     actions: {
       setTab,
@@ -211,6 +227,7 @@ export function useSearchData() {
       startAddingShelf: () => setIsAddingShelf(true),
       confirmNewShelf,
       submitAddBook: () => addBook(),
+      toggleRemindRelease: () => setRemindRelease((on) => !on),
     },
   };
 }

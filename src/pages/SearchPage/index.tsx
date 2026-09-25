@@ -52,6 +52,9 @@ export default function SearchPage() {
         book={ui.selectedBook}
         status={ui.status}
         onStatusChange={actions.setStatus}
+        releaseDate={ui.releaseDate}
+        remindRelease={ui.remindRelease}
+        onToggleRemindRelease={actions.toggleRemindRelease}
         isSubmitting={ui.isAddingBook}
         onSubmit={actions.submitAddBook}
         onClose={actions.closeSheet}

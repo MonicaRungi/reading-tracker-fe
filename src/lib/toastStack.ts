@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { toast, type ToastT } from "sonner";
 
 const BASE_DURATION = 4000;
@@ -22,7 +23,7 @@ const METHODS: Partial<Record<NonNullable<ToastT["type"]>, ToastMethod>> = {
  * id ne fa ripartire il timer con la nuova durata.
  */
 export function showStackedSuccessToasts(
-  items: { id: string; message: string }[],
+  items: { id: string; message: string; description?: string; icon?: ReactNode }[],
 ) {
   if (items.length === 0) return;
   const longest = BASE_DURATION + (items.length - 1) * STAGGER;
@@ -38,6 +39,8 @@ export function showStackedSuccessToasts(
   items.forEach((item, index) => {
     toast.success(item.message, {
       id: item.id,
+      description: item.description,
+      icon: item.icon,
       duration: BASE_DURATION + (items.length - 1 - index) * STAGGER,
     });
   });

@@ -8,11 +8,16 @@ import type { ReadingStatus } from "@/api/library";
 import { SelectedBookSummary } from "./components/SelectedBookSummary";
 import { BookMetaDetails } from "./components/BookMetaDetails";
 import { ReadingStatusPicker } from "./components/ReadingStatusPicker";
+import { ReleaseReminderCard } from "@/components/shared/ReleaseReminderCard";
 
 interface AddBookSheetProps {
   book: BookMeta | null;
   status: ReadingStatus;
   onStatusChange: (status: ReadingStatus | "") => void;
+  /** Data di uscita futura e completa: abilita il promemoria. */
+  releaseDate: string | null;
+  remindRelease: boolean;
+  onToggleRemindRelease: () => void;
   isSubmitting: boolean;
   onSubmit: () => void;
   onClose: () => void;
@@ -22,6 +27,9 @@ export function AddBookSheet({
   book,
   status,
   onStatusChange,
+  releaseDate,
+  remindRelease,
+  onToggleRemindRelease,
   isSubmitting,
   onSubmit,
   onClose,
@@ -69,6 +77,14 @@ export function AddBookSheet({
             {t("search.readingStatus")}
           </p>
           <ReadingStatusPicker value={status} onChange={onStatusChange} />
+
+          {releaseDate && (
+            <ReleaseReminderCard
+              releaseDate={releaseDate}
+              active={remindRelease}
+              onToggle={onToggleRemindRelease}
+            />
+          )}
         </div>
 
         <div className="shrink-0 border-t border-border px-5 pb-4 pt-3">
