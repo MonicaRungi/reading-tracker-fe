@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { it } from "date-fns/locale";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet } from "@/components/ui/sheet";
+import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 
@@ -27,19 +28,17 @@ export function DatePickerSheet({
       ? t("bookDetail.startedDateLabel")
       : t("bookDetail.finishedDateLabel");
 
-  const [selected, setSelected] = useState<Date | undefined>(
-    currentValue ? new Date(currentValue) : undefined,
-  );
+  // Bozza della data scelta nel calendario: null = nessuna modifica, si mostra
+  // il valore salvato. Si azzera alla chiusura, così a ogni apertura lo sheet
+  // riparte dalla data del campo interessato.
+  const [draft, setDraft] = useState<Date | undefined | null>(null);
+  const selected =
+    draft !== null ? draft : currentValue ? new Date(currentValue) : undefined;
 
-  // Riallinea la data selezionata al campo interessato ogni volta che lo sheet si
-  // apre (il componente resta montato tra un'apertura e l'altra, quindi lo state
-  // non si reinizializza da solo).
-  useEffect(() => {
-    if (open) {
-      setSelected(currentValue ? new Date(currentValue) : undefined);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentValue]);
+  function close() {
+    setDraft(null);
+    onClose();
+  }
 
   function handleSave() {
     if (!selected || !open) return;
@@ -48,17 +47,14 @@ export function DatePickerSheet({
     const mm = String(selected.getMonth() + 1).padStart(2, "0");
     const dd = String(selected.getDate()).padStart(2, "0");
     onSave(open, `${yyyy}-${mm}-${dd}`);
-    onClose();
+    close();
   }
 
   return (
-    <Sheet open={open !== null} onOpenChange={(next) => !next && onClose()}>
-      <SheetContent
-        side="bottom"
-        className="rounded-t-[22px] px-5 pb-safe pt-2"
+    <Sheet open={open !== null} onOpenChange={(next) => !next && close()}>
+      <BottomSheetContent
+        className="px-5"
       >
-        <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-border" />
-
         <h2 className="mb-5 pr-8 text-[20px] font-bold text-foreground">
           {label}
         </h2>
@@ -67,7 +63,7 @@ export function DatePickerSheet({
           key={open}
           mode="single"
           selected={selected}
-          onSelect={setSelected}
+          onSelect={setDraft}
           defaultMonth={selected}
           locale={it}
           disabled={
@@ -88,7 +84,7 @@ export function DatePickerSheet({
         >
           {t("bookDetail.confirmDate")}
         </Button>
-      </SheetContent>
+      </BottomSheetContent>
     </Sheet>
   );
 }

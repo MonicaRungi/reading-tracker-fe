@@ -1,5 +1,6 @@
+import { useTranslation } from "react-i18next";
+import { BackHeader } from "@/components/shared/BackHeader";
 import { useGoodreadsImportData } from "./hooks/useGoodreadsImportData";
-import { GoodreadsImportHeader } from "./components/GoodreadsImportHeader";
 import { GoodreadsConnectCard } from "./components/GoodreadsConnectCard";
 import { GoodreadsImportPreview } from "./components/GoodreadsImportPreview";
 import { GoodreadsImportingState } from "./components/GoodreadsImportingState";
@@ -7,11 +8,12 @@ import { GoodreadsImportResult } from "./components/GoodreadsImportResult";
 import { GoodreadsImportError } from "./components/GoodreadsImportError";
 
 export default function GoodreadsImportPage() {
+  const { t } = useTranslation();
   const { data, ui, actions } = useGoodreadsImportData();
 
   return (
     <div className="flex min-h-full flex-col">
-      <GoodreadsImportHeader onBack={actions.goBack} />
+      <BackHeader title={t("import.goodreads")} onBack={actions.goBack} />
 
       <div className="flex-1 space-y-5 px-4 pb-8">
         <GoodreadsConnectCard

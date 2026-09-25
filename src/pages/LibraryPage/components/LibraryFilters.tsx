@@ -18,7 +18,7 @@ export function LibraryFilters({
       type="single"
       value={value}
       onValueChange={onChange}
-      className="mb-4 flex w-full justify-start gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      className="isolate mb-4 flex w-full justify-start gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
     >
       {FILTERS.map((filter) => (
         <ToggleGroupItem

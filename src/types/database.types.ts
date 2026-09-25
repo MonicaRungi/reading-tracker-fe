@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          icon_key: string
+          id: string
+          key: string
+          metric: string | null
+          threshold: number | null
+          tier: string | null
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          icon_key: string
+          id?: string
+          key: string
+          metric?: string | null
+          threshold?: number | null
+          tier?: string | null
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          icon_key?: string
+          id?: string
+          key?: string
+          metric?: string | null
+          threshold?: number | null
+          tier?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       books: {
         Row: {
           authors: string[] | null
@@ -112,18 +151,69 @@ export type Database = {
           display_name: string | null
           id: string
           theme: string
+          total_pages_read: number
         }
         Insert: {
           created_at?: string
           display_name?: string | null
           id: string
           theme?: string
+          total_pages_read?: number
         }
         Update: {
           created_at?: string
           display_name?: string | null
           id?: string
           theme?: string
+          total_pages_read?: number
+        }
+        Relationships: []
+      }
+      reading_goals: {
+        Row: {
+          confirmed_at: string
+          created_at: string
+          id: string
+          is_locked: boolean
+          period: string
+          period_end: string
+          period_start: string
+          role: string
+          status: string
+          target: number
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confirmed_at?: string
+          created_at?: string
+          id?: string
+          is_locked?: boolean
+          period: string
+          period_end: string
+          period_start: string
+          role: string
+          status?: string
+          target: number
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confirmed_at?: string
+          created_at?: string
+          id?: string
+          is_locked?: boolean
+          period?: string
+          period_end?: string
+          period_start?: string
+          role?: string
+          status?: string
+          target?: number
+          type?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -199,12 +289,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          badge_id: string
+          is_featured: boolean
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          is_featured?: boolean
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          is_featured?: boolean
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_reading_log: { Args: never; Returns: undefined }
+      close_expired_reading_goals: { Args: never; Returns: undefined }
+      increment_total_pages_read: {
+        Args: { p_delta: number; p_user_id: string }
+        Returns: undefined
+      }
+      unlock_badge: {
+        Args: { p_badge_key: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
@@ -338,7 +466,11 @@ export const Constants = {
   },
 } as const
 
-
+// ---------------------------------------------------------------------------
+// Tutto quello che sta sopra è generato: `supabase gen types typescript
+// --project-id ekpyxrjjwbiklnmyiswu --schema public`. Rigenerando, conservare
+// questo blocco di alias in fondo al file (la generazione lo cancella).
+// ---------------------------------------------------------------------------
 // Alias comodi per usare i tipi Row/Insert/Update nei file api
 export type BookRow = Database["public"]["Tables"]["books"]["Row"]
 export type BookInsert = Database["public"]["Tables"]["books"]["Insert"]
@@ -347,3 +479,6 @@ export type LibraryItemUpdate = Database["public"]["Tables"]["library_items"]["U
 export type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"]
 export type ShelfRow = Database["public"]["Tables"]["shelves"]["Row"]
 export type ReadingLogRow = Database["public"]["Tables"]["reading_log"]["Row"]
+export type ReadingGoalRow = Database["public"]["Tables"]["reading_goals"]["Row"]
+export type BadgeRow = Database["public"]["Tables"]["badges"]["Row"]
+export type UserBadgeRow = Database["public"]["Tables"]["user_badges"]["Row"]

@@ -10,6 +10,8 @@ import { GenresSection } from "./components/GenresSection";
 import { SignOutButton } from "./components/SignOutButton";
 import { useNavigate } from "react-router-dom";
 import { ImportButton } from "./components/ImportButton";
+import { FeaturedBadgesSection } from "@/components/shared/FeaturedBadgesSection";
+import { BadgeDetailSheet } from "@/components/shared/BadgeDetailSheet";
 
 export default function ProfilePage() {
   const { t } = useTranslation();
@@ -43,6 +45,14 @@ export default function ProfilePage() {
             <>
               <StatsGrid stats={data.stats} />
 
+              <FeaturedBadgesSection
+                badges={data.featuredBadges}
+                maxFeatured={data.maxFeatured}
+                actionLabel={t("badges.seeAll")}
+                onAction={actions.goToBadges}
+                onSelect={actions.openBadge}
+              />
+
               <ActivitySection
                 view={ui.activityView}
                 onViewChange={actions.setActivityView}
@@ -69,6 +79,16 @@ export default function ProfilePage() {
         />
         <SignOutButton onClick={actions.signOut} />
       </div>
+
+      <BadgeDetailSheet
+        badge={data.selectedBadge}
+        progress={data.selectedBadgeProgress}
+        canFeatureMore={data.canFeatureMore}
+        maxFeatured={data.maxFeatured}
+        isTogglingFeatured={ui.isTogglingFeatured}
+        onToggleFeatured={actions.toggleBadgeFeatured}
+        onClose={actions.closeBadge}
+      />
     </div>
   );
 }

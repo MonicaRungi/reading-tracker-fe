@@ -1,11 +1,12 @@
 import { supabase } from "@/lib/supabase";
 import { upsertBook } from "@/api/books";
+import { toISODate } from "@/lib/format";
 import type { AddLibraryItemInput, LibraryItem, ReadingStatus } from "./types";
 
 const LIBRARY_SELECT = "*, book:books(*)";
 
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toISODate();
 }
 
 export async function listLibrary(): Promise<LibraryItem[]> {
@@ -56,7 +57,9 @@ export async function updateStatus(
 ): Promise<LibraryItem> {
   const { data: current, error: fetchError } = await supabase
     .from("library_items")
-    .select("user_id, started_at, finished_at, current_page, book:books(page_count)")
+    .select(
+      "user_id, started_at, finished_at, current_page, book:books(page_count)",
+    )
     .eq("id", itemId)
     .single();
   if (fetchError) throw fetchError;
@@ -68,7 +71,9 @@ export async function updateStatus(
   // lette oggi: porta current_page al totale e aggiorna il reading_log.
   const pageCount = current.book?.page_count ?? 0;
   const missingPages =
-    status === "read" ? Math.max(0, pageCount - (current.current_page ?? 0)) : 0;
+    status === "read"
+      ? Math.max(0, pageCount - (current.current_page ?? 0))
+      : 0;
 
   const { data, error } = await supabase
     .from("library_items")
@@ -159,6 +164,12 @@ async function logPagesRead(userId: string, delta: number): Promise<void> {
     { onConflict: "user_id,log_date" },
   );
   if (error) throw error;
+
+  const { error: incrementError } = await supabase.rpc(
+    "increment_total_pages_read",
+    { p_user_id: userId, p_delta: delta },
+  );
+  if (incrementError) throw incrementError;
 }
 
 export async function rateItem(

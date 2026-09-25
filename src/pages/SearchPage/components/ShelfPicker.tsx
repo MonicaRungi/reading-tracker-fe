@@ -32,7 +32,7 @@ export function ShelfPicker({
         type="multiple"
         value={selectedIds}
         onValueChange={onSelectedIdsChange}
-        className="flex flex-wrap gap-2"
+        className="isolate flex flex-wrap gap-2"
       >
         {shelves.map((shelf) => (
           <ToggleGroupItem

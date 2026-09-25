@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Papa from "papaparse";
 import { useAuth } from "@/hooks/useAuth";
 import { listLibrary } from "@/api/library";
 import { supabase } from "@/lib/supabase";
+import { invalidateProgressQueries } from "@/lib/progressQueries";
 
 export type ImportStep = "upload" | "preview" | "importing" | "done" | "error";
 
@@ -29,6 +30,7 @@ export function useGoodreadsImportData() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const [step, setStep] = useState<ImportStep>("upload");
   const [preview, setPreview] = useState<ImportPreview | null>(null);
@@ -139,7 +141,15 @@ export function useGoodreadsImportData() {
 
     setResult(data);
     setStep("done");
-  }, [preview, t]);
+
+    // L'import inserisce libri già letti: aggiorna libreria, statistiche e,
+    // visto che il trigger sblocca badge anche all'insert, obiettivi e badge.
+    void Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["library", user?.id] }),
+      queryClient.invalidateQueries({ queryKey: ["stats", user?.id] }),
+      invalidateProgressQueries(queryClient, user?.id),
+    ]);
+  }, [preview, t, queryClient, user?.id]);
 
   const reset = useCallback(() => {
     setStep("upload");
