@@ -1,11 +1,16 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { updateProfileTheme, type ThemePreference } from "@/api/profile";
+import {
+  getProfile,
+  updateProfileTheme,
+  type ThemePreference,
+} from "@/api/profile";
 import { getStats } from "@/api/stats";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { toISODate } from "@/lib/format";
+import { getInitials, resolveDisplayName } from "@/lib/profileName";
 import { useNavigate } from "react-router-dom";
 import { useBadges } from "@/hooks/useBadges";
 
@@ -31,6 +36,12 @@ export function useProfileData() {
 
   const [booksView, setBooksView] = useState<BooksView>("month");
   const [activityView, setActivityView] = useState<ActivityView>("day");
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile", userId],
+    queryFn: () => getProfile(),
+    enabled: Boolean(userId),
+  });
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["stats", userId],
@@ -89,8 +100,12 @@ export function useProfileData() {
           isActive: m.month === currentMonth,
         })) ?? []);
 
-  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "??";
-  const displayName = user?.email ? user.email.split("@")[0] : "";
+  const displayName = resolveDisplayName({
+    profileName: profile?.display_name,
+    metadata: user?.user_metadata,
+    email: user?.email,
+  });
+  const initials = getInitials(displayName);
 
   return {
     data: {
