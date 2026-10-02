@@ -56,6 +56,8 @@ export const it = {
     emptyFilter: "Nessun libro",
     emptyFilterSub: "Non hai libri in questa categoria",
     filterAll: "Tutti",
+    bookCount_one: "{{count}} libro",
+    bookCount_other: "{{count}} libri",
     searchPlaceholder: "Cerca per titolo o autore",
   },
   status: {

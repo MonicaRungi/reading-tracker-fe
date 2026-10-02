@@ -3,6 +3,7 @@ import { Search, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { SearchField } from "@/components/shared/SearchField";
+import { LoadMoreTrigger } from "@/components/shared/LoadMoreTrigger";
 import type { LibraryItem } from "@/api/library";
 import type { LibraryFilter } from "../hooks/useLibraryData";
 import { LibraryFilters } from "./LibraryFilters";
@@ -10,14 +11,22 @@ import { LibraryGrid } from "./LibraryGrid";
 
 export function MyLibrarySection({
   items,
+  total,
   isLoading,
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore,
   filter,
   onFilterChange,
   query,
   onQueryChange,
 }: {
   items: LibraryItem[];
+  total: number | undefined;
   isLoading: boolean;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  onLoadMore: () => void;
   filter: LibraryFilter;
   onFilterChange: (filter: LibraryFilter | "") => void;
   query: string;
@@ -76,7 +85,23 @@ export function MyLibrarySection({
       </div>
 
       <div className="px-4">
-        <LibraryGrid items={items} isLoading={isLoading} filter={filter} />
+        {total !== undefined && !isLoading && (
+          <p className="mb-3 text-[13px] text-muted-foreground">
+            {t("library.bookCount", { count: total })}
+          </p>
+        )}
+        <LibraryGrid
+          items={items}
+          isLoading={isLoading}
+          filter={filter}
+          hasQuery={query.trim() !== ""}
+        />
+        {hasNextPage && (
+          <LoadMoreTrigger
+            onLoadMore={onLoadMore}
+            isLoading={isFetchingNextPage}
+          />
+        )}
       </div>
     </section>
   );

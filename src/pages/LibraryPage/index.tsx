@@ -42,7 +42,11 @@ export default function LibraryPage() {
 
           <MyLibrarySection
             items={data.grid}
+            total={data.total}
             isLoading={data.isLoading}
+            hasNextPage={data.hasNextPage}
+            isFetchingNextPage={data.isFetchingNextPage}
+            onLoadMore={actions.loadMore}
             filter={ui.filter}
             onFilterChange={actions.setFilter}
             query={ui.query}

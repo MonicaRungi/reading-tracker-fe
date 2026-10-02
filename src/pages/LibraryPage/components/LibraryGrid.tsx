@@ -10,10 +10,12 @@ export function LibraryGrid({
   items,
   isLoading,
   filter,
+  hasQuery,
 }: {
   items: LibraryItem[];
   isLoading: boolean;
   filter: LibraryFilter;
+  hasQuery: boolean;
 }) {
   const { t } = useTranslation();
 
@@ -27,7 +29,7 @@ export function LibraryGrid({
     );
   }
 
-  if (items.length === 0 && filter !== "all") {
+  if (items.length === 0 && (filter !== "all" || hasQuery)) {
     return (
       <EmptyState
         icon={BookOpen}
