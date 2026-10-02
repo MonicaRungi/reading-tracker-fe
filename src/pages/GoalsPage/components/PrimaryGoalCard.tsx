@@ -4,18 +4,25 @@ import type { ReadingGoal } from "@/api/goals";
 import { Illustration } from "@/components/shared/Illustration";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatNumber } from "@/lib/format";
+import { isGoalInCurrentPeriod } from "@/lib/goals";
+import { cn } from "@/lib/utils";
 import { GoalProgressRow } from "./GoalProgressRow";
 
 export function PrimaryGoalCard({
   goal,
   current,
   year,
+  isFilled,
   onCreate,
+  onFilled,
 }: {
   goal: ReadingGoal | null;
   current: number;
   year: number;
+  /** La barra animata è arrivata al 100%. */
+  isFilled: boolean;
   onCreate: () => void;
+  onFilled: () => void;
 }) {
   const { t } = useTranslation();
 
@@ -33,7 +40,15 @@ export function PrimaryGoalCard({
     );
   }
 
-  const reached = goal.status === "achieved" || current >= goal.target;
+  // Nel periodo in corso conta il progresso reale: lo status 'achieved' resta
+  // anche se poi il conteggio scende (libro tolto dai letti, target alzato).
+  // Chiuso il periodo, fa fede lo status salvato.
+  const inCurrentPeriod = isGoalInCurrentPeriod(goal);
+  const reached = inCurrentPeriod
+    ? current >= goal.target
+    : goal.status === "achieved";
+  // Nel periodo in corso il messaggio aspetta che la barra arrivi al 100%.
+  const showReached = reached && (!inCurrentPeriod || isFilled);
 
   return (
     <div className="flex gap-3 rounded-2xl bg-card px-4 py-4">
@@ -57,10 +72,17 @@ export function PrimaryGoalCard({
             target: formatNumber(goal.target),
           })}
           ratio={current / goal.target}
+          animate
+          onFilled={onFilled}
         />
         <p className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
           {reached ? (
-            <span className="font-medium text-primary">
+            <span
+              className={cn(
+                "origin-left font-medium text-primary",
+                showReached ? "animate-goal-pop" : "invisible",
+              )}
+            >
               {t("goals.detail.primaryReached")}
             </span>
           ) : (
