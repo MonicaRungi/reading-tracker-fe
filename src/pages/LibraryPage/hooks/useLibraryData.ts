@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom"
 import { listLibraryPage } from "@/api/library"
 import { getGoalsProgress, listGoals } from "@/api/goals"
 import { findPrimaryGoalForYear } from "@/lib/goals"
+import { getBooleanPreference, setBooleanPreference } from "@/lib/preferences"
 import { useAuth } from "@/hooks/useAuth"
 import { useDebounce } from "@/hooks/useDebounce"
 import { useNotifications } from "@/hooks/useNotifications"
@@ -17,6 +18,7 @@ export type LibraryFilter = "all" | ReadingStatus
 
 const PAGE_SIZE = 30 // multiplo delle 3 colonne della griglia
 const READING_LIMIT = 20
+const GOAL_OPEN_KEY = "rt.libraryGoalOpen"
 
 export function useLibraryData() {
   const { user } = useAuth()
@@ -24,6 +26,9 @@ export function useLibraryData() {
   const userId = user?.id ?? ""
   const [filter, setFilter] = useState<LibraryFilter>("all")
   const [query, setQuery] = useState("")
+  const [isGoalOpen, setIsGoalOpen] = useState(() =>
+    getBooleanPreference(GOAL_OPEN_KEY, true),
+  )
   const { unreadCount } = useNotifications()
 
   const debouncedQuery = useDebounce(query.trim(), 300)
@@ -98,10 +103,14 @@ export function useLibraryData() {
       isLoadingGoals,
       unreadNotifications: unreadCount,
     },
-    ui: { filter, query },
+    ui: { filter, query, isGoalOpen },
     actions: {
       setFilter: (next: LibraryFilter | "") => next && setFilter(next),
       setQuery,
+      setGoalOpen: (open: boolean) => {
+        setIsGoalOpen(open)
+        setBooleanPreference(GOAL_OPEN_KEY, open)
+      },
       loadMore: () => {
         if (gridQuery.hasNextPage && !gridQuery.isFetchingNextPage) {
           void gridQuery.fetchNextPage()

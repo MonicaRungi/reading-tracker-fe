@@ -15,7 +15,7 @@ export function ArchivedGoalsRow({
     <Button
       variant="ghost"
       onClick={onOpen}
-      className="h-auto w-full justify-start gap-3 rounded-2xl bg-card px-4 py-3.5 text-[14px] font-normal text-foreground hover:bg-card"
+      className="h-auto w-full justify-start gap-3 rounded-2xl bg-card px-4 py-3.5 shadow-card text-[14px] font-normal text-foreground hover:bg-card"
     >
       <Archive className="size-5 text-muted-foreground" aria-hidden="true" />
       <span className="flex-1 text-left">

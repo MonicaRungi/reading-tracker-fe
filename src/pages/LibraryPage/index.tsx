@@ -23,6 +23,8 @@ export default function LibraryPage() {
           goal={data.primaryGoal}
           current={data.primaryGoalCurrent}
           year={data.year}
+          isOpen={ui.isGoalOpen}
+          onOpenChange={actions.setGoalOpen}
           onCreateGoal={actions.goToGoalOnboarding}
           onOpenGoals={actions.goToGoals}
         />

@@ -12,7 +12,7 @@ export function JourneySummary({
   const { t } = useTranslation();
 
   return (
-    <div className="flex gap-3 rounded-2xl bg-card px-4 py-4" aria-live="polite">
+    <div className="flex gap-3 rounded-2xl bg-card px-4 py-4 shadow-card" aria-live="polite">
       <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent">
         <Sparkles className="size-[18px] text-primary" aria-hidden="true" />
       </div>

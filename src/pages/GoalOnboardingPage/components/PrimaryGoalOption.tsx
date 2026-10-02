@@ -25,7 +25,7 @@ export function PrimaryGoalOption({
   return (
     <div
       className={cn(
-        "rounded-2xl border bg-card px-4 py-3.5 transition-colors",
+        "rounded-2xl border bg-card px-4 py-3.5 transition-colors shadow-card",
         selected ? "border-primary bg-accent" : "border-border",
       )}
     >

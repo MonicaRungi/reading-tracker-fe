@@ -39,7 +39,7 @@ export function ReviewStep({
         layout="centered"
       />
 
-      <div className="divide-y divide-primary/15 rounded-2xl bg-accent px-4">
+      <div className="divide-y divide-primary/15 rounded-2xl bg-accent px-4 shadow-card">
         <GoalSummaryRow
           illustration="books"
           label={t("goals.primaryLabel")}

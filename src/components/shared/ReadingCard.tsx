@@ -25,7 +25,7 @@ export function ReadingCard({
     <div
       ref={ref}
       className={cn(
-        "flex shrink-0 snap-start items-center gap-4 rounded-[16px] border border-border bg-accent p-3",
+        "flex shrink-0 snap-start items-center gap-4 rounded-[16px] border border-border bg-accent p-3 shadow-card",
         fullWidth ? "w-full" : "w-[86%]",
       )}
       onClick={() => navigate(`/book/${item.id}`)}

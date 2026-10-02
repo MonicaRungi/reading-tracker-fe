@@ -40,7 +40,7 @@ export function BadgeItem({
           : t("badges.lockedLabel", { title: badge.title })
       }
       className={cn(
-        "relative h-auto w-full flex-col items-center justify-start gap-2 whitespace-normal rounded-2xl border border-transparent bg-card px-2 pb-3 pt-3 font-normal hover:bg-card disabled:opacity-100",
+        "relative h-auto w-full flex-col items-center justify-start gap-2 whitespace-normal rounded-2xl border border-transparent bg-card px-2 pb-3 pt-3 shadow-card font-normal hover:bg-card disabled:opacity-100",
         isSelected && "border-primary bg-accent hover:bg-accent",
       )}
     >

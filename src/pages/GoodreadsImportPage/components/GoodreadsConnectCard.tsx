@@ -22,7 +22,7 @@ export function GoodreadsConnectCard({
 
   return (
     <>
-      <div className="space-y-4 rounded-2xl bg-accent p-4">
+      <div className="space-y-4 rounded-2xl bg-accent p-4 shadow-card">
         <div className="flex items-start gap-4">
           <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-muted shadow">
             <GoodreadsIcon className="size-8 text-foreground" />

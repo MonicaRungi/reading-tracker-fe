@@ -28,7 +28,7 @@ export function PrimaryGoalCard({
 
   if (!goal) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-2xl bg-card px-4 py-6 text-center">
+      <div className="flex flex-col items-center gap-3 rounded-2xl bg-card px-4 py-6 text-center shadow-card">
         <Illustration name="target" className="size-16" />
         <p className="text-[15px] font-semibold text-foreground">
           {t("goals.detail.primaryEmptyTitle", { year })}
@@ -51,7 +51,7 @@ export function PrimaryGoalCard({
   const showReached = reached && (!inCurrentPeriod || isFilled);
 
   return (
-    <div className="flex gap-3 rounded-2xl bg-card px-4 py-4">
+    <div className="flex gap-3 rounded-2xl bg-card px-4 py-4 shadow-card">
       <Illustration name="open-book" className="size-20" />
       <div className="min-w-0 flex-1 space-y-2">
         <div>
