@@ -9,17 +9,18 @@ devono essere discusse e registrate qui.
 ## 1. Product structure
 
 L'applicazione è una **SPA mobile-first** per uso personale (multi-utente, ma senza multi-tenancy).
-Un unico codebase, un'unica face. L'accesso è protetto da autenticazione Supabase (magic link +
+Un unico codebase, un'unica face. L'accesso è protetto da autenticazione Supabase (solo
 Google OAuth).
 
 ### 1.1 Navigazione
 
-Tre sezioni principali, accessibili dalla **bottom navigation** (mobile-first):
+Quattro sezioni principali, accessibili dalla **bottom navigation** (mobile-first):
 
 | Tab | Icona | Contenuto |
 |---|---|---|
 | Home / Libreria | house | Banner "Continua a leggere" + griglia libri |
 | Cerca | search | Ricerca testuale / ISBN / scan barcode |
+| Scaffali | library | Elenco scaffali e mensole con le costole (§16) |
 | Profilo | user | Statistiche, preferenze tema, logout |
 
 La bottom nav è sempre visibile nell'app shell autenticata. Le pagine di dettaglio (libro, scaffale)
@@ -29,9 +30,9 @@ sono push-navigate sopra la tab corrente — la bottom nav resta visibile.
 
 ```
 / (root)
-  ├── non autenticato → /login (magic link + Google)
+  ├── non autenticato → /login (Google OAuth)
   ├── autenticato → /library (home)
-  └── /auth/callback (magic link redirect handler)
+  └── /auth/callback (redirect di ritorno da Google OAuth)
 ```
 
 Il route guard vive in `components/layout/AuthGuard.tsx` — non nelle singole pagine.
@@ -221,6 +222,8 @@ Il bottom sheet di aggiunta è il punto unico per impostare stato e scaffali:
 | Stelle voto | `RatingStars` | interattive o read-only, 1-5 |
 | Barra avanzamento | `ProgressBar` | colore accent, border-radius pieno |
 | Aggiunta libro | `AddBookSheet` | bottom sheet con stati + scaffali |
+| Costola libro | `Spine` | foto della costola o costola generata (§16) |
+| Crea/modifica scaffale | `ShelfFormSheet` | nome + selettore tema (`ShelfThemePicker`) |
 | Date picker | `DatePickerPopover` | Popover + Calendar di shadcn |
 | Ricerca | `SearchBar` | campo unificato titolo/autore/ISBN |
 | Scanner barcode | `BarcodeScanner` | full-width viewfinder + scan line |
@@ -241,11 +244,12 @@ secondarie `variant="outline"`; azioni distruttive `variant="destructive"` + `Al
 - **Client**: `@supabase/supabase-js`, singleton in `src/lib/supabase.ts`.
 - **Session**: gestita da `useAuth()` (hook globale in `src/hooks/useAuth.ts`), che wrappa
   `supabase.auth.getSession()` e ascolta `onAuthStateChange`.
-- **Magic link**: `supabase.auth.signInWithOtp({ email })` — nessuna password.
-- **Google OAuth**: `supabase.auth.signInWithOAuth({ provider: 'google' })`.
+- **Google OAuth**: `supabase.auth.signInWithOAuth({ provider: 'google' })` — unico metodo di
+  accesso. Il magic link è stato rimosso (incompatibile con la PWA installata su iOS: il link
+  si apre in Safari, non nell'app).
 - **Logout**: `supabase.auth.signOut()` + redirect a `/login`.
-- **Callback route**: `/auth/callback` gestisce il token del magic link
-  (`supabase.auth.exchangeCodeForSession`).
+- **Callback route**: `/auth/callback` è il `redirectTo` di Google OAuth: supabase-js scambia
+  il code della URL e la pagina attende `SIGNED_IN` per andare a `/library`.
 - **Route guard**: `<AuthGuard>` in `components/layout/AuthGuard.tsx` — redirect a `/login`
   se non autenticato. Non codificare guard nelle pagine.
 - Le chiamate a Supabase nelle Edge Function passano il token JWT dell'utente nell'header
@@ -328,8 +332,48 @@ le function con fetch diretto dal frontend — sempre via `supabase.functions.in
   Mai committare `.env` su Git (è in `.gitignore`).
 - **RLS**: le policy garantiscono l'isolamento per utente a livello DB. Il frontend non filtra
   mai per `user_id` nelle query — ci pensa Supabase automaticamente via `auth.uid()`.
-- **Realtime**: non usato nell'MVP. Se aggiunto in futuro, i subscription vanno in hook
-  dedicati con cleanup su `useEffect` return.
-- **Storage**: non usato nell'MVP (le copertine vengono dalle API esterne).
+- **Realtime**: in uso per le notifiche (badge sbloccati, rinnovo obiettivi, uscite libri).
+  I subscription vivono in hook dedicati (`useNotificationsRealtime`) con cleanup su
+  `useEffect` return.
+- **Storage**: in uso solo per le foto delle costole (bucket privato `spines`, §16). Le
+  copertine continuano ad arrivare dalle API esterne.
 - **Keep-alive**: GitHub Action nella repo backend che fa una query ogni ~5 giorni per evitare
   la pausa del progetto free.
+
+---
+
+## 16. Scaffali a mensola
+
+Gli scaffali sono l'unico concetto di "scaffale" dell'app e hanno un'unica vista: la mensola,
+con i libri in piedi mostrati come costole.
+
+- **Rotte**: `/shelves` (elenco: crea, modifica, elimina) e `/shelves/:shelfId` (mensola).
+  Uno `:shelfId` inesistente o nascosto dalla RLS mostra un `EmptyState` con ritorno all'elenco.
+- **Tema della mensola**: `wood` | `white` | `night` | `sage`, scelto alla creazione e
+  modificabile. È **indipendente dal dark mode dell'app**: i colori sono CSS variables per
+  attributo (`[data-shelf-theme="…"]` in `index.css`: `--shelf-bg`, `--shelf-back`,
+  `--shelf-board`, `--shelf-board-edge`, `--shelf-board-shadow`, `--shelf-spine-shadow`) e non
+  vengono ridefiniti sotto `.dark`. Mai hex dei temi nei componenti.
+- **Layout a flusso**: la larghezza del contenitore è misurata con `ResizeObserver`
+  (`useElementWidth`); le costole riempiono una riga finché c'è spazio, poi si passa alla
+  mensola successiva (`lib/shelfLayout.ts`). Niente coordinate libere: l'ordine è `position`.
+  Le righe hanno altezza fissa, così la variazione d'altezza delle costole non sposta le tavole.
+- **Costola generata** (`lib/spine/generated.ts`), deterministica da `book.id`:
+  colore da una palette curata di 12 toni da rilegatura (mai estratto dalla copertina:
+  le immagini esterne sono cross-origin), larghezza proporzionale a `page_count` (18–44 px
+  all'altezza di riferimento 160 px), altezza ±8%, titolo e autore in verticale
+  (`writing-mode: vertical-rl`) con ellissi, colore del testo scelto dalla luminanza.
+  Le costole hanno bordi in rilievo e ombra: restano distinguibili anche quando il loro colore
+  è vicino a quello della parete del tema.
+- **Foto della costola**: collegata al `library_item` (per utente), non al catalogo `books`.
+  `spine_ratio` (larghezza/altezza) è salvato nel DB, così il layout riserva lo spazio prima
+  che l'immagine sia scaricata.
+- **Elenco**: card con anteprima a mini-mensola (primi 12 libri), nome, conteggio e menu ⋯
+  (modifica nome e tema, elimina). Dopo la creazione si apre il dettaglio dello scaffale.
+- **Eliminazione**: `ConfirmDialog` con testo esplicito — i libri restano in libreria
+  (`shelf_items` va in cascata, `library_items` no).
+- **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
+  esclude i libri già presenti. Resta valido anche il percorso da `AddBookSheet`.
+- **QueryKey**: `['shelves', userId]` per l'elenco, `['shelf', userId, shelfId]` per il
+  dettaglio. Le mutation sugli scaffali invalidano entrambe; aggiunta ed eliminazione di un
+  libro invalidano anche queste.

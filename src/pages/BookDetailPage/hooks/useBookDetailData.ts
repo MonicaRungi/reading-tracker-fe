@@ -135,8 +135,13 @@ export function useBookDetailData() {
   const { mutate: mutateDelete, isPending: isDeleting } = useMutation({
     mutationFn: () => deleteLibraryItem(id!),
     onSuccess: async () => {
-      await invalidate();
-      navigate(-1); // torna alla libreria dopo la cancellazione
+      await Promise.all([
+        invalidate(),
+        // il libro sparisce anche dagli scaffali (shelf_items in cascata)
+        queryClient.invalidateQueries({ queryKey: ["shelves", user?.id] }),
+        queryClient.invalidateQueries({ queryKey: ["shelf", user?.id] }),
+      ]);
+      navigate(-1); // torna alla pagina precedente (libreria o scaffale)
     },
     onError: () => toast.error("Errore nella rimozione del libro"),
   });

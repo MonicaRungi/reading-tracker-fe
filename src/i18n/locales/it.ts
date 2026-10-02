@@ -2,6 +2,7 @@ export const it = {
   nav: {
     library: "Libreria",
     search: "Cerca",
+    shelves: "Scaffali",
     profile: "Profilo",
   },
   common: {
@@ -26,15 +27,6 @@ export const it = {
     featureDiscoverSub: "Trova ispirazione per la tua prossima lettura.",
     featureLibraryTitle: "La tua libreria, ovunque",
     featureLibrarySub: "Sempre con te, su tutti i tuoi dispositivi.",
-    or: "oppure",
-    emailLabel: "La tua email",
-    emailPlaceholder: "nome@email.it",
-    sendMagicLink: "Invia magic link",
-    magicLinkHint:
-      "Ti invieremo un link di accesso alla tua email.\nNessuna password, niente complicazioni.",
-    checkEmail: "Controlla la tua email",
-    magicLinkSentTo: "Abbiamo inviato il link a",
-    changeEmail: "Usa un'altra email",
     continueWithGoogle: "Continua con Google",
     signOut: "Esci",
     featureSafe: "Sicuro",
@@ -59,6 +51,71 @@ export const it = {
     bookCount_one: "{{count}} libro",
     bookCount_other: "{{count}} libri",
     searchPlaceholder: "Cerca per titolo o autore",
+  },
+  shelves: {
+    title: "Scaffali",
+    new: "Nuovo",
+    emptyTitle: "Ancora nessuno scaffale",
+    emptySubtitle:
+      "Crea uno scaffale e metti in fila i tuoi libri.",
+    emptyCta: "Crea uno scaffale",
+    previewEmpty: "Scaffale vuoto",
+    openMenu: "Opzioni per {{name}}",
+    themes: {
+      wood: "Legno",
+      white: "Bianco",
+      night: "Notte",
+      sage: "Salvia",
+    },
+    form: {
+      createTitle: "Nuovo scaffale",
+      editTitle: "Modifica scaffale",
+      nameLabel: "Nome",
+      namePlaceholder: "Es. Preferiti, Da regalare…",
+      themeLabel: "Tema della mensola",
+      create: "Crea scaffale",
+      nameError: {
+        required: "Dai un nome allo scaffale",
+        taken: "Hai già uno scaffale con questo nome",
+      },
+    },
+    menu: {
+      edit: "Modifica nome e tema",
+      delete: "Elimina scaffale",
+    },
+    delete: {
+      title: "Eliminare “{{name}}”?",
+      description:
+        "Lo scaffale verrà eliminato. I libri restano nella tua libreria.",
+      confirm: "Elimina",
+    },
+    toast: {
+      created: "Scaffale creato",
+      updated: "Scaffale aggiornato",
+      deleted: "Scaffale eliminato",
+      booksAdded_one: "Libro aggiunto allo scaffale",
+      booksAdded_other: "{{count}} libri aggiunti allo scaffale",
+    },
+    detail: {
+      addBooks: "Aggiungi libri",
+      openBook: "Apri {{title}}",
+      emptyTitle: "Scaffale vuoto",
+      emptySubtitle:
+        "Aggiungi i libri della tua libreria: li vedrai qui come costole sulla mensola.",
+      notFoundTitle: "Scaffale non trovato",
+      notFoundSubtitle: "Potrebbe essere stato eliminato.",
+      backToList: "Torna agli scaffali",
+    },
+    addBooks: {
+      title: "Aggiungi libri",
+      selectBooks: "Seleziona i libri",
+      submit_one: "Aggiungi {{count}} libro",
+      submit_other: "Aggiungi {{count}} libri",
+      emptyLibrary: "La tua libreria è vuota",
+      noResults: "Nessun libro da aggiungere",
+      noResultsSub:
+        "Sono già tutti su questo scaffale, oppure nessuno corrisponde alla ricerca.",
+    },
   },
   status: {
     to_read: "Da leggere",
@@ -101,7 +158,6 @@ export const it = {
   },
   import: {
     goodreads: "Importa da Goodreads",
-    storygraph: "Importa da StoryGraph",
     connectTitle: "Importa la tua libreria",
     connectDescription:
       "Sincronizza i libri dal tuo account Goodreads e aggiungili alla tua libreria.",

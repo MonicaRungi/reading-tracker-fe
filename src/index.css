@@ -157,6 +157,51 @@
   --sidebar-ring: #e0644a;
 }
 
+/*
+ * Temi della mensola (DESIGN.md "Scaffali a mensola"). Indipendenti dal dark
+ * mode dell'app: ogni tema definisce i suoi valori una volta sola e non viene
+ * ridefinito sotto .dark. Si applicano con data-shelf-theme sul contenitore.
+ * --shelf-bg     fondo del mobile (cornice attorno alle mensole)
+ * --shelf-back   parete di fondo dietro le costole
+ * --shelf-board  piano della mensola; --shelf-board-edge il suo bordo frontale
+ * --shelf-board-shadow / --shelf-spine-shadow  ombre portate
+ */
+[data-shelf-theme="wood"] {
+  --shelf-bg: #3f2a1c;
+  --shelf-back: #5a3d29;
+  --shelf-board: #a8754c;
+  --shelf-board-edge: #7d5232;
+  --shelf-board-shadow: rgb(25 12 4 / 0.55);
+  --shelf-spine-shadow: rgb(20 10 4 / 0.45);
+}
+
+[data-shelf-theme="white"] {
+  --shelf-bg: #ebe6df;
+  --shelf-back: #fbf9f6;
+  --shelf-board: #ffffff;
+  --shelf-board-edge: #ddd5ca;
+  --shelf-board-shadow: rgb(60 40 20 / 0.16);
+  --shelf-spine-shadow: rgb(60 40 20 / 0.18);
+}
+
+[data-shelf-theme="night"] {
+  --shelf-bg: #11141c;
+  --shelf-back: #1a1f2c;
+  --shelf-board: #3a4258;
+  --shelf-board-edge: #2a3145;
+  --shelf-board-shadow: rgb(0 0 0 / 0.6);
+  --shelf-spine-shadow: rgb(0 0 0 / 0.55);
+}
+
+[data-shelf-theme="sage"] {
+  --shelf-bg: #7f9277;
+  --shelf-back: #9fb196;
+  --shelf-board: #e4e9dc;
+  --shelf-board-edge: #bcc8b1;
+  --shelf-board-shadow: rgb(35 50 30 / 0.3);
+  --shelf-spine-shadow: rgb(35 50 30 / 0.3);
+}
+
 @layer base {
   :root {
     --safe-area-inset-top: env(safe-area-inset-top, 0px);

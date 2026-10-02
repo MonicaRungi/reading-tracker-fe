@@ -1,16 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { GoodreadsIcon } from "@/components/shared/GoodreadsIcon";
-import { StoryGraphIcon } from "@/components/shared/StoryGraphIcon";
 import { Button } from "@/components/ui/button";
 
-export type ImportSource = "goodreads" | "storygraph";
+export type ImportSource = "goodreads";
 
 const SOURCE_ICONS: Record<
   ImportSource,
   (props: { className?: string }) => React.JSX.Element
 > = {
   goodreads: GoodreadsIcon,
-  storygraph: StoryGraphIcon,
 };
 
 export function ImportButton({
