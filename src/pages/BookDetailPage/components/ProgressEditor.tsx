@@ -47,7 +47,7 @@ export function ProgressEditor({
           onChange={(e) => onPageChange(Number(e.target.value))}
           onBlur={() => onCommit(currentPage)}
           disabled={isSaving}
-          className="h-auto w-20 rounded-xl border-border py-1.5 text-center text-[14px] shadow-none"
+          className="h-auto w-20 rounded-xl border-border py-1.5 text-center text-base shadow-none md:text-[14px]"
         />
         <span className="text-[13px] text-muted-foreground">
           {t("bookDetail.pageOf", { count: pageCount })}
