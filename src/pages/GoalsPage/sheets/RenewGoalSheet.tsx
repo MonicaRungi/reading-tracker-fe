@@ -4,7 +4,7 @@ import type { ReadingGoal } from "@/api/goals";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
-import { SecondaryGoalIcon } from "./components/SecondaryGoalIcon";
+import { SecondaryGoalIcon } from "../components/SecondaryGoalIcon";
 
 export function RenewGoalSheet({
   goal,

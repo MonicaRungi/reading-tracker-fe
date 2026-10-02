@@ -11,8 +11,8 @@ import { ReadingDates } from "./components/ReadingDates";
 import { ProgressSection } from "./components/ProgressSection";
 import { RatingSection } from "./components/RatingSection";
 import { StatusCta } from "./components/StatusCta";
-import { BookMenuSheet } from "./components/BookMenuSheet";
-import { DatePickerSheet } from "./components/DatePickerSheet";
+import { BookMenuSheet } from "./sheets/BookMenuSheet";
+import { DatePickerSheet } from "./sheets/DatePickerSheet";
 import { ReleaseReminderCard } from "@/components/shared/ReleaseReminderCard";
 import { useEffect } from "react";
 
