@@ -2,9 +2,14 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { getShelf } from "@/api/shelves";
+import type { ShelfBook } from "@/api/shelves";
 import { useAuth } from "@/hooks/useAuth";
 import { useShelfEditor } from "@/hooks/useShelfEditor";
 import { useAddBooksToShelf } from "./useAddBooksToShelf";
+import { useShelfReorder } from "./useShelfReorder";
+
+// riferimento stabile: un [] nuovo a ogni render invaliderebbe i memo del riordino
+const EMPTY_BOOKS: ShelfBook[] = [];
 
 export function useShelfDetailData() {
   const { shelfId = "" } = useParams<{ shelfId: string }>();
@@ -28,6 +33,7 @@ export function useShelfDetailData() {
     [shelf],
   );
   const addBooks = useAddBooksToShelf({ userId, shelfId, shelvedItemIds });
+  const reorder = useShelfReorder({ userId, shelfId, books: shelf?.books ?? EMPTY_BOOKS });
 
   return {
     data: {
@@ -36,17 +42,22 @@ export function useShelfDetailData() {
       isNotFound: shelfQuery.isSuccess && shelf === null,
       isError: shelfQuery.isError,
       addBooks: addBooks.data,
+      reorder: reorder.data,
     },
     ui: {
       ...editor.ui,
       addBooks: addBooks.ui,
+      reorder: reorder.ui,
     },
     actions: {
       ...editor.actions,
       goToList,
-      openBook: (libraryItemId: string) => navigate(`/book/${libraryItemId}`),
+      openBook: (libraryItemId: string) => {
+        if (!reorder.actions.isClickAfterDrag()) navigate(`/book/${libraryItemId}`);
+      },
       openShelfMenu: () => shelf && editor.actions.openMenu(shelf),
       addBooks: addBooks.actions,
+      reorder: reorder.actions,
     },
   };
 }

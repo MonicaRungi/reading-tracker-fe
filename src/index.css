@@ -166,6 +166,8 @@
  * --shelf-board-shadow  ombra portata sotto il piano
  * --shelf-plank-grain   venatura del piano (layer di background del ::before)
  * --shelf-wall-grain    pannelli e venatura della parete (layer di shelf-wall)
+ * --shelf-placeholder   segnaposto tratteggiato della costola che si sta spostando
+ * --shelf-hint          testo dei suggerimenti sulla parete
  */
 /*
  * Venatura del legno (tutti i temi): rumore SVG inline (feTurbulence) stirato
@@ -174,6 +176,8 @@
  * niente immagini da scaricare.
  */
 [data-shelf-theme="wood"] {
+  --shelf-placeholder: rgb(255 255 255 / 35%);
+  --shelf-hint: rgb(255 255 255 / 55%);
   --shelf-back: #282723;
   --shelf-board: #8a5a3b;
   --shelf-board-light: #a97450;
@@ -187,6 +191,8 @@
 }
 
 [data-shelf-theme="white"] {
+  --shelf-placeholder: rgb(60 45 30 / 30%);
+  --shelf-hint: rgb(60 45 30 / 55%);
   --shelf-back: #f4f1eb;
   --shelf-board: #e2ddd4;
   --shelf-board-light: #f4f0e9;
@@ -200,6 +206,8 @@
 }
 
 [data-shelf-theme="night"] {
+  --shelf-placeholder: rgb(255 255 255 / 30%);
+  --shelf-hint: rgb(255 255 255 / 50%);
   --shelf-back: #171d27;
   --shelf-board: #242c3b;
   --shelf-board-light: #313b4d;
@@ -213,6 +221,8 @@
 }
 
 [data-shelf-theme="sage"] {
+  --shelf-placeholder: rgb(40 55 35 / 35%);
+  --shelf-hint: rgb(40 55 35 / 60%);
   --shelf-back: #d9e0d2;
   --shelf-board: #87967d;
   --shelf-board-light: #9eab96;

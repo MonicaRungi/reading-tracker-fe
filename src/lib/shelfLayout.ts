@@ -4,6 +4,9 @@ export const SHELF_SPINE_HEIGHT = 150;
 /** Spazio fra costole adiacenti: deve combaciare con il gap di `shelf-books` (index.css). */
 export const SHELF_SPINE_GAP = 2;
 
+/** Id della zona "Trascina qui per rimuovere" fra i droppable di dnd-kit. */
+export const SHELF_REMOVE_ZONE_ID = "shelf-remove-zone";
+
 /** Stesso breakpoint dei media query di `shelf-books` / `shelf-board`. */
 const MOBILE_QUERY = "(width < 40rem)";
 

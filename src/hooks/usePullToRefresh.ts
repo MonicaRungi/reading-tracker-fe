@@ -41,6 +41,32 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     let isPulling = false;
     let current = 0;
     let refreshing = false;
+    // Elemento da cui è partito il tocco. Se durante il gesto viene smontato (es.
+    // una costola che cambia riga mentre la si trascina), touchmove/touchend non
+    // risalgono più fino a window: li si ascolta anche lì, come fa dnd-kit.
+    let touchTarget: EventTarget | null = null;
+    let lastEvent: Event | null = null;
+
+    function listenOnTarget(target: EventTarget) {
+      touchTarget = target;
+      target.addEventListener("touchmove", onTouchMove as EventListener, { passive: true });
+      target.addEventListener("touchend", onTouchEnd);
+      target.addEventListener("touchcancel", onTouchEnd);
+    }
+
+    function stopListeningOnTarget() {
+      touchTarget?.removeEventListener("touchmove", onTouchMove as EventListener);
+      touchTarget?.removeEventListener("touchend", onTouchEnd);
+      touchTarget?.removeEventListener("touchcancel", onTouchEnd);
+      touchTarget = null;
+    }
+
+    /** Lo stesso evento arriva due volte (elemento + window) finché l'elemento è montato. */
+    function isDuplicate(event: Event) {
+      if (event === lastEvent) return true;
+      lastEvent = event;
+      return false;
+    }
 
     const update = (value: number) => {
       current = value;
@@ -48,6 +74,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     };
 
     function onTouchStart(event: TouchEvent) {
+      stopListeningOnTarget();
       start = null;
       isPulling = false;
       if (refreshing || event.touches.length !== 1 || window.scrollY > 0) return;
@@ -58,10 +85,11 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
       if (scrolledAreaOf(target)) return;
       if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
       start = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      if (event.target) listenOnTarget(event.target);
     }
 
     function onTouchMove(event: TouchEvent) {
-      if (!start) return;
+      if (!start || isDuplicate(event)) return;
       const dx = event.touches[0].clientX - start.x;
       const dy = event.touches[0].clientY - start.y;
 
@@ -87,6 +115,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     }
 
     async function onTouchEnd() {
+      stopListeningOnTarget();
       if (!start) return;
       start = null;
       if (!isPulling || current < PULL_THRESHOLD) {
@@ -114,6 +143,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     window.addEventListener("touchend", onTouchEnd);
     window.addEventListener("touchcancel", onTouchEnd);
     return () => {
+      stopListeningOnTarget();
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);

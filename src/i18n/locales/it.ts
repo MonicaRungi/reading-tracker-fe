@@ -106,6 +106,23 @@ export const it = {
       notFoundSubtitle: "Potrebbe essere stato eliminato.",
       backToList: "Torna agli scaffali",
     },
+    reorder: {
+      hint: "Tieni premuto e trascina per riordinare",
+      moving: "Sposta",
+      removeZone: "Trascina qui per rimuovere",
+      roleDescription: "libro, tieni premuto per spostarlo",
+      removed: "“{{title}}” tolto dallo scaffale",
+      undo: "Annulla",
+      saveError: "Non è stato possibile salvare il nuovo ordine",
+      a11y: {
+        instructions:
+          "Invio apre il libro. Spazio lo prende: con le frecce lo sposti, di nuovo spazio lo lascia, Esc annulla. Per toglierlo dallo scaffale portalo sulla zona in fondo.",
+        picked: "Hai preso {{title}}.",
+        moved: "{{title}} in posizione {{position}}.",
+        dropped: "{{title}} sistemato.",
+        cancelled: "Spostamento di {{title}} annullato.",
+      },
+    },
     addBooks: {
       title: "Aggiungi libri",
       selectBooks: "Seleziona i libri",

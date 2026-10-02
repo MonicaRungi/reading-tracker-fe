@@ -424,6 +424,10 @@ export type Database = {
         Args: { p_authors: string[]; p_query: string; p_title: string }
         Returns: boolean
       }
+      reorder_shelf: {
+        Args: { p_item_ids: string[]; p_shelf_id: string }
+        Returns: undefined
+      }
       search_library: {
         Args: { p_query?: string; p_status?: string }
         Returns: {

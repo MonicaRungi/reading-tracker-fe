@@ -115,12 +115,35 @@ export async function addBooksToShelf(
   if (error) throw error
 }
 
-export async function removeBookFromShelf(shelfId: string, libraryItemId: string): Promise<void> {
-  const { error } = await supabase
+/** Accoda un solo libro e ne ritorna lo shelf_item: serve all'"Annulla" della rimozione. */
+export async function addBookToShelf(
+  shelfId: string,
+  libraryItemId: string,
+): Promise<string> {
+  const { data, error } = await supabase
     .from("shelf_items")
-    .delete()
-    .eq("shelf_id", shelfId)
-    .eq("library_item_id", libraryItemId)
+    .insert({ shelf_id: shelfId, library_item_id: libraryItemId })
+    .select("id")
+    .single()
+  if (error) throw error
+  return data.id
+}
+
+/** Toglie un elemento dallo scaffale (il libro resta in libreria). */
+export async function removeShelfItem(shelfItemId: string): Promise<void> {
+  const { error } = await supabase.from("shelf_items").delete().eq("id", shelfItemId)
+  if (error) throw error
+}
+
+/**
+ * Nuovo ordine dello scaffale: `shelfItemIds` deve contenere esattamente gli
+ * elementi dello scaffale. La RPC lo verifica e riscrive tutte le position.
+ */
+export async function reorderShelf(shelfId: string, shelfItemIds: string[]): Promise<void> {
+  const { error } = await supabase.rpc("reorder_shelf", {
+    p_shelf_id: shelfId,
+    p_item_ids: shelfItemIds,
+  })
   if (error) throw error
 }
 

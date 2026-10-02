@@ -383,7 +383,10 @@ con i libri in piedi mostrati come costole.
   tutta la larghezza e riempie l'altezza fino alla bottom nav. La pagina non scrolla: scorrono
   solo le mensole dentro il mobile (`overflow-y-auto`, `overscroll-contain`). Il mobile è
   marcato `data-scroll-area`, così nella PWA il pull-to-refresh parte solo se le mensole sono
-  in cima (`usePullToRefresh`).
+  in cima (`usePullToRefresh`). Le costole sono `data-no-pull-refresh`: una tirata verso il
+  basso che parte da una costola è sempre uno spostamento. L'hook ascolta la fine del tocco
+  anche sull'elemento di partenza, perché se viene smontato durante il gesto (una costola che
+  cambia riga) gli eventi non risalgono più fino a `window`.
 - **Layout a flusso**: la larghezza del contenitore è misurata con `ResizeObserver`
   (`useElementWidth`); le costole riempiono una riga finché c'è spazio, poi si passa alla
   mensola successiva (`lib/shelfLayout.ts`). Niente coordinate libere: l'ordine è `position`.
@@ -407,6 +410,31 @@ con i libri in piedi mostrati come costole.
   (`shelf_items` va in cascata, `library_items` no).
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
   esclude i libri già presenti. Resta valido anche il percorso da `AddBookSheet`.
+- **Riordino senza modalità** (dettaglio scaffale): un tap su una costola apre il libro, la
+  **pressione lunga** la solleva e si trascina; al rilascio è già salvato. Niente pulsante
+  "Riordina" né "Fine": una modalità non darebbe vantaggi, perché dentro il mobile scorrevole
+  la pressione lunga serve comunque a distinguere il trascinamento dallo scroll. Il click
+  che il browser emette subito dopo un trascinamento viene ignorato (300 ms), così il libro
+  appena spostato non si apre. Da tastiera: Invio apre, Spazio prende il libro, frecce lo
+  spostano, Esc annulla.
+  - **Suggerimento** "Tieni premuto e trascina per riordinare" in fondo alle mensole, finché
+    non si è riordinato una volta (`rt.shelfReorderHintSeen` in localStorage).
+  - **Durante il trascinamento**: la copia della costola segue il dito, sollevata e inclinata,
+    con l'etichetta "Sposta" (`DragOverlay`); al suo posto un segnaposto tratteggiato
+    (`--shelf-placeholder` del tema). In fondo al mobile compare la zona
+    "Trascina qui per rimuovere".
+  - **dnd-kit** (`@dnd-kit/core` + `sortable`): sensori mouse (5 px), touch (pressione di
+    250 ms, tolleranza 5 px; costole con `touch-action: manipulation` e senza menu di sistema
+    iOS, quindi prima dell'attivazione lo scroll resta nativo) e tastiera. Annunci e
+    istruzioni per screen reader in italiano via `t()`.
+  - **Riflusso dal vivo**: niente trasformazioni di dnd-kit (stirerebbero costole di larghezza
+    diversa). L'ordine cambia subito e il layout a flusso ricompone le righe. Collisione con
+    `pointerWithin` (solo sopra una costola o la zona "rimuovi") e almeno 8 px di movimento fra
+    due spostamenti: senza, al punto di a capo il riflusso si alimenta da solo all'infinito.
+  - **Salvataggio**: una sola chiamata a `reorder_shelf` al rilascio, ottimistica (`onMutate`
+    + rollback e toast in `onError`), in fila con le altre mutation dello scaffale (`scope`).
+  - **Rimozione**: rilasciando sulla zona in fondo; ottimistica, con toast "Annulla" per 5 s
+    che reinserisce il libro e lo rimette nella posizione di prima. Il libro resta in libreria.
 - **QueryKey**: `['shelves', userId]` per l'elenco, `['shelf', userId, shelfId]` per il
   dettaglio. Le mutation sugli scaffali invalidano entrambe; aggiunta ed eliminazione di un
   libro invalidano anche queste.

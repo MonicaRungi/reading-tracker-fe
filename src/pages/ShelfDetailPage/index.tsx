@@ -69,8 +69,14 @@ export default function ShelfDetailPage() {
         <div className="flex min-h-0 flex-1 flex-col px-2 pb-4 pt-2">
           <ShelfBoard
             theme={shelf.color_theme}
-            books={shelf.books}
+            books={data.reorder.orderedBooks}
+            activeBook={data.reorder.activeBook}
+            showHint={ui.reorder.showHint && shelf.books.length > 1}
             onOpenBook={actions.openBook}
+            onDragStart={actions.reorder.dragStart}
+            onDragMove={actions.reorder.dragMove}
+            onDragEnd={actions.reorder.dragEnd}
+            onDragCancel={actions.reorder.dragCancel}
             className="min-h-0 flex-1"
           />
         </div>
