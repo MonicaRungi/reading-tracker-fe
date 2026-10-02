@@ -30,7 +30,7 @@ export function EmptyState({
       className={cn(
         "flex flex-col items-center gap-2 px-4 py-12 text-center",
         isLarge && "flex-1 justify-center gap-4 px-8",
-        isInline && "gap-1.5 rounded-2xl bg-card py-5",
+        isInline && "gap-1.5 rounded-2xl bg-card py-5 shadow-card",
       )}
     >
       {Icon &&

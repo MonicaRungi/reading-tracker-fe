@@ -15,6 +15,7 @@ import {
 } from "@/api/goals";
 import { markRenewalNotificationsRead } from "@/api/notifications";
 import { useAuth } from "@/hooks/useAuth";
+import { fireConfetti } from "@/lib/confetti";
 import { formatWeekdayDate, toISODate } from "@/lib/format";
 import {
   DEFAULT_SECONDARY_TARGETS,
@@ -60,6 +61,8 @@ export function useGoalsData() {
   const [archiveTarget, setArchiveTarget] = useState<ReadingGoal | null>(null);
   const [isArchivedOpen, setIsArchivedOpen] = useState(false);
   const [banner, setBanner] = useState<GoalsBanner | null>(null);
+  // La barra del goal annuale è arrivata al 100%: una festa per visita.
+  const [isPrimaryFilled, setIsPrimaryFilled] = useState(false);
 
   const dismissedIds = useSyncExternalStore(subscribeRenewalDismissals, () =>
     getDismissedRenewals(userId),
@@ -199,6 +202,7 @@ export function useGoalsData() {
     },
     ui: {
       banner,
+      isPrimaryFilled,
       renewTarget,
       picker,
       editTarget,
@@ -213,6 +217,11 @@ export function useGoalsData() {
       goBack: () => navigate(-1),
       goToOnboarding: () => navigate("/goals/onboarding"),
       closeBanner: () => setBanner(null),
+      celebratePrimary: () => {
+        if (isPrimaryFilled) return;
+        setIsPrimaryFilled(true);
+        fireConfetti();
+      },
       // invito
       dismissRenewal: (goal: ReadingGoal) => dismissRenewal(userId, goal.id),
       openRenew: (goal: ReadingGoal) => setRenewTarget(goal),

@@ -399,6 +399,31 @@ export type Database = {
         Args: { p_delta: number; p_user_id: string }
         Returns: undefined
       }
+      library_book_matches: {
+        Args: { p_authors: string[]; p_query: string; p_title: string }
+        Returns: boolean
+      }
+      search_library: {
+        Args: { p_query?: string; p_status?: string }
+        Returns: {
+          added_at: string
+          book_id: string
+          current_page: number | null
+          finished_at: string | null
+          id: string
+          rating: number | null
+          started_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "library_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       unlock_badge: {
         Args: { p_badge_key: string; p_user_id: string }
         Returns: undefined

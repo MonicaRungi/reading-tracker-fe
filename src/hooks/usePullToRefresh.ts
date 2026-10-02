@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { hapticFeedback } from "@/lib/haptics";
 import { isStandalonePwa } from "@/lib/pwa";
 
 /** Trascinamento (px, già con resistenza) oltre il quale si aggiorna. */
@@ -75,7 +74,6 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
       }
 
       const next = Math.min(MAX_PULL, Math.max(0, dy * RESISTANCE));
-      if (current < PULL_THRESHOLD && next >= PULL_THRESHOLD) hapticFeedback(10);
       update(next);
     }
 

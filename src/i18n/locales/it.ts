@@ -56,6 +56,8 @@ export const it = {
     emptyFilter: "Nessun libro",
     emptyFilterSub: "Non hai libri in questa categoria",
     filterAll: "Tutti",
+    bookCount_one: "{{count}} libro",
+    bookCount_other: "{{count}} libri",
     searchPlaceholder: "Cerca per titolo o autore",
   },
   status: {
@@ -221,6 +223,8 @@ export const it = {
     alreadyExists: "Hai già un obiettivo per quest'anno",
     // Card in Libreria
     librarySectionTitle: "Il tuo obiettivo di lettura",
+    librarySectionHide: "Nascondi l'obiettivo di lettura",
+    librarySectionShow: "Mostra l'obiettivo di lettura",
     primaryProgress_one: "{{current}} di {{target}} libro",
     primaryProgress_other: "{{current}} di {{target}} libri",
     annualGoal: "Obiettivo annuale",

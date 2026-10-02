@@ -25,7 +25,7 @@ export function SecondaryGoalOption({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-2xl border bg-card transition-colors",
+        "overflow-hidden rounded-2xl border bg-card transition-colors shadow-card",
         checked ? "border-primary bg-accent" : "border-border",
       )}
     >

@@ -46,7 +46,9 @@ export default function GoalsPage() {
               goal={data.primary}
               current={data.primaryCurrent}
               year={data.year}
+              isFilled={ui.isPrimaryFilled}
               onCreate={actions.goToOnboarding}
+              onFilled={actions.celebratePrimary}
             />
           </section>
 

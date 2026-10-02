@@ -23,7 +23,7 @@ export function ReleaseReminderCard({
   const Icon = active ? BellRing : CalendarClock;
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-accent px-4 py-3">
+    <div className="flex items-center gap-3 rounded-2xl bg-accent px-4 py-3 shadow-card">
       <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-background">
         <Icon className="size-5 text-primary" aria-hidden="true" />
       </div>

@@ -22,7 +22,7 @@ export function RenewalPrompt({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-3 rounded-2xl border border-primary/20 bg-accent px-4 py-4">
+    <div className="space-y-3 rounded-2xl border border-primary/20 bg-accent px-4 py-4 shadow-card">
       <div className="flex items-start gap-3">
         <SecondaryGoalIcon type={goal.type} />
         <div className="min-w-0 flex-1">

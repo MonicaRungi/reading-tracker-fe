@@ -10,6 +10,19 @@ export interface LibraryItem extends LibraryItemRow {
   book: BookRow
 }
 
+export interface LibraryPageParams {
+  status?: ReadingStatus
+  query?: string
+  offset: number
+  limit: number
+}
+
+/** Una pagina della libreria + il totale delle righe che matchano i filtri. */
+export interface LibraryPage {
+  items: LibraryItem[]
+  total: number
+}
+
 export interface AddLibraryItemInput {
   book: import("@/api/books").BookMeta
   status: ReadingStatus

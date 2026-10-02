@@ -1,7 +1,13 @@
 import { supabase } from "@/lib/supabase";
 import { upsertBook } from "@/api/books";
 import { toISODate } from "@/lib/format";
-import type { AddLibraryItemInput, LibraryItem, ReadingStatus } from "./types";
+import type {
+  AddLibraryItemInput,
+  LibraryItem,
+  LibraryPage,
+  LibraryPageParams,
+  ReadingStatus,
+} from "./types";
 
 const LIBRARY_SELECT = "*, book:books(*)";
 
@@ -17,6 +23,29 @@ export async function listLibrary(): Promise<LibraryItem[]> {
     .order("added_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as LibraryItem[];
+}
+
+export async function listLibraryPage({
+  status,
+  query,
+  offset,
+  limit,
+}: LibraryPageParams): Promise<LibraryPage> {
+  const { data, error, count } = await supabase
+    .rpc(
+      "search_library",
+      { p_status: status, p_query: query?.trim() || undefined },
+      { count: "exact" },
+    )
+    .select(LIBRARY_SELECT)
+    .order("finished_at", { ascending: false, nullsFirst: false })
+    .order("added_at", { ascending: false })
+    // tie-breaker: senza un ordinamento univoco le pagine possono
+    // ripetere o saltare righe con le stesse date
+    .order("id", { ascending: true })
+    .range(offset, offset + limit - 1);
+  if (error) throw error;
+  return { items: (data ?? []) as LibraryItem[], total: count ?? 0 };
 }
 
 export async function addLibraryItem(

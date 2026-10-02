@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Trash2 } from "lucide-react";
-import { hapticFeedback } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 
 const ACTION_WIDTH = 88;
@@ -39,7 +38,6 @@ export function SwipeToDelete({
     moved: boolean;
   } | null>(null);
   const suppressClick = useRef(false);
-  const pastFullSwipe = useRef(false);
 
   const isOpen = offset < 0 && !isDragging;
 
@@ -69,7 +67,6 @@ export function SwipeToDelete({
       locked: null,
       moved: false,
     };
-    pastFullSwipe.current = false;
   }
 
   function onPointerMove(event: React.PointerEvent) {
@@ -91,11 +88,6 @@ export function SwipeToDelete({
     g.moved = true;
     const width = rootRef.current?.offsetWidth ?? 320;
     const next = Math.min(0, Math.max(-width, g.startOffset + dx));
-    const past = -next > width * FULL_SWIPE_RATIO;
-    if (past !== pastFullSwipe.current) {
-      pastFullSwipe.current = past;
-      if (past) hapticFeedback(10);
-    }
     setOffset(next);
   }
 

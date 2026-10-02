@@ -41,7 +41,7 @@ export function ContinueReadingSection({ items }: { items: LibraryItem[] }) {
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex gap-3 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 flex scroll-px-4 gap-3 overflow-x-auto px-4 pb-4 pt-1 [scroll-snap-type:x_mandatory] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map((item, index) => (
           <ReadingCard
@@ -56,7 +56,7 @@ export function ContinueReadingSection({ items }: { items: LibraryItem[] }) {
       </div>
 
       {items.length > 1 && (
-        <div className="mt-2 flex justify-center gap-1.5">
+        <div className="flex justify-center gap-1.5">
           {items.map((item, i) => (
             <div
               key={item.id}

@@ -25,7 +25,7 @@ export function SecondaryGoalCard({
   const isReached = goal.status === "achieved";
 
   return (
-    <div className="space-y-3 rounded-2xl bg-card px-4 py-4">
+    <div className="space-y-3 rounded-2xl bg-card px-4 py-4 shadow-card">
       <div className="flex items-start gap-3">
         <SecondaryGoalIcon type={goal.type} />
         <div className="min-w-0 flex-1">

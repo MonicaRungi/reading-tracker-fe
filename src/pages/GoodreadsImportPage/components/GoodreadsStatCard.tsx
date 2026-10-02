@@ -13,7 +13,7 @@ export function GoodreadsStatCard({
   size?: "default" | "sm";
 }) {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-2xl bg-accent px-3 py-4">
+    <div className="flex flex-col items-center gap-1 rounded-2xl bg-accent px-3 py-4 shadow-card">
       {icon}
       <span
         className={cn(
