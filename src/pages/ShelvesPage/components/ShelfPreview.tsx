@@ -1,7 +1,7 @@
 import type { ShelfBook, ShelfTheme } from "@/api/shelves";
 import { Spine } from "@/components/shared/Spine";
 
-const PREVIEW_SPINE_HEIGHT = 64;
+const PREVIEW_SPINE_HEIGHT = 76;
 
 /** Mini-mensola dell'elenco: una sola riga, i libri in eccesso si tagliano. */
 export function ShelfPreview({
@@ -12,19 +12,25 @@ export function ShelfPreview({
   books: ShelfBook[];
 }) {
   return (
-    <div data-shelf-theme={theme} className="bg-(--shelf-bg) px-2 pt-2">
-      <div className="flex h-[78px] items-end gap-[2px] overflow-hidden rounded-t-md bg-(--shelf-back) px-2.5">
-        {books.map(({ shelf_item_id, library_item }) => (
-          <Spine
-            key={shelf_item_id}
-            book={library_item.book}
-            spine_ratio={library_item.spine_ratio}
-            height={PREVIEW_SPINE_HEIGHT}
-          />
-        ))}
+    // cornice sottile: angoli superiori come quelli della card, squadrata in
+    // basso dove tocca il corpo della card
+    <div
+      data-shelf-theme={theme}
+      className="shelf-frame [--shelf-frame-radius-bottom:0px] [--shelf-frame-radius:10px] [--shelf-frame-width:4px]"
+    >
+      <div className="shelf-wall px-3 pb-3 pt-3">
+        <div className="flex h-[84px] items-end justify-center-safe gap-[2px] overflow-hidden px-1.5">
+          {books.map(({ shelf_item_id, library_item }) => (
+            <Spine
+              key={shelf_item_id}
+              book={library_item.book}
+              spine_ratio={library_item.spine_ratio}
+              height={PREVIEW_SPINE_HEIGHT}
+            />
+          ))}
+        </div>
+        <div className="shelf-plank [--plank-height:8px]" />
       </div>
-      <div className="h-2 border-b-[3px] border-(--shelf-board-edge) bg-(--shelf-board) shadow-[0_4px_6px_var(--shelf-board-shadow)]" />
-      <div className="h-2" />
     </div>
   );
 }

@@ -10,10 +10,18 @@ const MIN_REFRESH_MS = 600;
 /** Movimento minimo prima di decidere se il gesto è verticale od orizzontale. */
 const DIRECTION_LOCK_PX = 10;
 
+/** Area con scroll proprio (es. la mensola): il pull parte solo se è in cima. */
+function scrolledAreaOf(target: Element | null): boolean {
+  const area = target?.closest("[data-scroll-area]");
+  return area ? area.scrollTop > 0 : false;
+}
+
 /**
  * Pull-to-refresh sulla pagina (scroll della window). Parte solo con la pagina
  * in cima, un dito e un gesto verticale; si ignora se è aperto un dialog o un
  * bottom sheet, o se il tocco parte da un elemento `[data-no-pull-refresh]`.
+ * Dentro un'area `[data-scroll-area]` con scroll proprio parte solo se anche
+ * quell'area è in cima, così il gesto scorre l'area invece di aggiornare.
  * Attivo **solo nella PWA installata**, dove il browser non offre il suo: in una
  * scheda del browser restano il pull-to-refresh e il rimbalzo nativi.
  */
@@ -47,6 +55,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
       if (target?.closest('[role="dialog"], [role="alertdialog"], [data-no-pull-refresh]')) {
         return;
       }
+      if (scrolledAreaOf(target)) return;
       if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
       start = { x: event.touches[0].clientX, y: event.touches[0].clientY };
     }

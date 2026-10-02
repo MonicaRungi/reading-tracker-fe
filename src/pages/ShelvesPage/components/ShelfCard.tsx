@@ -16,7 +16,8 @@ export function ShelfCard({
   const { t } = useTranslation();
 
   return (
-    <article className="overflow-hidden rounded-2xl bg-card shadow-card">
+    // angoli superiori più stretti: seguono la cornice dell'anteprima
+    <article className="overflow-hidden rounded-2xl rounded-t-[10px] bg-card shadow-card">
       <button
         type="button"
         onClick={onOpen}

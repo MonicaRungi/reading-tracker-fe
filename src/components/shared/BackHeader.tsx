@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 /** Header sticky delle pagine di dettaglio: freccia indietro + titolo (+ azione). */
 export function BackHeader({
   title,
+  subtitle,
   onBack,
   action,
 }: {
   title: string;
+  /** Riga secondaria sotto il titolo (es. "11 libri"). */
+  subtitle?: string;
   onBack: () => void;
   /** Azione opzionale a destra (es. "Segna tutte come lette"). */
   action?: ReactNode;
@@ -27,7 +30,12 @@ export function BackHeader({
       >
         <ChevronLeft className="size-5" />
       </Button>
-      <h1 className="flex-1 text-[18px] font-bold text-foreground">{title}</h1>
+      <div className="min-w-0 flex-1">
+        <h1 className="truncate text-[18px] font-bold text-foreground">{title}</h1>
+        {subtitle && (
+          <p className="text-[13px] leading-tight text-muted-foreground">{subtitle}</p>
+        )}
+      </div>
       {action}
     </div>
   );

@@ -1,30 +1,33 @@
 import type { ShelfTheme } from "@/api/shelves";
+import { Spine } from "@/components/shared/Spine";
 
-/** Altezze delle tre costoline del campione, in % della parete. */
-const SWATCH_SPINES = [
-  { height: "70%", color: "#8c3b2e" },
-  { height: "82%", color: "#c98b3a" },
-  { height: "64%", color: "#2f4858" },
+const SWATCH_SPINE_HEIGHT = 46;
+
+/** Libri fissi del campione: stessi colori e misure su ogni tema, per confrontarli. */
+const SWATCH_BOOKS = [
+  { id: "swatch-1", title: "", authors: null, page_count: 320 },
+  { id: "swatch-2", title: "", authors: null, page_count: 520 },
+  { id: "swatch-3", title: "", authors: null, page_count: 180 },
+  { id: "swatch-4", title: "", authors: null, page_count: 410 },
+  { id: "swatch-5", title: "", authors: null, page_count: 260 },
 ];
 
-/** Campione di un tema: parete, tre costoline e il piano della mensola. */
+/** Campione di un tema: parete, qualche costola e il piano della mensola. */
 export function ShelfThemeSwatch({ theme }: { theme: ShelfTheme }) {
   return (
     <div
       data-shelf-theme={theme}
       aria-hidden="true"
-      className="flex h-12 w-full flex-col overflow-hidden rounded-lg bg-(--shelf-bg) p-1"
+      className="shelf-frame w-full [--shelf-frame-radius:8px] [--shelf-frame-width:3px]"
     >
-      <div className="flex flex-1 items-end justify-center gap-0.5 rounded-t-sm bg-(--shelf-back) px-1">
-        {SWATCH_SPINES.map((spine) => (
-          <span
-            key={spine.color}
-            className="w-1.5 rounded-t-[1px]"
-            style={{ height: spine.height, backgroundColor: spine.color }}
-          />
-        ))}
+      <div className="shelf-wall overflow-hidden px-3 pb-2.5 pt-3">
+        <div className="flex h-[52px] items-end justify-center gap-[2px]">
+          {SWATCH_BOOKS.map((book) => (
+            <Spine key={book.id} book={book} height={SWATCH_SPINE_HEIGHT} />
+          ))}
+        </div>
+        <div className="shelf-plank [--plank-height:6px]" />
       </div>
-      <div className="h-1.5 border-b border-(--shelf-board-edge) bg-(--shelf-board)" />
     </div>
   );
 }

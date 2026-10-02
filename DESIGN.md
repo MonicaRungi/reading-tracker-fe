@@ -119,6 +119,8 @@ La firma visiva dell'app:
 
 - **Font**: sans di sistema (`font-sans`, ovvero `-apple-system, system-ui`). Nessun font esterno
   da caricare — l'app è mobile-first e deve restare leggera.
+  **Eccezione**: il titolo sulle costole dei libri (§16) usa il serif di sistema (`font-serif`:
+  "New York" su iOS, Georgia altrove), sempre senza font da scaricare.
 - **Accento (Corallo)**: `#E0644A` — il colore primario dell'app. Usato per CTA, chip attivi,
   barre di avanzamento, icone bottom nav attive, badge stato "In lettura".
 - **Soft Corallo**: `#FBE9E3` — sfondo pill/chip attivi, card "In lettura" nel banner, sfondo hero login.
@@ -351,9 +353,37 @@ con i libri in piedi mostrati come costole.
   Uno `:shelfId` inesistente o nascosto dalla RLS mostra un `EmptyState` con ritorno all'elenco.
 - **Tema della mensola**: `wood` | `white` | `night` | `sage`, scelto alla creazione e
   modificabile. È **indipendente dal dark mode dell'app**: i colori sono CSS variables per
-  attributo (`[data-shelf-theme="…"]` in `index.css`: `--shelf-bg`, `--shelf-back`,
-  `--shelf-board`, `--shelf-board-edge`, `--shelf-board-shadow`, `--shelf-spine-shadow`) e non
-  vengono ridefiniti sotto `.dark`. Mai hex dei temi nei componenti.
+  attributo (`[data-shelf-theme="…"]` in `index.css`: `--shelf-back`, `--shelf-board`,
+  `--shelf-board-light`, `--shelf-board-shadow`, `--shelf-plank-grain`, `--shelf-wall-grain`)
+  e non vengono ridefiniti sotto `.dark`. Ogni tema ha il suo piano (legno, bianco, blu notte,
+  salvia). Mai hex dei temi nei componenti.
+- **Effetto legno** (tutti i temi): venatura generata da un SVG inline (`feTurbulence`
+  stirato nel verso delle fibre) — orizzontale sui piani con fibre scure e chiare, verticale
+  sulla parete a pannelli con le fughe fra le assi. Ogni tema tinge le venature con i propri
+  colori (Bianco: legno sbiancato e leggero). Nessuna immagine da scaricare; per ritoccarla si
+  cambiano `baseFrequency` (fittezza) e la riga alpha di `feColorMatrix` (intensità).
+  La texture della parete si ripete a piastrelle: lì `stitchTiles='stitch'` e una regione del
+  filtro pari alla piastrella (`x='0' y='0' width='100%' height='100%'`) sono obbligatori, senza
+  si vedono le giunzioni. I piani invece stirano una sola texture su tutta la lunghezza
+  (`100% 100%`): non hanno giunzioni e non vanno toccati, perché quelle due opzioni cambiano la
+  densità del rumore e le venature si appiattiscono. La parete usa
+  `background-attachment: local` e scorre con le mensole.
+- **Cornice** (`shelf-frame`): bordo sottile dello stesso materiale dei piani del tema (6 px,
+  5 px sotto i 640 px), con luce dall'alto e ombra interna. È un elemento esterno che non
+  scorre: dentro c'è la parete, con lo scroll proprio, così le costole non passano sopra il
+  bordo. Spessore e raggio si regolano con `--shelf-frame-width` / `--shelf-frame-radius`
+  (anteprime: 4 px senza raggio, perché gli angoli li arrotonda la card; campioni: 3 px).
+- **Utility della mensola** (`index.css`): `shelf-wall` (parete con luce dall'alto),
+  `shelf-board` (mobile: righe impilate, gap 28 px), `shelf-books` (riga di costole allineate in
+  basso, min-height 190 px / 168 px sotto i 640 px), `shelf-plank` (piano con venatura, bordo
+  frontale e ombra; altezza regolabile con `--plank-height` per anteprime e campioni), `spine` e
+  `spine-title` (volume, ombre, titolo verticale con ellissi). Gradienti e pseudo-elementi
+  stanno lì, non nei componenti.
+- **Dettaglio**: header con nome e numero di libri sotto il titolo; il mobile occupa quasi
+  tutta la larghezza e riempie l'altezza fino alla bottom nav. La pagina non scrolla: scorrono
+  solo le mensole dentro il mobile (`overflow-y-auto`, `overscroll-contain`). Il mobile è
+  marcato `data-scroll-area`, così nella PWA il pull-to-refresh parte solo se le mensole sono
+  in cima (`usePullToRefresh`).
 - **Layout a flusso**: la larghezza del contenitore è misurata con `ResizeObserver`
   (`useElementWidth`); le costole riempiono una riga finché c'è spazio, poi si passa alla
   mensola successiva (`lib/shelfLayout.ts`). Niente coordinate libere: l'ordine è `position`.
@@ -361,15 +391,18 @@ con i libri in piedi mostrati come costole.
 - **Costola generata** (`lib/spine/generated.ts`), deterministica da `book.id`:
   colore da una palette curata di 12 toni da rilegatura (mai estratto dalla copertina:
   le immagini esterne sono cross-origin), larghezza proporzionale a `page_count` (18–44 px
-  all'altezza di riferimento 160 px), altezza ±8%, titolo e autore in verticale
-  (`writing-mode: vertical-rl`) con ellissi, colore del testo scelto dalla luminanza.
-  Le costole hanno bordi in rilievo e ombra: restano distinguibili anche quando il loro colore
-  è vicino a quello della parete del tema.
+  all'altezza di riferimento 160 px), altezza ±8%, un libro su 8 leggermente inclinato (max
+  1,2°), solo il titolo in verticale (`writing-mode: vertical-rl`, serif 11 px a 150 px di
+  altezza) con ellissi, colore del testo scelto dalla luminanza. Volume e bordi in rilievo
+  separano le costole anche quando il loro colore è vicino a quello della parete.
 - **Foto della costola**: collegata al `library_item` (per utente), non al catalogo `books`.
   `spine_ratio` (larghezza/altezza) è salvato nel DB, così il layout riserva lo spazio prima
   che l'immagine sia scaricata.
-- **Elenco**: card con anteprima a mini-mensola (primi 12 libri), nome, conteggio e menu ⋯
-  (modifica nome e tema, elimina). Dopo la creazione si apre il dettaglio dello scaffale.
+- **Elenco**: header con titolo, sottotitolo e pulsante "+" circolare; card con anteprima a
+  mini-mensola (primi 12 libri), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
+  Dopo la creazione si apre il dettaglio dello scaffale.
+- **Selettore tema**: griglia 2×2 di anteprime (parete, costole, piano) con la label sotto; il
+  tema scelto ha bordo e testo corallo. Niente decorazioni finché non arriva la Fase 4.
 - **Eliminazione**: `ConfirmDialog` con testo esplicito — i libri restano in libreria
   (`shelf_items` va in cascata, `library_items` no).
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;

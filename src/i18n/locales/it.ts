@@ -54,7 +54,7 @@ export const it = {
   },
   shelves: {
     title: "Scaffali",
-    new: "Nuovo",
+    subtitle: "Organizza i tuoi libri per temi, stati d'animo o come preferisci.",
     emptyTitle: "Ancora nessuno scaffale",
     emptySubtitle:
       "Crea uno scaffale e metti in fila i tuoi libri.",

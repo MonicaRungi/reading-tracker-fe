@@ -40,9 +40,12 @@ export default function ShelfDetailPage() {
   const { shelf } = data;
 
   return (
-    <div className="flex min-h-full flex-col">
+    // altezza del viewport meno la bottom nav (pb-20 di AppLayout): la pagina
+    // non scrolla, scorrono solo le mensole dentro il mobile
+    <div className="flex h-[calc(100svh-5rem-var(--safe-area-inset-top))] flex-col overflow-hidden">
       <BackHeader
         title={shelf.name}
+        subtitle={t("library.bookCount", { count: shelf.books.length })}
         onBack={actions.goToList}
         action={
           <ShelfHeaderActions
@@ -62,14 +65,13 @@ export default function ShelfDetailPage() {
           action={{ label: t("shelves.detail.addBooks"), onClick: actions.addBooks.open }}
         />
       ) : (
-        <div className="space-y-3 px-4 pb-6">
-          <p className="text-[13px] text-muted-foreground">
-            {t("library.bookCount", { count: shelf.books.length })}
-          </p>
+        // il mobile riempie l'altezza rimasta, come nel design
+        <div className="flex min-h-0 flex-1 flex-col px-2 pb-4 pt-2">
           <ShelfBoard
             theme={shelf.color_theme}
             books={shelf.books}
             onOpenBook={actions.openBook}
+            className="min-h-0 flex-1"
           />
         </div>
       )}

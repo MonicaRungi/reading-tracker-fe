@@ -16,6 +16,9 @@ const DEFAULT_WIDTH = 26;
 const MIN_PAGES = 80;
 const MAX_PAGES = 900;
 const HEIGHT_VARIATION = 0.08;
+/** Un libro su LEAN_EVERY è leggermente inclinato, di al massimo MAX_LEAN gradi. */
+const LEAN_EVERY = 8;
+const MAX_LEAN = 1.2;
 
 /** Tele e cuoi da rilegatura: toni caldi e smorzati, niente colori saturi. */
 const PALETTE = [
@@ -43,6 +46,8 @@ export interface GeneratedSpine {
   width: number;
   /** Altezza in px: `height` con una piccola variazione per libro. */
   height: number;
+  /** Inclinazione in gradi (quasi sempre 0), con perno sul fondo della costola. */
+  rotation: number;
 }
 
 // FNV-1a a 32 bit: veloce e con una buona distribuzione anche su uuid simili.
@@ -85,5 +90,9 @@ export function generatedSpine(
     foreground: relativeLuminance(background) > 0.18 ? DARK_TEXT : LIGHT_TEXT,
     width: Math.round(baseWidth(book.page_count) * scale),
     height: Math.round(height * (1 + variation * HEIGHT_VARIATION)),
+    rotation:
+      (h >>> 20) % LEAN_EVERY === 0
+        ? Math.round(variation * MAX_LEAN * 10) / 10
+        : 0,
   };
 }

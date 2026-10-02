@@ -1,8 +1,19 @@
 /** Altezza delle costole sulla mensola del dettaglio scaffale. */
 export const SHELF_SPINE_HEIGHT = 150;
 
-/** Spazio fra costole adiacenti: deve combaciare con `gap-[2px]` di ShelfRow. */
+/** Spazio fra costole adiacenti: deve combaciare con il gap di `shelf-books` (index.css). */
 export const SHELF_SPINE_GAP = 2;
+
+/** Stesso breakpoint dei media query di `shelf-books` / `shelf-board`. */
+const MOBILE_QUERY = "(width < 40rem)";
+
+/**
+ * Padding orizzontale di una riga (`shelf-books` in index.css): lo spazio utile
+ * per le costole è la larghezza interna del mobile meno questo valore per lato.
+ */
+export function shelfRowInset(): number {
+  return window.matchMedia(MOBILE_QUERY).matches ? 6 : 12;
+}
 
 /**
  * Disposizione a flusso della mensola: riempie una riga finché c'è spazio,
