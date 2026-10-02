@@ -109,6 +109,8 @@ export type Database = {
           finished_at: string | null
           id: string
           rating: number | null
+          spine_path: string | null
+          spine_ratio: number | null
           started_at: string | null
           status: string
           updated_at: string
@@ -121,6 +123,8 @@ export type Database = {
           finished_at?: string | null
           id?: string
           rating?: number | null
+          spine_path?: string | null
+          spine_ratio?: number | null
           started_at?: string | null
           status?: string
           updated_at?: string
@@ -133,6 +137,8 @@ export type Database = {
           finished_at?: string | null
           id?: string
           rating?: number | null
+          spine_path?: string | null
+          spine_ratio?: number | null
           started_at?: string | null
           status?: string
           updated_at?: string
@@ -306,17 +312,29 @@ export type Database = {
       shelf_items: {
         Row: {
           added_at: string
-          library_item_id: string
+          decor_key: string | null
+          id: string
+          item_type: string
+          library_item_id: string | null
+          position: number
           shelf_id: string
         }
         Insert: {
           added_at?: string
-          library_item_id: string
+          decor_key?: string | null
+          id?: string
+          item_type?: string
+          library_item_id?: string | null
+          position?: number
           shelf_id: string
         }
         Update: {
           added_at?: string
-          library_item_id?: string
+          decor_key?: string | null
+          id?: string
+          item_type?: string
+          library_item_id?: string | null
+          position?: number
           shelf_id?: string
         }
         Relationships: [
@@ -338,18 +356,21 @@ export type Database = {
       }
       shelves: {
         Row: {
+          color_theme: string
           created_at: string
           id: string
           name: string
           user_id: string
         }
         Insert: {
+          color_theme?: string
           created_at?: string
           id?: string
           name: string
           user_id: string
         }
         Update: {
+          color_theme?: string
           created_at?: string
           id?: string
           name?: string
@@ -412,6 +433,8 @@ export type Database = {
           finished_at: string | null
           id: string
           rating: number | null
+          spine_path: string | null
+          spine_ratio: number | null
           started_at: string | null
           status: string
           updated_at: string
