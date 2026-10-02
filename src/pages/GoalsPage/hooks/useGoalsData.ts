@@ -28,7 +28,6 @@ import {
   nextSecondaryStart,
   visibleSecondaries,
 } from "@/lib/goals";
-import { hapticFeedback } from "@/lib/haptics";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
 import {
   dismissRenewal,
@@ -222,7 +221,6 @@ export function useGoalsData() {
         if (isPrimaryFilled) return;
         setIsPrimaryFilled(true);
         fireConfetti();
-        hapticFeedback(30);
       },
       // invito
       dismissRenewal: (goal: ReadingGoal) => dismissRenewal(userId, goal.id),

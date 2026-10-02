@@ -10,7 +10,6 @@ import type { BookMeta } from "@/api/books";
 import { addLibraryItem, listLibrary } from "@/api/library";
 import type { LibraryItem, ReadingStatus } from "@/api/library";
 import { createLibraryMatcher } from "@/lib/bookMatch";
-import { hapticFeedback } from "@/lib/haptics";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
 import { listShelves, createShelf } from "@/api/shelves";
 import { createReminder } from "@/api/releaseReminders";
@@ -184,7 +183,6 @@ export function useSearchData() {
   }, [addShelf, newShelfName]);
 
   async function handleDetected(isbn: string) {
-    hapticFeedback();
     setScannerOpen(false);
 
     await handleScan(isbn);
