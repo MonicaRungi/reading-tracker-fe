@@ -260,8 +260,7 @@
       color-mix(in srgb, var(--shelf-back), white 8%),
       var(--shelf-back)
     );
-  /* nel mobile con scroll proprio la parete scorre insieme alle mensole */
-  background-attachment: local;
+  /* la parete resta ferma: nel mobile con scroll proprio scorrono solo dorsi e piani */
 }
 
 /*

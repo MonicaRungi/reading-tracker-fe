@@ -100,6 +100,9 @@ src/
 - **Bottom nav safe area**: `pb-safe` o `env(safe-area-inset-bottom)`.
 - **Spacing verticale** tra sezioni: `space-y-5` o `gap-5`.
 - Niente scroll orizzontale a livello pagina.
+- **Scroll fra le rotte** (`useScrollRestoration`, chiamato in `App.tsx`): una navigazione in
+  avanti (link, tab, `navigate`) apre la pagina dall'alto; indietro/avanti del browser riporta
+  alla posizione lasciata. Riguarda solo lo scroll della finestra, non le aree con scroll proprio.
 
 ### 4.2 Griglia
 
@@ -366,8 +369,8 @@ con i libri in piedi mostrati come dorsi.
   filtro pari alla piastrella (`x='0' y='0' width='100%' height='100%'`) sono obbligatori, senza
   si vedono le giunzioni. I piani invece stirano una sola texture su tutta la lunghezza
   (`100% 100%`): non hanno giunzioni e non vanno toccati, perché quelle due opzioni cambiano la
-  densità del rumore e le venature si appiattiscono. La parete usa
-  `background-attachment: local` e scorre con le mensole.
+  densità del rumore e le venature si appiattiscono. La parete resta ferma
+  mentre le mensole scorrono (sfondo con `background-attachment` predefinito, non `local`).
 - **Cornice** (`shelf-frame`): bordo sottile dello stesso materiale dei piani del tema (6 px,
   5 px sotto i 640 px), con luce dall'alto e ombra interna. È un elemento esterno che non
   scorre: dentro c'è la parete, con lo scroll proprio, così i dorsi non passano sopra il

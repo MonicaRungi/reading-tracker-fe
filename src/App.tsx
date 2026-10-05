@@ -18,6 +18,7 @@ import GoalsPage from "@/pages/GoalsPage";
 import ShelvesPage from "@/pages/ShelvesPage";
 import ShelfDetailPage from "@/pages/ShelfDetailPage";
 import { useTheme } from "./hooks/useTheme";
+import { useScrollRestoration } from "./hooks/useScrollRestoration";
 
 // Pagina di prova della pipeline del dorso: import.meta.env.DEV vale false
 // nella build di produzione, quindi pagina e import spariscono dal bundle.
@@ -25,6 +26,7 @@ const DevSpinePage = import.meta.env.DEV ? lazy(() => import("@/pages/DevSpinePa
 
 function App() {
   useTheme();
+  useScrollRestoration();
 
   return (
     <Routes>
