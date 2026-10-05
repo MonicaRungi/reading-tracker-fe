@@ -354,12 +354,12 @@ con i libri in piedi mostrati come dorsi.
 
 - **Rotte**: `/shelves` (elenco: crea, modifica, elimina) e `/shelves/:shelfId` (mensola).
   Uno `:shelfId` inesistente o nascosto dalla RLS mostra un `EmptyState` con ritorno all'elenco.
-- **Tema della mensola**: `wood` | `white` | `night` | `sage`, scelto alla creazione e
+- **Tema della mensola**: `wood` | `white` | `night` | `sage` | `lilac` | `terracotta`, scelto alla creazione e
   modificabile. È **indipendente dal dark mode dell'app**: i colori sono CSS variables per
   attributo (`[data-shelf-theme="…"]` in `index.css`: `--shelf-back`, `--shelf-board`,
   `--shelf-board-light`, `--shelf-board-shadow`, `--shelf-plank-grain`, `--shelf-wall-grain`)
   e non vengono ridefiniti sotto `.dark`. Ogni tema ha il suo piano (legno, bianco, blu notte,
-  salvia). Mai hex dei temi nei componenti.
+  salvia, malva, cotto). Mai hex dei temi nei componenti.
 - **Effetto legno** (tutti i temi): venatura generata da un SVG inline (`feTurbulence`
   stirato nel verso delle fibre) — orizzontale sui piani con fibre scure e chiare, verticale
   sulla parete a pannelli con le fughe fra le assi. Ogni tema tinge le venature con i propri
@@ -433,7 +433,7 @@ con i libri in piedi mostrati come dorsi.
 - **Elenco**: header con titolo, sottotitolo e pulsante "+" circolare; card con anteprima a
   mini-mensola (primi 12 libri), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
   Dopo la creazione si apre il dettaglio dello scaffale.
-- **Selettore tema**: griglia 2×2 di anteprime (parete, dorsi, piano) con la label sotto; il
+- **Selettore tema**: griglia a 2 colonne (3 righe con 6 temi) di anteprime (parete, dorsi, piano) con la label sotto; il
   tema scelto ha bordo e testo corallo. Niente decorazioni finché non arriva la Fase 4.
 - **Eliminazione**: `ConfirmDialog` con testo esplicito — i libri restano in libreria
   (`shelf_items` va in cascata, `library_items` no).

@@ -54,10 +54,10 @@ export const it = {
   },
   shelves: {
     title: "Scaffali",
-    subtitle: "Organizza i tuoi libri per temi, stati d'animo o come preferisci.",
+    subtitle:
+      "Organizza i tuoi libri per temi, stati d'animo o come preferisci.",
     emptyTitle: "Ancora nessuno scaffale",
-    emptySubtitle:
-      "Crea uno scaffale e metti in fila i tuoi libri.",
+    emptySubtitle: "Crea uno scaffale e metti in fila i tuoi libri.",
     emptyCta: "Crea uno scaffale",
     previewEmpty: "Scaffale vuoto",
     openMenu: "Opzioni per {{name}}",
@@ -66,12 +66,14 @@ export const it = {
       white: "Bianco",
       night: "Notte",
       sage: "Salvia",
+      lilac: "Lilla",
+      terracotta: "Terracotta",
     },
     form: {
       createTitle: "Nuovo scaffale",
       editTitle: "Modifica scaffale",
       nameLabel: "Nome",
-      namePlaceholder: "Es. Preferiti, Da regalare…",
+      namePlaceholder: "Es. Preferiti, Lista dei desideri…",
       themeLabel: "Tema della mensola",
       create: "Crea scaffale",
       nameError: {
@@ -445,8 +447,7 @@ export const it = {
         "I nuovi obiettivi inizieranno nella prima settimana disponibile, senza sovrapporsi con quelli attivi.",
       pickerStart: "Partenza",
       pickerSave: "Salva obiettivi",
-      pickerNothingAvailable:
-        "Hai già programmato un obiettivo per ogni tipo.",
+      pickerNothingAvailable: "Hai già programmato un obiettivo per ogni tipo.",
       // Modifica e archiviazione
       editSheetTitle: "Modifica obiettivo",
       editSave: "Salva",
@@ -491,7 +492,8 @@ export const it = {
     notUnlocked: "Da sbloccare",
     feature: "Metti in evidenza",
     unfeature: "Rimuovi dall'evidenza",
-    featuredNote: "Puoi avere fino a {{count}} badge in evidenza sul tuo profilo.",
+    featuredNote:
+      "Puoi avere fino a {{count}} badge in evidenza sul tuo profilo.",
     featuredLimitReached:
       "Hai già {{count}} badge in evidenza: rimuovine uno per aggiungere questo.",
     featuredAdded: "Badge messo in evidenza",
@@ -519,7 +521,8 @@ export const it = {
     goalRenewalHint: "Puoi impostarne uno nuovo per questa settimana.",
     bookRelease: "È uscito un libro che aspettavi",
     empty: "Nessuna notifica",
-    emptySub: "Qui troverai badge sbloccati, obiettivi da rinnovare e libri in uscita.",
+    emptySub:
+      "Qui troverai badge sbloccati, obiettivi da rinnovare e libri in uscita.",
     retentionHint: "Le notifiche vengono eliminate dopo 30 giorni.",
     // Promemoria di uscita
     releaseOn: "Esce {{date}}",

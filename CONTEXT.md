@@ -80,7 +80,7 @@ id          uuid primary key default gen_random_uuid()
 user_id     uuid not null references auth.users(id) on delete cascade
 name        text not null
 color_theme text not null default 'wood'
-            check (color_theme in ('wood','white','night','sage'))
+            check (color_theme in ('wood','white','night','sage','lilac','terracotta'))
 created_at  timestamptz not null default now()
 unique (user_id, name)
 ```

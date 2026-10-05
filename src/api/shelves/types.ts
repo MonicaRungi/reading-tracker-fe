@@ -1,7 +1,7 @@
 import type { BookRow, LibraryItemRow } from "@/types/database.types"
 
 /** Tema colore della mensola: indipendente dal dark mode dell'app. */
-export type ShelfTheme = "wood" | "white" | "night" | "sage"
+export type ShelfTheme = "wood" | "white" | "night" | "sage" | "lilac" | "terracotta"
 
 /** Quanto basta di un libro per disegnarne il dorso. */
 export type SpineBook = Pick<BookRow, "id" | "title" | "authors" | "page_count">
