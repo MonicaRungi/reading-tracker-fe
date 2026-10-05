@@ -5,7 +5,7 @@ import { generatedSpine } from "@/lib/spine/generated";
 import { cn } from "@/lib/utils";
 import { SpinePhoto } from "./SpinePhoto";
 
-/** Corpo del titolo sulla mensola del dettaglio; scala con l'altezza della costola. */
+/** Corpo del titolo sulla mensola del dettaglio; scala con l'altezza del dorso. */
 const TITLE_FONT_SIZE = 11;
 const MIN_TITLE_FONT_SIZE = 6;
 
@@ -16,7 +16,7 @@ type SpineStyle = CSSProperties & {
 };
 
 /**
- * Costola di un libro: la foto se c'è, altrimenti quella generata.
+ * Dorso di un libro: la foto se c'è, altrimenti quello generato.
  * `spine_ratio` c'è se e solo se il libro ha una foto (vincolo nel DB): lo
  * spazio della foto è riservato subito, con un segnaposto finché l'URL firmato
  * non arriva, così la mensola non "salta" durante il caricamento.

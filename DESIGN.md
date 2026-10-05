@@ -20,7 +20,7 @@ Quattro sezioni principali, accessibili dalla **bottom navigation** (mobile-firs
 |---|---|---|
 | Home / Libreria | house | Banner "Continua a leggere" + griglia libri |
 | Cerca | search | Ricerca testuale / ISBN / scan barcode |
-| Scaffali | library | Elenco scaffali e mensole con le costole (§16) |
+| Scaffali | library | Elenco scaffali e mensole con i dorsi (§16) |
 | Profilo | user | Statistiche, preferenze tema, logout |
 
 La bottom nav è sempre visibile nell'app shell autenticata. Le pagine di dettaglio (libro, scaffale)
@@ -119,7 +119,7 @@ La firma visiva dell'app:
 
 - **Font**: sans di sistema (`font-sans`, ovvero `-apple-system, system-ui`). Nessun font esterno
   da caricare — l'app è mobile-first e deve restare leggera.
-  **Eccezione**: il titolo sulle costole dei libri (§16) usa il serif di sistema (`font-serif`:
+  **Eccezione**: il titolo sui dorsi dei libri (§16) usa il serif di sistema (`font-serif`:
   "New York" su iOS, Georgia altrove), sempre senza font da scaricare.
 - **Accento (Corallo)**: `#E0644A` — il colore primario dell'app. Usato per CTA, chip attivi,
   barre di avanzamento, icone bottom nav attive, badge stato "In lettura".
@@ -224,7 +224,7 @@ Il bottom sheet di aggiunta è il punto unico per impostare stato e scaffali:
 | Stelle voto | `RatingStars` | interattive o read-only, 1-5 |
 | Barra avanzamento | `ProgressBar` | colore accent, border-radius pieno |
 | Aggiunta libro | `AddBookSheet` | bottom sheet con stati + scaffali |
-| Costola libro | `Spine` | foto della costola o costola generata (§16) |
+| Dorso libro | `Spine` | foto del dorso o dorso generato (§16) |
 | Crea/modifica scaffale | `ShelfFormSheet` | nome + selettore tema (`ShelfThemePicker`) |
 | Date picker | `DatePickerPopover` | Popover + Calendar di shadcn |
 | Ricerca | `SearchBar` | campo unificato titolo/autore/ISBN |
@@ -337,7 +337,7 @@ le function con fetch diretto dal frontend — sempre via `supabase.functions.in
 - **Realtime**: in uso per le notifiche (badge sbloccati, rinnovo obiettivi, uscite libri).
   I subscription vivono in hook dedicati (`useNotificationsRealtime`) con cleanup su
   `useEffect` return.
-- **Storage**: in uso solo per le foto delle costole (bucket privato `spines`, §16). Le
+- **Storage**: in uso solo per le foto dei dorsi (bucket privato `spines`, §16). Le
   copertine continuano ad arrivare dalle API esterne.
 - **Keep-alive**: GitHub Action nella repo backend che fa una query ogni ~5 giorni per evitare
   la pausa del progetto free.
@@ -347,7 +347,7 @@ le function con fetch diretto dal frontend — sempre via `supabase.functions.in
 ## 16. Scaffali a mensola
 
 Gli scaffali sono l'unico concetto di "scaffale" dell'app e hanno un'unica vista: la mensola,
-con i libri in piedi mostrati come costole.
+con i libri in piedi mostrati come dorsi.
 
 - **Rotte**: `/shelves` (elenco: crea, modifica, elimina) e `/shelves/:shelfId` (mensola).
   Uno `:shelfId` inesistente o nascosto dalla RLS mostra un `EmptyState` con ritorno all'elenco.
@@ -370,11 +370,11 @@ con i libri in piedi mostrati come costole.
   `background-attachment: local` e scorre con le mensole.
 - **Cornice** (`shelf-frame`): bordo sottile dello stesso materiale dei piani del tema (6 px,
   5 px sotto i 640 px), con luce dall'alto e ombra interna. È un elemento esterno che non
-  scorre: dentro c'è la parete, con lo scroll proprio, così le costole non passano sopra il
+  scorre: dentro c'è la parete, con lo scroll proprio, così i dorsi non passano sopra il
   bordo. Spessore e raggio si regolano con `--shelf-frame-width` / `--shelf-frame-radius`
   (anteprime: 4 px senza raggio, perché gli angoli li arrotonda la card; campioni: 3 px).
 - **Utility della mensola** (`index.css`): `shelf-wall` (parete con luce dall'alto),
-  `shelf-board` (mobile: righe impilate, gap 28 px), `shelf-books` (riga di costole allineate in
+  `shelf-board` (mobile: righe impilate, gap 28 px), `shelf-books` (riga di dorsi allineati in
   basso, min-height 190 px / 168 px sotto i 640 px), `shelf-plank` (piano con venatura, bordo
   frontale e ombra; altezza regolabile con `--plank-height` per anteprime e campioni), `spine` e
   `spine-title` (volume, ombre, titolo verticale con ellissi). Gradienti e pseudo-elementi
@@ -383,30 +383,37 @@ con i libri in piedi mostrati come costole.
   tutta la larghezza e riempie l'altezza fino alla bottom nav. La pagina non scrolla: scorrono
   solo le mensole dentro il mobile (`overflow-y-auto`, `overscroll-contain`). Il mobile è
   marcato `data-scroll-area`, così nella PWA il pull-to-refresh parte solo se le mensole sono
-  in cima (`usePullToRefresh`). Le costole sono `data-no-pull-refresh`: una tirata verso il
-  basso che parte da una costola è sempre uno spostamento. L'hook ascolta la fine del tocco
-  anche sull'elemento di partenza, perché se viene smontato durante il gesto (una costola che
+  in cima (`usePullToRefresh`). I dorsi sono `data-no-pull-refresh`: una tirata verso il
+  basso che parte da un dorso è sempre uno spostamento. L'hook ascolta la fine del tocco
+  anche sull'elemento di partenza, perché se viene smontato durante il gesto (un dorso che
   cambia riga) gli eventi non risalgono più fino a `window`.
 - **Layout a flusso**: la larghezza del contenitore è misurata con `ResizeObserver`
-  (`useElementWidth`); le costole riempiono una riga finché c'è spazio, poi si passa alla
+  (`useElementWidth`); i dorsi riempiono una riga finché c'è spazio, poi si passa alla
   mensola successiva (`lib/shelfLayout.ts`). Niente coordinate libere: l'ordine è `position`.
-  Le righe hanno altezza fissa, così la variazione d'altezza delle costole non sposta le tavole.
-- **Costola generata** (`lib/spine/generated.ts`), deterministica da `book.id`:
+  Le righe hanno altezza fissa, così la variazione d'altezza dei dorsi non sposta le tavole.
+- **Dorso generato** (`lib/spine/generated.ts`), deterministica da `book.id`:
   colore da una palette curata di 12 toni da rilegatura (mai estratto dalla copertina:
   le immagini esterne sono cross-origin), larghezza proporzionale a `page_count` (18–44 px
   all'altezza di riferimento 160 px), altezza ±8%, un libro su 8 leggermente inclinato (max
   1,2°), solo il titolo in verticale (`writing-mode: vertical-rl`, serif 11 px a 150 px di
   altezza) con ellissi, colore del testo scelto dalla luminanza. Volume e bordi in rilievo
-  separano le costole anche quando il loro colore è vicino a quello della parete.
-- **Foto della costola**: collegata al `library_item` (per utente), non al catalogo `books`.
+  separano i dorsi anche quando il loro colore è vicino a quello della parete.
+- **Foto del dorso**: collegata al `library_item` (per utente), non al catalogo `books`.
   `spine_ratio` (larghezza/altezza) è salvato nel DB, così il layout riserva lo spazio prima
   che l'immagine sia scaricata.
-  - **Dove**: dettaglio libro, accanto alla copertina e alla stessa altezza (`SpineSection`;
-    badge fotocamera se non c'è ancora una foto). Tap → `SpineCaptureSheet`: consigli di scatto,
-    "Scatta" (fotocamera nativa, `capture="environment"`) o "Galleria" → 4 angoli
-    (`SpineCropper`) → tre rese affiancate (Originale / Migliorato predefinito / Vivido), avviso
-    "La foto sembra sfocata" con "Rifai" / "Usa comunque" → salvataggio. Con una foto già
-    presente lo sheet offre anche "Rimuovi la foto" (con conferma: torna la costola generata).
+  - **Dove**: dettaglio libro, accanto alla copertina e alla stessa altezza (`SpineSection`).
+    Senza foto è uno spazio tratteggiato corallo (40 × 144 px, angoli come la copertina) con "+";
+    con la foto mostra il dorso fotografato. Tap → `SpineCaptureSheet`, in tre tappe:
+    1. **Foto del dorso**: illustrazione `spine-photo` (variante chiara e scura), tre
+       consigli con la lampadina, "Scatta foto" (pieno; fotocamera nativa,
+       `capture="environment"`) e "Scegli da galleria" (bordato), impilati. Con una foto già
+       presente anche "Rimuovi la foto" (con conferma: torna il dorso generato).
+    2. **Ritaglia il dorso**: barra propria "Annulla · titolo · Avanti" al posto della X;
+       "Annulla" torna alla tappa 1. Foto su fondo scuro con i 4 angoli (`SpineCropper`),
+       "Ruota a sinistra" / "Ruota a destra" (90°, gli angoli tornano al rettangolo iniziale).
+    3. **Scegli la resa**: titolo centrato, tre card (Originale / Migliorata predefinita /
+       Vivida; quella scelta ha bordo corallo e spunta), "Salva il dorso". Se la foto sembra
+       sfocata, al posto del pulsante compare l'avviso con "Rifai" / "Usa comunque".
   - **Pipeline** (`lib/spine/`, in un worker con ripiego sul main thread): raddrizzamento
     prospettico, miglioramento che non cambia la tinta (bilanciamento, esposizione e punti di
     nero/bianco stimati sulla foto intera; livelli, gamma e curva sulla sola luminanza),
@@ -423,13 +430,13 @@ con i libri in piedi mostrati come costole.
 - **Elenco**: header con titolo, sottotitolo e pulsante "+" circolare; card con anteprima a
   mini-mensola (primi 12 libri), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
   Dopo la creazione si apre il dettaglio dello scaffale.
-- **Selettore tema**: griglia 2×2 di anteprime (parete, costole, piano) con la label sotto; il
+- **Selettore tema**: griglia 2×2 di anteprime (parete, dorsi, piano) con la label sotto; il
   tema scelto ha bordo e testo corallo. Niente decorazioni finché non arriva la Fase 4.
 - **Eliminazione**: `ConfirmDialog` con testo esplicito — i libri restano in libreria
   (`shelf_items` va in cascata, `library_items` no).
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
   esclude i libri già presenti. Resta valido anche il percorso da `AddBookSheet`.
-- **Riordino senza modalità** (dettaglio scaffale): un tap su una costola apre il libro, la
+- **Riordino senza modalità** (dettaglio scaffale): un tap su un dorso apre il libro, la
   **pressione lunga** la solleva e si trascina; al rilascio è già salvato. Niente pulsante
   "Riordina" né "Fine": una modalità non darebbe vantaggi, perché dentro il mobile scorrevole
   la pressione lunga serve comunque a distinguere il trascinamento dallo scroll. Il click
@@ -438,17 +445,17 @@ con i libri in piedi mostrati come costole.
   spostano, Esc annulla.
   - **Suggerimento** "Tieni premuto e trascina per riordinare" in fondo alle mensole, finché
     non si è riordinato una volta (`rt.shelfReorderHintSeen` in localStorage).
-  - **Durante il trascinamento**: la copia della costola segue il dito, sollevata e inclinata,
+  - **Durante il trascinamento**: la copia del dorso segue il dito, sollevata e inclinata,
     con l'etichetta "Sposta" (`DragOverlay`); al suo posto un segnaposto tratteggiato
     (`--shelf-placeholder` del tema). In fondo al mobile compare la zona
     "Trascina qui per rimuovere".
   - **dnd-kit** (`@dnd-kit/core` + `sortable`): sensori mouse (5 px), touch (pressione di
-    250 ms, tolleranza 5 px; costole con `touch-action: manipulation` e senza menu di sistema
+    250 ms, tolleranza 5 px; dorsi con `touch-action: manipulation` e senza menu di sistema
     iOS, quindi prima dell'attivazione lo scroll resta nativo) e tastiera. Annunci e
     istruzioni per screen reader in italiano via `t()`.
-  - **Riflusso dal vivo**: niente trasformazioni di dnd-kit (stirerebbero costole di larghezza
+  - **Riflusso dal vivo**: niente trasformazioni di dnd-kit (stirerebbero dorsi di larghezza
     diversa). L'ordine cambia subito e il layout a flusso ricompone le righe. Collisione con
-    `pointerWithin` (solo sopra una costola o la zona "rimuovi") e almeno 8 px di movimento fra
+    `pointerWithin` (solo sopra un dorso o la zona "rimuovi") e almeno 8 px di movimento fra
     due spostamenti: senza, al punto di a capo il riflusso si alimenta da solo all'infinito.
   - **Salvataggio**: una sola chiamata a `reorder_shelf` al rilascio, ottimistica (`onMutate`
     + rollback e toast in `onError`), in fila con le altre mutation dello scaffale (`scope`).

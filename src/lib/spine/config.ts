@@ -1,5 +1,5 @@
 /**
- * Costanti della pipeline della foto della costola, in un solo posto: vanno
+ * Costanti della pipeline della foto del dorso, in un solo posto: vanno
  * tarate su foto reali (poca luce, luce calda, luce fredda) con la pagina di
  * prova /dev/spine, che mostra i tempi di ogni passaggio.
  */
@@ -19,14 +19,14 @@ export interface EnhanceSettings {
   levelsClip: number;
   /**
    * Limiti dello stiramento (0–255): il punto nero non sale oltre levelsMaxBlack e
-   * il punto bianco non scende sotto levelsMinWhite. Una costola è quasi tutta del
+   * il punto bianco non scende sotto levelsMinWhite. Un dorso è quasi tutto del
    * suo colore: senza limiti il suo stesso corpo diventerebbe "nero".
    */
   levelsMaxBlack: number;
   levelsMinWhite: number;
   /**
    * La gamma correttiva scatta solo se la luminanza media della foto intera (0–1)
-   * è sotto questa soglia: una costola marrone è scura di suo, non per poca luce.
+   * è sotto questa soglia: un dorso marrone è scuro di suo, non per poca luce.
    */
   gammaThreshold: number;
   /** Esponente minimo della gamma (schiarimento massimo). */
@@ -71,7 +71,7 @@ export const PRESET_SETTINGS: Record<SpinePreset, EnhanceSettings | null> = {
 export const SPINE_PIPELINE = {
   /** Lato lungo massimo della foto dopo la decodifica (le foto da 12 MP sono ~4000 px). */
   maxInputSide: 2000,
-  /** Altezza della costola raddrizzata (mai ingrandita oltre la risoluzione disponibile). */
+  /** Altezza del dorso raddrizzato (mai ingrandita oltre la risoluzione disponibile). */
   outputHeight: 1200,
   /** Sotto questa varianza del Laplaciano la foto è considerata sfocata. */
   blurThreshold: 60,

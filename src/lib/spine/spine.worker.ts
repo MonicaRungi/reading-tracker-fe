@@ -7,7 +7,7 @@ import { SpineEngine } from "./engine";
  * viene trasferita, non copiata.
  */
 
-type Method = "supports" | "load" | "process" | "encode" | "reset";
+type Method = "supports" | "load" | "rotate" | "process" | "encode" | "reset";
 
 const scope = self as unknown as DedicatedWorkerGlobalScope;
 const engine = new SpineEngine();
@@ -33,6 +33,12 @@ scope.onmessage = async (event: MessageEvent<{ id: number; method: Method; args:
         const loaded = await engine.load(args[0] as Blob);
         transfer.push(loaded.preview);
         result = loaded;
+        break;
+      }
+      case "rotate": {
+        const rotated = await engine.rotate(args[0] as Parameters<SpineEngine["rotate"]>[0]);
+        transfer.push(rotated.preview);
+        result = rotated;
         break;
       }
       case "process":

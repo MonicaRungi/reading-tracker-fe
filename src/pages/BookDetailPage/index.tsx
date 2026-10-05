@@ -166,11 +166,12 @@ export default function BookDetailPage() {
         onClose={actions.spine.close}
         onPickFile={actions.spine.pickFile}
         onQuadChange={actions.spine.setQuad}
+        onRotateLeft={actions.spine.rotateLeft}
+        onRotateRight={actions.spine.rotateRight}
         onProcess={actions.spine.processCrop}
         onPresetChange={actions.spine.setPreset}
         onAcceptBlur={actions.spine.acceptBlur}
         onRetake={actions.spine.retake}
-        onBackToCrop={actions.spine.backToCrop}
         onSave={actions.spine.save}
         onRemove={actions.spine.askRemove}
       />

@@ -65,7 +65,7 @@ rating       int check (rating between 1 and 5)   -- nullable
 started_at   date                                  -- nullable
 finished_at  date                                  -- nullable
 current_page int default 0
-spine_path   text                                  -- foto costola nel bucket 'spines'
+spine_path   text                                  -- foto dorso nel bucket 'spines'
 spine_ratio  numeric(6,4) check (spine_ratio > 0)  -- larghezza / altezza della foto
              -- check: (spine_path is null) = (spine_ratio is null)
 added_at     timestamptz not null default now()
@@ -320,9 +320,9 @@ correggi questa sezione di conseguenza invece di fidarti ciecamente.
 ### Sviluppi futuri (post-MVP)
 
 **In corso — Scaffali a mensola** (DESIGN.md §16), a fasi:
-1. Vista mensola con costole generate, temi, crea/modifica/elimina, aggiunta libri — fatto
+1. Vista mensola con dorsi generati, temi, crea/modifica/elimina, aggiunta libri — fatto
 2. Riordino drag & drop (RPC `reorder_shelf`) e rimozione dallo scaffale
-3. Foto della costola (bucket `spines`, pipeline immagine lato client, URL firmati)
+3. Foto del dorso (bucket `spines`, pipeline immagine lato client, URL firmati)
 4. Elementi decorativi ed esportazione della mensola come immagine
 
 In ordine di priorità non definito — da discutere quando si riprende in mano il progetto:
@@ -355,7 +355,7 @@ Schermate disponibili (nell'ordine del file):
 - **QueryKey con userId**: ogni queryKey include l'userId per evitare cache condivisa tra
   utenti diversi sullo stesso device: `['library', userId]`, `['shelves', userId]`, ecc.
 - **Copertine**: arrivano come URL da Google Books / Open Library. Supabase Storage è usato
-  solo per le foto delle costole (bucket privato `spines`).
+  solo per le foto dei dorsi (bucket privato `spines`).
 - **Tema**: persistito in `localStorage['rt.theme']`, default `auto` (segue sistema).
   Applicato come classe `.dark` su `<html>`.
 - **Safe area iOS** (PWA): usare `env(safe-area-inset-top/bottom)` per bottom nav e status

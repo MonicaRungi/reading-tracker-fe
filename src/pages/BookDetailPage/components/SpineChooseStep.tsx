@@ -1,10 +1,11 @@
 import { Camera, ImageIcon, Lightbulb } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Illustration } from "@/components/shared/Illustration";
 import { Button } from "@/components/ui/button";
 
 const TIP_KEYS = ["light", "straight", "close"] as const;
 
-/** Prima tappa: scatto o galleria, con i consigli; se c'è già una foto, anche "Rimuovi". */
+/** Prima tappa: illustrazione, consigli, scatto o galleria; con una foto già presente anche "Rimuovi". */
 export function SpineChooseStep({
   hasPhoto,
   isLoading,
@@ -20,18 +21,23 @@ export function SpineChooseStep({
 
   return (
     <div className="space-y-5">
-      <ul className="space-y-2 rounded-2xl bg-card p-4 shadow-card">
+      {/* variante chiara e scura: Illustration sceglie quella del tema dell'app */}
+      <div className="flex h-[168px] items-center justify-center rounded-2xl bg-accent/60">
+        <Illustration name="spine-photo" className="size-[150px]" />
+      </div>
+
+      <ul className="space-y-3">
         {TIP_KEYS.map((key) => (
-          <li key={key} className="flex gap-2.5 text-[14px] text-foreground">
-            <Lightbulb className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+          <li key={key} className="flex gap-3 text-[14px] leading-snug text-foreground">
+            <Lightbulb className="mt-0.5 size-[18px] shrink-0 text-primary" aria-hidden="true" />
             {t(`spine.capture.tips.${key}`)}
           </li>
         ))}
       </ul>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-3">
         {/* fotocamera nativa: HDR e messa a fuoco di sistema, funziona anche nella PWA iOS */}
-        <Button asChild disabled={isLoading} className="h-auto gap-2 rounded-xl py-[14px] text-[15px]">
+        <Button asChild disabled={isLoading} className="h-auto w-full gap-2 rounded-xl py-[14px] text-[15px]">
           <label>
             <Camera className="size-5" aria-hidden="true" />
             {t("spine.capture.camera")}
@@ -48,7 +54,12 @@ export function SpineChooseStep({
             />
           </label>
         </Button>
-        <Button asChild variant="outline" disabled={isLoading} className="h-auto gap-2 rounded-xl py-[14px] text-[15px]">
+        <Button
+          asChild
+          variant="outline"
+          disabled={isLoading}
+          className="h-auto w-full gap-2 rounded-xl border-primary/40 py-[14px] text-[15px] text-foreground"
+        >
           <label>
             <ImageIcon className="size-5" aria-hidden="true" />
             {t("spine.capture.gallery")}

@@ -8,7 +8,7 @@ export interface UploadSpineInput {
   libraryItemId: string
   blob: Blob
   type: SpineImageType
-  /** larghezza / altezza della costola elaborata. */
+  /** larghezza / altezza del dorso elaborato. */
   ratio: number
   /** Foto precedente da eliminare dopo la sostituzione (null se è la prima). */
   previousPath: string | null

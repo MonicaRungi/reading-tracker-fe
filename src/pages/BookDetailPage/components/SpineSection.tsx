@@ -1,12 +1,15 @@
-import { Camera } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { LibraryItem } from "@/api/library";
 import { Spine } from "@/components/shared/Spine";
 
-/** Altezza della copertina in BookHero: la costola le sta accanto alla stessa altezza. */
+/** Altezza della copertina in BookHero: il dorso le sta accanto alla stessa altezza. */
 const SPINE_HEIGHT = 144;
 
-/** Costola accanto alla copertina: la foto se c'è, altrimenti la generata. Tap → sheet. */
+/**
+ * Dorso accanto alla copertina. Con la foto mostra il dorso fotografato; senza,
+ * uno spazio tratteggiato con "+" che invita ad aggiungerla. Tap → sheet.
+ */
 export function SpineSection({
   item,
   spineUrl,
@@ -19,14 +22,26 @@ export function SpineSection({
   onPhotoError: () => void;
 }) {
   const { t } = useTranslation();
-  const hasPhoto = Boolean(item.spine_path);
+
+  if (!item.spine_path) {
+    return (
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={t("spine.section.add")}
+        className="flex h-[144px] w-10 shrink-0 items-center justify-center self-start rounded-[10px] border-[1.5px] border-dashed border-primary/60 bg-accent/60 text-primary transition-colors active:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <Plus className="size-5" aria-hidden="true" />
+      </button>
+    );
+  }
 
   return (
     <button
       type="button"
       onClick={onOpen}
-      aria-label={hasPhoto ? t("spine.section.manage") : t("spine.section.add")}
-      className="relative shrink-0 self-start rounded-[3px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      aria-label={t("spine.section.manage")}
+      className="shrink-0 self-start rounded-[3px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       <Spine
         book={item.book}
@@ -35,14 +50,6 @@ export function SpineSection({
         height={SPINE_HEIGHT}
         onPhotoError={onPhotoError}
       />
-      {!hasPhoto && (
-        <span
-          aria-hidden="true"
-          className="absolute -bottom-2 left-1/2 flex size-7 -translate-x-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md ring-2 ring-background"
-        >
-          <Camera className="size-3.5" />
-        </span>
-      )}
     </button>
   );
 }

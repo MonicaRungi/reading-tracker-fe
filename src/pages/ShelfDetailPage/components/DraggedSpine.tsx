@@ -5,7 +5,7 @@ import type { SpineUrls } from "@/api/spines";
 import { Spine } from "@/components/shared/Spine";
 import { SHELF_SPINE_HEIGHT } from "@/lib/shelfLayout";
 
-/** Copia della costola che segue il dito: sollevata, inclinata, con l'etichetta "Sposta". */
+/** Copia del dorso che segue il dito: sollevata, inclinata, con l'etichetta "Sposta". */
 export function DraggedSpine({ book, spineUrls }: { book: ShelfBook; spineUrls: SpineUrls }) {
   const { t } = useTranslation();
 

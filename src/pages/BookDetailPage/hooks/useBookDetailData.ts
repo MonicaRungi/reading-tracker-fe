@@ -137,7 +137,7 @@ export function useBookDetailData() {
 
   const { mutate: mutateDelete, isPending: isDeleting } = useMutation({
     mutationFn: async () => {
-      // prima la foto della costola: dopo, nessuna riga la referenzierebbe più
+      // prima la foto del dorso: dopo, nessuna riga la referenzierebbe più
       if (item?.spine_path) await removeSpineFile(item.spine_path);
       await deleteLibraryItem(id!);
     },

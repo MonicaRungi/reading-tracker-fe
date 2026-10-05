@@ -37,20 +37,20 @@ import { ReorderHint } from "./ReorderHint";
 import { ShelfRow } from "./ShelfRow";
 
 // L'ordine cambia dal vivo e il layout a flusso ricompone le righe: le
-// trasformazioni di dnd-kit (che stirerebbero costole di larghezza diversa) non servono.
+// trasformazioni di dnd-kit (che stirerebbero dorsi di larghezza diversa) non servono.
 const noTransformStrategy: SortingStrategy = () => null;
 
-// I rettangoli delle costole cambiano a ogni riflusso: vanno rimisurati sempre.
+// I rettangoli dei dorsi cambiano a ogni riflusso: vanno rimisurati sempre.
 const MEASURING = { droppable: { strategy: MeasuringStrategy.Always } };
 
 // Invio apre il libro (vedi SortableSpine): da tastiera lo spostamento parte solo con Spazio.
 const KEYBOARD_CODES = { start: ["Space"], cancel: ["Escape"], end: ["Space", "Enter"] };
 
 /**
- * Mensola a flusso: le costole riempiono una riga finché c'è spazio, poi si
+ * Mensola a flusso: i dorsi riempiono una riga finché c'è spazio, poi si
  * passa alla mensola successiva. La larghezza disponibile è misurata sul
  * mobile, quindi il layout si adatta a rotazione e resize.
- * Con la pressione lunga le costole si trascinano (anche fra righe diverse);
+ * Con la pressione lunga i dorsi si trascinano (anche fra righe diverse);
  * durante il trascinamento compare in fondo la zona "rimuovi".
  */
 export function ShelfBoard({
@@ -131,7 +131,7 @@ export function ShelfBoard({
     <div data-shelf-theme={theme} className={cn("shelf-frame", className)}>
       <DndContext
         sensors={sensors}
-        // solo con il puntatore sopra una costola: negli spazi fra le righe e
+        // solo con il puntatore sopra un dorso: negli spazi fra le righe e
         // sopra i piani non si sposta nulla
         collisionDetection={pointerWithin}
         measuring={MEASURING}

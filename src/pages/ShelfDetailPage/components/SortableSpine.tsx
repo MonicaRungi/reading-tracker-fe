@@ -7,10 +7,10 @@ import { SHELF_SPINE_HEIGHT } from "@/lib/shelfLayout";
 import { cn } from "@/lib/utils";
 
 /**
- * Costola sulla mensola. Un tap apre il libro, la pressione lunga solleva la
- * costola per spostarla. Niente transform di dnd-kit:
- * l'ordine cambia dal vivo e il layout a flusso sposta le costole; al posto
- * di quella trascinata resta un segnaposto tratteggiato (la copia segue il
+ * Dorso sulla mensola. Un tap apre il libro, la pressione lunga solleva il
+ * dorso per spostarlo. Niente transform di dnd-kit:
+ * l'ordine cambia dal vivo e il layout a flusso sposta i dorsi; al posto
+ * di quello trascinato resta un segnaposto tratteggiato (la copia segue il
  * dito nel DragOverlay). Da tastiera: Invio apre, Spazio sposta.
  */
 export function SortableSpine({
@@ -48,7 +48,7 @@ export function SortableSpine({
       onClick={onOpen}
       aria-label={t("shelves.detail.openBook", { title })}
       aria-roledescription={t("shelves.reorder.roleDescription")}
-      // una tirata verso il basso che parte da una costola è uno spostamento,
+      // una tirata verso il basso che parte da un dorso è uno spostamento,
       // non un pull-to-refresh (che resta disponibile da header e parete)
       data-no-pull-refresh=""
       className={cn(

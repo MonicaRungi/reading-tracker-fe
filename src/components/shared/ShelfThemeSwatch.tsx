@@ -12,7 +12,7 @@ const SWATCH_BOOKS = [
   { id: "swatch-5", title: "", authors: null, page_count: 260 },
 ];
 
-/** Campione di un tema: parete, qualche costola e il piano della mensola. */
+/** Campione di un tema: parete, qualche dorso e il piano della mensola. */
 export function ShelfThemeSwatch({ theme }: { theme: ShelfTheme }) {
   return (
     <div

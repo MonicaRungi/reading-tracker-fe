@@ -9,7 +9,7 @@ const CORNER_KEYS = ["topLeft", "topRight", "bottomRight", "bottomLeft"] as cons
 const KEY_STEP = 4;
 
 /**
- * Foto con i 4 angoli della costola trascinabili (dito, mouse o frecce).
+ * Foto con i 4 angoli del dorso trascinabili (dito, mouse o frecce).
  * Il quadrilatero è in pixel della foto; qui si converte da/verso lo schermo.
  */
 export function SpineCropper({

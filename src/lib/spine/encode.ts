@@ -11,7 +11,7 @@ export interface EncodedSpine {
 const ACCEPTED = ["image/webp", "image/jpeg"] as const;
 
 /**
- * Comprime la costola per il bucket: WebP se il browser lo produce davvero,
+ * Comprime il dorso per il bucket: WebP se il browser lo produce davvero,
  * altrimenti JPEG; se supera il limite riduce la qualità e riprova.
  */
 export async function encodeSpine(image: ImageData): Promise<EncodedSpine> {

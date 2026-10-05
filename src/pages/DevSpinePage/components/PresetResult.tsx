@@ -39,7 +39,7 @@ export function PresetResult({
               ms: encoded.timings.encode,
             })}
           </p>
-          <a href={encoded.url} download={`costola-${preset}`} className="text-[12px] text-primary underline">
+          <a href={encoded.url} download={`dorso-${preset}`} className="text-[12px] text-primary underline">
             {t("dev.spine.download")}
           </a>
         </>

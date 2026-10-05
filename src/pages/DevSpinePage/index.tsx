@@ -5,7 +5,7 @@ import { useDevSpineData } from "./hooks/useDevSpineData";
 import { PresetResult } from "./components/PresetResult";
 import { TimingsList } from "./components/TimingsList";
 
-/** Pagina di prova della pipeline della costola: esiste solo in sviluppo (vedi App.tsx). */
+/** Pagina di prova della pipeline del dorso: esiste solo in sviluppo (vedi App.tsx). */
 export default function DevSpinePage() {
   const { t } = useTranslation();
   const { data, ui, actions } = useDevSpineData();

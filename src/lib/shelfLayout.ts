@@ -1,7 +1,7 @@
-/** Altezza delle costole sulla mensola del dettaglio scaffale. */
+/** Altezza dei dorsi sulla mensola del dettaglio scaffale. */
 export const SHELF_SPINE_HEIGHT = 150;
 
-/** Spazio fra costole adiacenti: deve combaciare con il gap di `shelf-books` (index.css). */
+/** Spazio fra dorsi adiacenti: deve combaciare con il gap di `shelf-books` (index.css). */
 export const SHELF_SPINE_GAP = 2;
 
 /** Id della zona "Trascina qui per rimuovere" fra i droppable di dnd-kit. */
@@ -12,7 +12,7 @@ const MOBILE_QUERY = "(width < 40rem)";
 
 /**
  * Padding orizzontale di una riga (`shelf-books` in index.css): lo spazio utile
- * per le costole è la larghezza interna del mobile meno questo valore per lato.
+ * per i dorsi è la larghezza interna del mobile meno questo valore per lato.
  */
 export function shelfRowInset(): number {
   return window.matchMedia(MOBILE_QUERY).matches ? 6 : 12;
@@ -21,7 +21,7 @@ export function shelfRowInset(): number {
 /**
  * Disposizione a flusso della mensola: riempie una riga finché c'è spazio,
  * poi passa alla successiva. Ogni riga ha almeno un elemento, anche se più
- * largo del contenitore (non succede con le costole, ma evita righe vuote).
+ * largo del contenitore (non succede con i dorsi, ma evita righe vuote).
  */
 export function layoutShelfRows<T>(
   items: readonly T[],

@@ -2,11 +2,13 @@ import type { SpinePreset } from "./config";
 import { SpineEngine } from "./engine";
 import type { EncodedResult, LoadedPhoto, ProcessedSpine } from "./engine";
 import type { Quad } from "./homography";
+import type { RotationDirection } from "./rotate";
 
 /** Stessa interfaccia, che la pipeline giri nel worker o sul thread principale. */
 export interface SpineProcessor {
   mode: "worker" | "main";
   load(file: Blob): Promise<LoadedPhoto>;
+  rotate(direction: RotationDirection): Promise<LoadedPhoto>;
   process(quad: Quad, presets: readonly SpinePreset[]): Promise<ProcessedSpine>;
   encode(preset: SpinePreset): Promise<EncodedResult>;
   dispose(): void;
@@ -20,6 +22,7 @@ function mainThreadProcessor(): SpineProcessor {
   return {
     mode: "main",
     load: (file) => engine.load(file),
+    rotate: (direction) => engine.rotate(direction),
     process: async (quad, presets) => engine.process(quad, presets),
     encode: (preset) => engine.encode(preset),
     dispose: () => engine.reset(),
@@ -69,6 +72,7 @@ async function workerProcessor(): Promise<SpineProcessor | null> {
   return {
     mode: "worker",
     load: (file) => call<LoadedPhoto>("load", file),
+    rotate: (direction) => call<LoadedPhoto>("rotate", direction),
     process: (quad, presets) => call<ProcessedSpine>("process", quad, presets),
     encode: (preset) => call<EncodedResult>("encode", preset),
     dispose: () => worker.terminate(),

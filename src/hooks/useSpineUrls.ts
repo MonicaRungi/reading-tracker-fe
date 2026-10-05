@@ -14,7 +14,7 @@ const EMPTY_URLS: SpineUrls = {};
 const MIN_REFRESH_INTERVAL_MS = 60 * 1000;
 
 /**
- * URL firmati delle foto delle costole, in un'unica richiesta per l'insieme di
+ * URL firmati delle foto dei dorsi, in un'unica richiesta per l'insieme di
  * path dato (dettaglio libro, mensola, anteprime). `refresh` li rigenera, ad
  * esempio quando un'immagine non si carica (URL scaduto → 400/403), con un limite
  * di frequenza.

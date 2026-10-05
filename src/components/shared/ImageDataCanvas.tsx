@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
-/** Mostra un ImageData (es. la costola elaborata) a un'altezza data, mantenendo le proporzioni. */
+/** Mostra un ImageData (es. il dorso elaborato) a un'altezza data, mantenendo le proporzioni. */
 export function ImageDataCanvas({
   image,
   height,

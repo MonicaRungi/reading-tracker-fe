@@ -2,8 +2,8 @@ import type { ShelfBook } from "@/api/shelves";
 import { generatedSpine } from "./generated";
 
 /**
- * Ingombro di una costola sulla mensola, noto prima di scaricare qualsiasi
- * immagine: la foto usa `spine_ratio` dal DB, la generata le sue dimensioni.
+ * Ingombro di un dorso sulla mensola, noto prima di scaricare qualsiasi
+ * immagine: la foto usa `spine_ratio` dal DB, il dorso generato le sue dimensioni.
  */
 export function spineSize(
   item: ShelfBook["library_item"],

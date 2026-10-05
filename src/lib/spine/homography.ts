@@ -1,5 +1,5 @@
 /**
- * Raddrizzamento prospettico della costola: dai 4 angoli scelti dall'utente a
+ * Raddrizzamento prospettico del dorso: dai 4 angoli scelti dall'utente a
  * un rettangolo verticale, con mappatura inversa e campionamento bilineare.
  */
 
@@ -24,7 +24,7 @@ export function quadSize([tl, tr, br, bl]: Quad): { width: number; height: numbe
 }
 
 /**
- * Una costola è sempre alta e stretta: se il quadrilatero è più largo che
+ * Un dorso è sempre alto e stretto: se il quadrilatero è più largo che
  * alto (foto scattata in orizzontale) gli angoli ruotano di 90°, così il lato
  * sinistro diventa quello in alto.
  */

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Foto della costola con lo spazio già riservato: segnaposto finché l'URL
+ * Foto del dorso con lo spazio già riservato: segnaposto finché l'URL
  * firmato non arriva o se l'immagine non si carica (mai l'icona "immagine
  * rotta"). Su errore chiede un URL nuovo con `onError`.
  */

@@ -19,7 +19,7 @@ import ShelvesPage from "@/pages/ShelvesPage";
 import ShelfDetailPage from "@/pages/ShelfDetailPage";
 import { useTheme } from "./hooks/useTheme";
 
-// Pagina di prova della pipeline della costola: import.meta.env.DEV vale false
+// Pagina di prova della pipeline del dorso: import.meta.env.DEV vale false
 // nella build di produzione, quindi pagina e import spariscono dal bundle.
 const DevSpinePage = import.meta.env.DEV ? lazy(() => import("@/pages/DevSpinePage")) : null;
 

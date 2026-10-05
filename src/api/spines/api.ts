@@ -37,7 +37,7 @@ async function updateSpineFields(libraryItemId: string, fields: SpineFields): Pr
 }
 
 /**
- * Carica la costola elaborata e la collega al libro: upload → spine_path e
+ * Carica il dorso elaborato e lo collega al libro: upload → spine_path e
  * spine_ratio su library_items → eliminazione della foto precedente. Se
  * l'aggiornamento del DB fallisce, il file appena caricato viene rimosso.
  */
@@ -68,7 +68,7 @@ export async function uploadSpine({
   return fields
 }
 
-/** Toglie la foto della costola: prima il DB (torna la costola generata), poi il file. */
+/** Toglie la foto del dorso: prima il DB (torna il dorso generato), poi il file. */
 export async function removeSpine(libraryItemId: string, path: string): Promise<void> {
   await updateSpineFields(libraryItemId, { spine_path: null, spine_ratio: null })
   await removeFileQuietly(path)
@@ -79,7 +79,7 @@ export async function removeSpineFile(path: string): Promise<void> {
   await removeFileQuietly(path)
 }
 
-/** URL firmati in un'unica richiesta per tutte le costole con foto da mostrare. */
+/** URL firmati in un'unica richiesta per tutti i dorsi con foto da mostrare. */
 export async function getSpineUrls(paths: string[]): Promise<SpineUrls> {
   if (paths.length === 0) return {}
   const { data, error } = await supabase.storage

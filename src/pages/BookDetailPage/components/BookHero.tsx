@@ -11,7 +11,7 @@ export function BookHero({
   spine,
 }: {
   item: LibraryItem;
-  /** Costola accanto alla copertina (SpineSection), alla stessa altezza. */
+  /** Dorso accanto alla copertina (SpineSection), alla stessa altezza. */
   spine?: ReactNode;
 }) {
   const { t } = useTranslation();

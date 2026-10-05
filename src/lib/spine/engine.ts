@@ -8,6 +8,8 @@ import type { EncodedSpine } from "./encode";
 import { orientQuad, quadSize, warpQuad } from "./homography";
 import type { Quad } from "./homography";
 import { blurScore } from "./quality";
+import { rotateImage90 } from "./rotate";
+import type { RotationDirection } from "./rotate";
 
 export type StepTimings = Record<string, number>;
 
@@ -27,7 +29,7 @@ export interface ProcessedSpine {
   height: number;
   /** larghezza / altezza: va in library_items.spine_ratio. */
   ratio: number;
-  /** Varianza del Laplaciano della costola raddrizzata, prima del miglioramento. */
+  /** Varianza del Laplaciano del dorso raddrizzato, prima del miglioramento. */
   blurScore: number;
   isBlurry: boolean;
   results: { preset: SpinePreset; image: ImageData }[];
@@ -43,14 +45,16 @@ function round(ms: number) {
 }
 
 /**
- * Pipeline della foto della costola, senza stato condiviso col DOM: gira nel
+ * Pipeline della foto del dorso, senza stato condiviso col DOM: gira nel
  * worker (spine.worker.ts) o, se il browser non ha OffscreenCanvas nei worker,
  * sul thread principale (process.ts sceglie). Tiene in memoria la foto
  * decodificata e i risultati, così la foto originale viaggia una volta sola.
  */
 export class SpineEngine {
   source: ImageData | null = null;
-  /** Luce dominante ed esposizione della foto intera, non della costola. */
+  /** Dimensioni della foto prima della riduzione (solo informative). */
+  original = { width: 0, height: 0 };
+  /** Luce dominante ed esposizione della foto intera, non del dorso. */
   scene: SceneStats = { gains: [1, 1, 1], luma: 0.5, lumaHistogram: new Uint32Array(256), samples: 0 };
   results = new Map<SpinePreset, ImageData>();
 
@@ -80,8 +84,33 @@ export class SpineEngine {
     const originalWidth = bitmap.width;
     const originalHeight = bitmap.height;
     bitmap.close();
+    this.original = { width: originalWidth, height: originalHeight };
     const preview = await canvasToBitmap(canvas);
     return { width, height, preview, originalWidth, originalHeight, timings };
+  }
+
+  /**
+   * "Ruota a sinistra/destra" nell'editor degli angoli: ruota di 90° la foto già
+   * ridotta (la scena non cambia, quindi le misure di sceneStats restano valide).
+   */
+  async rotate(direction: RotationDirection): Promise<LoadedPhoto> {
+    if (!this.source) throw new Error("SpineEngine: nessuna foto caricata");
+    const t = performance.now();
+    this.source = rotateImage90(this.source, direction);
+    this.original = { width: this.original.height, height: this.original.width };
+    this.results.clear();
+    const { width, height } = this.source;
+    const canvas = createCanvas(width, height);
+    context2d(canvas).putImageData(this.source, 0, 0);
+    const preview = await canvasToBitmap(canvas);
+    return {
+      width,
+      height,
+      preview,
+      originalWidth: this.original.width,
+      originalHeight: this.original.height,
+      timings: { rotate: round(performance.now() - t) },
+    };
   }
 
   process(quad: Quad, presets: readonly SpinePreset[]): ProcessedSpine {

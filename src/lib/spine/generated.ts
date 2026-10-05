@@ -1,8 +1,8 @@
 import type { SpineBook } from "@/api/shelves";
 
 /**
- * Costola generata: aspetto deterministico a partire da `book.id`, così lo
- * stesso libro ha sempre la stessa costola su ogni scaffale e dispositivo.
+ * Dorso generato: aspetto deterministico a partire da `book.id`, così lo
+ * stesso libro ha sempre lo stesso dorso su ogni scaffale e dispositivo.
  * Il colore non viene estratto dalla copertina: le immagini di Google Books /
  * Open Library sono cross-origin e "sporcano" il canvas.
  */
@@ -46,7 +46,7 @@ export interface GeneratedSpine {
   width: number;
   /** Altezza in px: `height` con una piccola variazione per libro. */
   height: number;
-  /** Inclinazione in gradi (quasi sempre 0), con perno sul fondo della costola. */
+  /** Inclinazione in gradi (quasi sempre 0), con perno sul fondo del dorso. */
   rotation: number;
 }
 

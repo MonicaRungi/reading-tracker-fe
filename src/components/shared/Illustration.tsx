@@ -14,6 +14,7 @@ export type IllustrationName =
   | "flag"
   | "star"
   | "stats"
+  | "spine-photo"
   | "trophy";
 
 const SOURCES = import.meta.glob<string>("/src/assets/illustrations/*.png", {

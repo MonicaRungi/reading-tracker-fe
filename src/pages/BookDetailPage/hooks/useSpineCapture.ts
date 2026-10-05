@@ -11,13 +11,14 @@ import type { SpinePreset } from "@/lib/spine/config";
 import { defaultSpineQuad } from "@/lib/spine/defaultQuad";
 import type { LoadedPhoto, ProcessedSpine } from "@/lib/spine/engine";
 import type { Quad } from "@/lib/spine/homography";
+import type { RotationDirection } from "@/lib/spine/rotate";
 import { createSpineProcessor } from "@/lib/spine/process";
 import type { SpineProcessor } from "@/lib/spine/process";
 
 export type SpineCaptureStep = "choose" | "crop" | "review";
 
 /**
- * Foto della costola dal dettaglio libro: scatto o galleria → 4 angoli →
+ * Foto del dorso dal dettaglio libro: scatto o galleria → 4 angoli →
  * confronto dei preset (con avviso di sfocatura) → compressione e upload.
  * La pipeline gira in un worker creato all'apertura dello sheet e chiuso alla
  * chiusura: la foto originale resta nel telefono, si carica solo il risultato.
@@ -128,6 +129,25 @@ export function useSpineCapture(item: LibraryItem | undefined) {
     }
   }
 
+  // "Ruota a sinistra/destra": la foto ruota di 90° e gli angoli tornano al rettangolo iniziale
+  async function rotate(direction: RotationDirection) {
+    if (!processorRef.current) return;
+    setBusy("loading");
+    try {
+      const processor = await processorRef.current;
+      const rotated = await processor.rotate(direction);
+      setPhoto((current) => {
+        current?.preview.close();
+        return rotated;
+      });
+      setQuad(defaultSpineQuad(rotated.width, rotated.height));
+    } catch {
+      toast.error(t("spine.toast.loadError"));
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function processCrop() {
     if (!processorRef.current || !quad) return;
     setBusy("processing");
@@ -177,12 +197,13 @@ export function useSpineCapture(item: LibraryItem | undefined) {
       },
       pickFile,
       setQuad,
+      rotateLeft: () => void rotate(-1),
+      rotateRight: () => void rotate(1),
       processCrop,
       setPreset,
       acceptBlur: () => setBlurAccepted(true),
-      // "Rifai": si torna alla scelta della foto
+      // "Annulla" nel ritaglio e "Rifai" dopo l'avviso di sfocatura: si torna alla scelta della foto
       retake: resetCapture,
-      backToCrop: () => setStep("crop"),
       save: () => save.mutate(),
       askRemove: () => setConfirmRemove(true),
       setConfirmRemove: (open: boolean) => !remove.isPending && setConfirmRemove(open),

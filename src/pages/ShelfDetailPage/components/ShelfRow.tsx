@@ -2,7 +2,7 @@ import type { ShelfBook } from "@/api/shelves";
 import type { SpineUrls } from "@/api/spines";
 import { SortableSpine } from "./SortableSpine";
 
-/** Una mensola: costole allineate in basso, poi il piano. */
+/** Una mensola: dorsi allineati in basso, poi il piano. */
 export function ShelfRow({
   books,
   spineUrls,
@@ -16,7 +16,7 @@ export function ShelfRow({
 }) {
   return (
     <div className="min-w-0 shrink-0">
-      {/* altezza minima fissa: la variazione ±8% delle costole non sposta i piani */}
+      {/* altezza minima fissa: la variazione ±8% dei dorsi non sposta i piani */}
       <div className="shelf-books">
         {books.map((book) => (
           <SortableSpine

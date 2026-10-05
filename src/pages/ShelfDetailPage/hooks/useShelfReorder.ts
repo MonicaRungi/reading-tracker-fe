@@ -14,7 +14,7 @@ const UNDO_DURATION_MS = 5000;
 
 /**
  * Movimento minimo del puntatore fra due spostamenti. Uno spostamento ricompone
- * le righe e può portare un'altra costola sotto il puntatore fermo: senza
+ * le righe e può portare un altro dorso sotto il puntatore fermo: senza
  * questa soglia il riflusso si alimenterebbe da solo all'infinito.
  */
 const MIN_MOVE_BETWEEN_SWAPS_PX = 8;
@@ -23,7 +23,7 @@ const MIN_MOVE_BETWEEN_SWAPS_PX = 8;
 const REORDER_HINT_KEY = "rt.shelfReorderHintSeen";
 
 /**
- * Dopo un trascinamento il browser può emettere un click sulla costola (mouse
+ * Dopo un trascinamento il browser può emettere un click sul dorso (mouse
  * rilasciato sopra di lei, pressione lunga senza movimento): va ignorato,
  * altrimenti aprirebbe il libro appena spostato.
  */
@@ -39,7 +39,7 @@ function withPositions(books: ShelfBook[]): ShelfBook[] {
 
 /**
  * Riordino del dettaglio scaffale, senza modalità dedicata: un tap apre il
- * libro, la pressione lunga solleva la costola. Durante il trascinamento l'ordine vive in `draftOrder`
+ * libro, la pressione lunga solleva il dorso. Durante il trascinamento l'ordine vive in `draftOrder`
  * (riflusso dal vivo delle righe); al rilascio diventa ottimistico in cache e
  * parte una sola chiamata a reorder_shelf. Rilasciando sulla zona "rimuovi" il
  * libro esce dallo scaffale, con "Annulla".

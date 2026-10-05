@@ -1,22 +1,22 @@
 import type { EnhanceSettings } from "./config";
 
 /**
- * Miglioramento della costola raddrizzata, senza appiattire né snaturare i colori.
+ * Miglioramento del dorso raddrizzato, senza appiattire né snaturare i colori.
  * Ordine (TODO §3.3): denoise → bilanciamento del bianco → auto-levels →
  * gamma → curva a S → saturazione → unsharp mask.
  * Livelli, gamma e curva agiscono sulla luminanza: diventano una tabella di 256
  * fattori, applicata in un passaggio moltiplicando i tre canali.
  *
- * Due scelte per non cambiare la tinta della costola:
+ * Due scelte per non cambiare la tinta del dorso:
  * - bilanciamento gray-world, esposizione e punti di nero/bianco si stimano sulla
  *   foto intera (sceneStats),
- *   non sulla costola ritagliata: una costola è quasi tutta di un colore, e la
+ *   non sul dorso ritagliato: un dorso è quasi tutto di un colore, e la
  *   sua media non è "grigio" (un marrone verrebbe corretto verso il viola);
  * - livelli, gamma e curva lavorano sulla luminanza e si applicano con lo stesso
  *   fattore ai tre canali: tinta e saturazione non cambiano (stirare i canali
  *   separatamente cambia la tinta e, con poca luce, gonfia i colori). Lo
- *   stiramento ha limiti (levelsMaxBlack/levelsMinWhite): una costola è quasi
- *   tutta del suo colore e senza limiti il suo stesso corpo diventerebbe "nero".
+ *   stiramento ha limiti (levelsMaxBlack/levelsMinWhite): un dorso è quasi
+ *   tutto del suo colore e senza limiti il suo stesso corpo diventerebbe "nero".
  */
 
 export type EnhanceTimings = Record<string, number>;
@@ -60,9 +60,9 @@ function percentile(histogram: Uint32Array, total: number, fraction: number): nu
 }
 
 /**
- * Curva a S attorno a `pivot` (la luminanza media della costola): scurisce le
+ * Curva a S attorno a `pivot` (la luminanza media del dorso): scurisce le
  * ombre sotto e schiarisce le luci sopra, lasciando invariati 0, pivot e 1.
- * Attorno al grigio fisso (0,5) scurirebbe tutta la costola, quasi sempre scura.
+ * Attorno al grigio fisso (0,5) scurirebbe tutto il dorso, quasi sempre scuro.
  */
 function sCurve(x: number, amount: number, pivot: number): number {
   const k = 1 + amount;
@@ -72,7 +72,7 @@ function sCurve(x: number, amount: number, pivot: number): number {
 
 export type WhiteBalanceGains = [number, number, number];
 
-/** Misure della foto intera (non della costola): luce dominante ed esposizione. */
+/** Misure della foto intera (non del dorso): luce dominante ed esposizione. */
 export interface SceneStats {
   gains: WhiteBalanceGains;
   /** Luminanza media 0–1. */
@@ -139,18 +139,18 @@ function buildToneMapping(data: Uint8ClampedArray, s: EnhanceSettings, scene: Sc
   }
 
   // auto-levels: nero e bianco della foto intera (come ha esposto la fotocamera),
-  // non della costola (che dice solo di che colore è il libro), entro i limiti del preset
+  // non del dorso (che dice solo di che colore è il libro), entro i limiti del preset
   const low = Math.min(s.levelsMaxBlack, percentile(scene.lumaHistogram, scene.samples, s.levelsClip));
   const high = Math.max(s.levelsMinWhite, percentile(scene.lumaHistogram, scene.samples, 1 - s.levelsClip));
   const levels = (value: number) => Math.min(1, Math.max(0, (value - low) / (high - low)));
 
-  // gamma solo se la foto intera è scura (poca luce), non se la costola è scura di suo
+  // gamma solo se la foto intera è scura (poca luce), non se il dorso è scuro di suo
   const gamma =
     scene.luma > 0 && scene.luma < s.gammaThreshold
       ? Math.max(s.gammaMin, Math.log(0.45) / Math.log(scene.luma))
       : 1;
 
-  // perno della curva: luminanza media della costola dopo livelli e gamma
+  // perno della curva: luminanza media del dorso dopo livelli e gamma
   let pivot = 0;
   for (let value = 0; value < 256; value++) pivot += lumaHistogram[value] * Math.pow(levels(value), gamma);
   pivot = Math.min(0.9, Math.max(0.1, pivot / pixels));

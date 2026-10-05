@@ -42,7 +42,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     let current = 0;
     let refreshing = false;
     // Elemento da cui è partito il tocco. Se durante il gesto viene smontato (es.
-    // una costola che cambia riga mentre la si trascina), touchmove/touchend non
+    // un dorso che cambia riga mentre lo si trascina), touchmove/touchend non
     // risalgono più fino a window: li si ascolta anche lì, come fa dnd-kit.
     let touchTarget: EventTarget | null = null;
     let lastEvent: Event | null = null;

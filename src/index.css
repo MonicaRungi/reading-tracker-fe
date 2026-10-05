@@ -161,12 +161,12 @@
  * Temi della mensola (DESIGN.md §16). Indipendenti dal dark mode dell'app:
  * ogni tema definisce i suoi valori una volta sola e non viene ridefinito
  * sotto .dark. Si applicano con data-shelf-theme sul contenitore.
- * --shelf-back          parete di fondo dietro le costole
+ * --shelf-back          parete di fondo dietro i dorsi
  * --shelf-board         piano della mensola; --shelf-board-light la sua luce
  * --shelf-board-shadow  ombra portata sotto il piano
  * --shelf-plank-grain   venatura del piano (layer di background del ::before)
  * --shelf-wall-grain    pannelli e venatura della parete (layer di shelf-wall)
- * --shelf-placeholder   segnaposto tratteggiato della costola che si sta spostando
+ * --shelf-placeholder   segnaposto tratteggiato del dorso che si sta spostando
  * --shelf-hint          testo dei suggerimenti sulla parete
  */
 /*
@@ -329,7 +329,7 @@
 }
 
 /*
- * Riga di costole allineate in basso. Il padding orizzontale va tenuto
+ * Riga di dorsi allineati in basso. Il padding orizzontale va tenuto
  * allineato a SHELF_ROW_INSET (lib/shelfLayout.ts), che misura lo spazio utile.
  */
 @utility shelf-books {
@@ -392,7 +392,7 @@
 }
 
 /*
- * Costola: dimensioni e colore arrivano da Spine.tsx come custom property
+ * Dorso: dimensioni e colore arrivano da Spine.tsx come custom property
  * (--spine-width, --spine-height, --spine-color), il resto è qui.
  */
 @utility spine {

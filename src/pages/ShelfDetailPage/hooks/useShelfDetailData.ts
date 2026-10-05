@@ -35,7 +35,7 @@ export function useShelfDetailData() {
   );
   const addBooks = useAddBooksToShelf({ userId, shelfId, shelvedItemIds });
   const reorder = useShelfReorder({ userId, shelfId, books: shelf?.books ?? EMPTY_BOOKS });
-  // URL firmati di tutte le costole con foto dello scaffale, in un'unica richiesta
+  // URL firmati di tutti i dorsi con foto dello scaffale, in un'unica richiesta
   const spinePaths = useMemo(
     () => shelf?.books.map((book) => book.library_item.spine_path) ?? [],
     [shelf],
