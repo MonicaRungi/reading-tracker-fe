@@ -3,13 +3,20 @@ import type { BookRow, LibraryItemRow } from "@/types/database.types"
 /** Tema colore della mensola: indipendente dal dark mode dell'app. */
 export type ShelfTheme = "wood" | "white" | "night" | "sage" | "lilac" | "terracotta"
 
-/** Quanto basta di un libro per disegnarne il dorso. */
-export type SpineBook = Pick<BookRow, "id" | "title" | "authors" | "page_count">
+/** Quanto basta di un libro per disegnarne il dorso (e la copertina, se sta di fronte). */
+export type SpineBook = Pick<BookRow, "id" | "title" | "authors" | "page_count" | "cover_url">
+
+/**
+ * Come sta il libro su quello scaffale: in piedi (dorso), sdraiato (i sdraiati
+ * consecutivi formano una pila) o di fronte (copertina).
+ */
+export type ShelfItemDisplay = "spine" | "stack" | "cover"
 
 /** Un libro posato su uno scaffale, nell'ordine della mensola. */
 export interface ShelfBook {
   shelf_item_id: string
   position: number
+  display: ShelfItemDisplay
   library_item: Pick<LibraryItemRow, "id" | "spine_path" | "spine_ratio"> & {
     book: SpineBook
   }

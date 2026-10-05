@@ -2,10 +2,10 @@ import { Hand } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { ShelfBook } from "@/api/shelves";
 import type { SpineUrls } from "@/api/spines";
-import { Spine } from "@/components/shared/Spine";
+import { ShelfBookFace } from "@/components/shared/ShelfBookFace";
 import { SHELF_SPINE_HEIGHT } from "@/lib/shelfLayout";
 
-/** Copia del dorso che segue il dito: sollevata, inclinata, con l'etichetta "Sposta". */
+/** Copia del libro che segue il dito, come sta sulla mensola: sollevata, inclinata, con l'etichetta "Sposta". */
 export function DraggedSpine({ book, spineUrls }: { book: ShelfBook; spineUrls: SpineUrls }) {
   const { t } = useTranslation();
 
@@ -18,10 +18,9 @@ export function DraggedSpine({ book, spineUrls }: { book: ShelfBook; spineUrls: 
         <Hand className="size-4" aria-hidden="true" />
         {t("shelves.reorder.moving")}
       </span>
-      <Spine
-        book={book.library_item.book}
-        spine_url={book.library_item.spine_path ? spineUrls[book.library_item.spine_path] : undefined}
-        spine_ratio={book.library_item.spine_ratio}
+      <ShelfBookFace
+        book={book}
+        spineUrl={book.library_item.spine_path ? spineUrls[book.library_item.spine_path] : undefined}
         height={SHELF_SPINE_HEIGHT}
         className="-translate-y-2 rotate-6 scale-105 shadow-[0_14px_22px_rgb(0_0_0/40%)]"
       />

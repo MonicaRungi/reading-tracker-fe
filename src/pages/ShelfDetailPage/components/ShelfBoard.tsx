@@ -27,12 +27,14 @@ import {
   layoutShelfRows,
   SHELF_SPINE_GAP,
   SHELF_SPINE_HEIGHT,
+  SHELF_STACK_MAX_HEIGHT,
   shelfRowInset,
 } from "@/lib/shelfLayout";
-import { spineSize } from "@/lib/spine/size";
+import { buildShelfUnits } from "@/lib/shelfUnits";
 import { cn } from "@/lib/utils";
 import { DraggedSpine } from "./DraggedSpine";
 import { RemoveDropZone } from "./RemoveDropZone";
+import { DisplayDrawer } from "./DisplayDrawer";
 import { ReorderHint } from "./ReorderHint";
 import { ShelfRow } from "./ShelfRow";
 
@@ -51,16 +53,19 @@ const KEYBOARD_CODES = { start: ["Space"], cancel: ["Escape"], end: ["Space", "E
  * passa alla mensola successiva. La larghezza disponibile è misurata sul
  * mobile, quindi il layout si adatta a rotazione e resize.
  * Con la pressione lunga i dorsi si trascinano (anche fra righe diverse);
- * durante il trascinamento compare in fondo la zona "rimuovi".
+ * durante il trascinamento compaiono in fondo la zona "rimuovi" e a destra la
+ * linguetta del cassetto delle posizioni.
  */
 export function ShelfBoard({
   theme,
   books,
   activeBook,
+  isDrawerOpen,
   spineUrls,
   onPhotoError,
   showHint,
   onOpenBook,
+  onOpenMenu,
   onDragStart,
   onDragMove,
   onDragEnd,
@@ -70,10 +75,12 @@ export function ShelfBoard({
   theme: ShelfTheme;
   books: ShelfBook[];
   activeBook: ShelfBook | null;
+  isDrawerOpen: boolean;
   spineUrls: SpineUrls;
   onPhotoError: () => void;
   showHint: boolean;
   onOpenBook: (libraryItemId: string) => void;
+  onOpenMenu: (book: ShelfBook) => void;
   onDragStart: (event: DragStartEvent) => void;
   onDragMove: (event: DragMoveEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
@@ -94,15 +101,12 @@ export function ShelfBoard({
     }),
   );
 
+  // i libri diventano blocchi (in piedi, copertine, pile), poi righe a flusso
   const rows = useMemo(() => {
     const available = width - 2 * shelfRowInset();
     if (available <= 0) return [];
-    return layoutShelfRows(
-      books,
-      (book) => spineSize(book.library_item, SHELF_SPINE_HEIGHT).width,
-      available,
-      SHELF_SPINE_GAP,
-    );
+    const units = buildShelfUnits(books, SHELF_SPINE_HEIGHT, SHELF_STACK_MAX_HEIGHT);
+    return layoutShelfRows(units, (unit) => unit.width, available, SHELF_SPINE_GAP);
   }, [books, width]);
 
   const itemIds = useMemo(() => books.map((book) => book.shelf_item_id), [books]);
@@ -156,10 +160,11 @@ export function ShelfBoard({
               // una riga cambia, e una key per libro rimonterebbe la riga
               <ShelfRow
                 key={index}
-                books={row}
+                units={row}
                 spineUrls={spineUrls}
                 onPhotoError={onPhotoError}
                 onOpenBook={onOpenBook}
+                onOpenMenu={onOpenMenu}
               />
             ))}
             {showHint && rows.length > 0 && <ReorderHint />}
@@ -167,6 +172,7 @@ export function ShelfBoard({
         </SortableContext>
 
         {activeBook && <RemoveDropZone />}
+        {activeBook && <DisplayDrawer isOpen={isDrawerOpen} currentDisplay={activeBook.display} />}
 
         <DragOverlay dropAnimation={null}>
           {activeBook && <DraggedSpine book={activeBook} spineUrls={spineUrls} />}

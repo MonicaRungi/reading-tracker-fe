@@ -108,6 +108,15 @@ export const it = {
       notFoundSubtitle: "Potrebbe essere stato eliminato.",
       backToList: "Torna agli scaffali",
     },
+    display: {
+      menuLabel: "Posizione di {{title}}",
+      options: {
+        spine: "In verticale",
+        stack: "In orizzontale",
+        cover: "Di fronte",
+      },
+      saveError: "Non è stato possibile cambiare la posizione",
+    },
     reorder: {
       hint: "Tieni premuto e trascina per riordinare",
       moving: "Sposta",
@@ -118,7 +127,7 @@ export const it = {
       saveError: "Non è stato possibile salvare il nuovo ordine",
       a11y: {
         instructions:
-          "Invio apre il libro. Spazio lo prende: con le frecce lo sposti, di nuovo spazio lo lascia, Esc annulla. Per toglierlo dallo scaffale portalo sulla zona in fondo.",
+          "Invio apre il libro. Spazio lo prende: con le frecce lo sposti, di nuovo spazio lo lascia, Esc annulla. Per toglierlo dallo scaffale portalo sulla zona in fondo. Il tasto menu, o Maiusc+F10, sceglie se metterlo in verticale, in orizzontale o di fronte.",
         picked: "Hai preso {{title}}.",
         moved: "{{title}} in posizione {{position}}.",
         dropped: "{{title}} sistemato.",

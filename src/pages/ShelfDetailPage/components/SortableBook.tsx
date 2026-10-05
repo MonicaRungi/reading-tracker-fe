@@ -2,27 +2,31 @@ import type { KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useSortable } from "@dnd-kit/sortable";
 import type { ShelfBook } from "@/api/shelves";
-import { Spine } from "@/components/shared/Spine";
+import { ShelfBookFace } from "@/components/shared/ShelfBookFace";
 import { SHELF_SPINE_HEIGHT } from "@/lib/shelfLayout";
 import { cn } from "@/lib/utils";
 
 /**
- * Dorso sulla mensola. Un tap apre il libro, la pressione lunga solleva il
+ * Libro sulla mensola, come sta (in piedi, sdraiato o di fronte). Un tap apre il libro, la pressione lunga solleva il
  * dorso per spostarlo. Niente transform di dnd-kit:
  * l'ordine cambia dal vivo e il layout a flusso sposta i dorsi; al posto
  * di quello trascinato resta un segnaposto tratteggiato (la copia segue il
- * dito nel DragOverlay). Da tastiera: Invio apre, Spazio sposta.
+ * dito nel DragOverlay). Tenuto premuto senza spostarlo apre il menu della
+ * posizione (come anche il tasto destro). Da tastiera: Invio apre, Spazio sposta,
+ * tasto menu o Maiusc+F10 apre il menu della posizione.
  */
-export function SortableSpine({
+export function SortableBook({
   book,
   spineUrl,
   onPhotoError,
   onOpen,
+  onOpenMenu,
 }: {
   book: ShelfBook;
   spineUrl: string | undefined;
   onPhotoError: () => void;
   onOpen: () => void;
+  onOpenMenu: () => void;
 }) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, isDragging } = useSortable({
@@ -36,6 +40,11 @@ export function SortableSpine({
       onOpen();
       return;
     }
+    if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
+      event.preventDefault();
+      onOpenMenu();
+      return;
+    }
     listeners?.onKeyDown?.(event);
   }
 
@@ -46,6 +55,12 @@ export function SortableSpine({
       {...listeners}
       onKeyDown={handleKeyDown}
       onClick={onOpen}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        onOpenMenu();
+      }}
+      // per ancorare il menu della posizione a questo libro
+      data-shelf-item-id={book.shelf_item_id}
       aria-label={t("shelves.detail.openBook", { title })}
       aria-roledescription={t("shelves.reorder.roleDescription")}
       // una tirata verso il basso che parte da un dorso è uno spostamento,
@@ -58,11 +73,10 @@ export function SortableSpine({
         !isDragging && "transition-transform active:-translate-y-1",
       )}
     >
-      <Spine
-        book={book.library_item.book}
-        spine_url={spineUrl}
-        spine_ratio={book.library_item.spine_ratio}
+      <ShelfBookFace
+        book={book}
         height={SHELF_SPINE_HEIGHT}
+        spineUrl={spineUrl}
         onPhotoError={onPhotoError}
         className={cn(isDragging && "invisible")}
       />

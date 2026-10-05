@@ -459,6 +459,60 @@
   max-height: calc(100% - 18px);
 }
 
+/*
+ * Libro sdraiato: il dorso girato in orizzontale. --spine-width è la lunghezza
+ * (quanto il libro è alto), --spine-height lo spessore. La luce cade dall'alto,
+ * quindi il volume va dall'alto in basso; a destra si vede il taglio delle pagine.
+ */
+@utility spine-lying {
+  position: relative;
+  flex: 0 0 var(--spine-width);
+  width: var(--spine-width);
+  height: var(--spine-height);
+  display: flex;
+  align-items: center;
+  padding-inline: 8px 12px;
+  border-radius: 1px 3px 3px 1px;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 12%),
+      transparent 25% 75%,
+      rgb(0 0 0 / 16%)
+    ),
+    var(--spine-color);
+  box-shadow:
+    0 1px 1px rgb(255 255 255 / 12%) inset,
+    0 -1px 1px rgb(0 0 0 / 14%) inset,
+    0 2px 3px rgb(0 0 0 / 16%);
+}
+
+@utility spine-lying-title {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/*
+ * Taglio delle pagine all'estremità del libro sdraiato: rientrato fra i due
+ * piatti della copertina (che sporgono sopra e sotto), in ombra verso
+ * l'interno, con le pagine appena accennate (righe fitte quasi dello stesso tono).
+ */
+@utility spine-pages {
+  position: absolute;
+  inset-block: 2px;
+  right: 0;
+  width: 3px;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 28%), transparent 70%),
+    repeating-linear-gradient(180deg, rgb(0 0 0 / 7%) 0 0.5px, transparent 0.5px 1.5px),
+    linear-gradient(180deg, #d8ccb4, #ece2cd 35% 65%, #d3c6ad);
+  box-shadow: inset 0 1px 0 rgb(0 0 0 / 18%), inset 0 -1px 0 rgb(0 0 0 / 18%);
+}
+
 @utility pt-safe {
   padding-top: env(safe-area-inset-top);
 }

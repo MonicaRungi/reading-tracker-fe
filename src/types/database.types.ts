@@ -313,6 +313,7 @@ export type Database = {
         Row: {
           added_at: string
           decor_key: string | null
+          display: string
           id: string
           item_type: string
           library_item_id: string | null
@@ -322,6 +323,7 @@ export type Database = {
         Insert: {
           added_at?: string
           decor_key?: string | null
+          display?: string
           id?: string
           item_type?: string
           library_item_id?: string | null
@@ -331,6 +333,7 @@ export type Database = {
         Update: {
           added_at?: string
           decor_key?: string | null
+          display?: string
           id?: string
           item_type?: string
           library_item_id?: string | null

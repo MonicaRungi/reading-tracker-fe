@@ -8,6 +8,7 @@ import { ShelfFormSheet } from "@/components/shared/ShelfFormSheet";
 import { ShelfMenuSheet } from "@/components/shared/ShelfMenuSheet";
 import { useShelfDetailData } from "./hooks/useShelfDetailData";
 import { ShelfBoard } from "./components/ShelfBoard";
+import { BookDisplayMenu } from "./components/BookDisplayMenu";
 import { ShelfHeaderActions } from "./components/ShelfHeaderActions";
 import { AddBooksToShelfSheet } from "./sheets/AddBooksToShelfSheet";
 
@@ -71,10 +72,12 @@ export default function ShelfDetailPage() {
             theme={shelf.color_theme}
             books={data.reorder.orderedBooks}
             activeBook={data.reorder.activeBook}
+            isDrawerOpen={ui.reorder.isDrawerOpen}
             spineUrls={data.spineUrls}
             onPhotoError={actions.refreshSpineUrls}
             showHint={ui.reorder.showHint && shelf.books.length > 1}
             onOpenBook={actions.openBook}
+            onOpenMenu={actions.reorder.openMenu}
             onDragStart={actions.reorder.dragStart}
             onDragMove={actions.reorder.dragMove}
             onDragEnd={actions.reorder.dragEnd}
@@ -83,6 +86,12 @@ export default function ShelfDetailPage() {
           />
         </div>
       )}
+
+      <BookDisplayMenu
+        target={ui.reorder.menu}
+        onChoose={actions.reorder.chooseDisplay}
+        onClose={actions.reorder.closeMenu}
+      />
 
       <AddBooksToShelfSheet
         open={ui.addBooks.isOpen}

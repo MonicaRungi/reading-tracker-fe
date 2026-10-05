@@ -1,15 +1,23 @@
 import { supabase } from "@/lib/supabase"
-import type { Shelf, ShelfBook, ShelfDetail, ShelfInput, ShelfTheme } from "./types"
+import type {
+  Shelf,
+  ShelfBook,
+  ShelfDetail,
+  ShelfInput,
+  ShelfItemDisplay,
+  ShelfTheme,
+} from "./types"
 
 /** Libri mostrati nell'anteprima a mensola dell'elenco scaffali. */
 const PREVIEW_SIZE = 12
 
 const SHELF_BOOK_SELECT =
-  "id, position, library_item:library_items(id, spine_path, spine_ratio, book:books(id, title, authors, page_count))" as const
+  "id, position, display, library_item:library_items(id, spine_path, spine_ratio, book:books(id, title, authors, page_count, cover_url))" as const
 
 type ShelfItemRow = {
   id: string
   position: number
+  display: string
   library_item: ShelfBook["library_item"] | null
 }
 
@@ -25,7 +33,14 @@ type ShelfListRow = {
 function toShelfBooks(rows: ShelfItemRow[]): ShelfBook[] {
   return rows.flatMap((row) =>
     row.library_item
-      ? [{ shelf_item_id: row.id, position: row.position, library_item: row.library_item }]
+      ? [
+          {
+            shelf_item_id: row.id,
+            position: row.position,
+            display: row.display as ShelfItemDisplay,
+            library_item: row.library_item,
+          },
+        ]
       : [],
   )
 }
@@ -144,6 +159,21 @@ export async function reorderShelf(shelfId: string, shelfItemIds: string[]): Pro
     p_shelf_id: shelfId,
     p_item_ids: shelfItemIds,
   })
+  if (error) throw error
+}
+
+/** In piedi, sdraiato o di fronte: il client può modificare solo questa colonna di shelf_items. */
+export async function setShelfItemDisplay(
+  shelfItemId: string,
+  display: ShelfItemDisplay,
+): Promise<void> {
+  const { error } = await supabase
+    .from("shelf_items")
+    .update({ display })
+    .eq("id", shelfItemId)
+    // .single(): se la RLS nasconde la riga è un errore, non 0 righe silenziose
+    .select("id")
+    .single()
   if (error) throw error
 }
 

@@ -4,7 +4,10 @@ import { Spine } from "@/components/shared/Spine";
 
 const PREVIEW_SPINE_HEIGHT = 76;
 
-/** Mini-mensola dell'elenco: una sola riga, i libri in eccesso si tagliano. */
+/**
+ * Mini-mensola dell'elenco: una sola riga di soli dorsi in piedi, qualunque sia la
+ * posizione dei libri sulla mensola; i libri in eccesso si tagliano.
+ */
 export function ShelfPreview({
   theme,
   books,

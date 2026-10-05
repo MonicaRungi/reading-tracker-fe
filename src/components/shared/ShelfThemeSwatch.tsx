@@ -5,11 +5,11 @@ const SWATCH_SPINE_HEIGHT = 46;
 
 /** Libri fissi del campione: stessi colori e misure su ogni tema, per confrontarli. */
 const SWATCH_BOOKS = [
-  { id: "swatch-1", title: "", authors: null, page_count: 320 },
-  { id: "swatch-2", title: "", authors: null, page_count: 520 },
-  { id: "swatch-3", title: "", authors: null, page_count: 180 },
-  { id: "swatch-4", title: "", authors: null, page_count: 410 },
-  { id: "swatch-5", title: "", authors: null, page_count: 260 },
+  { id: "swatch-1", title: "", authors: null, page_count: 320, cover_url: null },
+  { id: "swatch-2", title: "", authors: null, page_count: 520, cover_url: null },
+  { id: "swatch-3", title: "", authors: null, page_count: 180, cover_url: null },
+  { id: "swatch-4", title: "", authors: null, page_count: 410, cover_url: null },
+  { id: "swatch-5", title: "", authors: null, page_count: 260, cover_url: null },
 ];
 
 /** Campione di un tema: parete, qualche dorso e il piano della mensola. */

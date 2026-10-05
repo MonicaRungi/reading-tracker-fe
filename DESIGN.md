@@ -431,7 +431,7 @@ con i libri in piedi mostrati come dorsi.
     non arriva o se l'immagine non si carica; in quel caso chiede URL nuovi, al massimo una
     volta al minuto.
 - **Elenco**: header con titolo, sottotitolo e pulsante "+" circolare; card con anteprima a
-  mini-mensola (primi 12 libri), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
+  mini-mensola (primi 12 libri, sempre come dorsi in piedi), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
   Dopo la creazione si apre il dettaglio dello scaffale.
 - **Selettore tema**: griglia a 2 colonne (3 righe con 6 temi) di anteprime (parete, dorsi, piano) con la label sotto; il
   tema scelto ha bordo e testo corallo. Niente decorazioni finché non arriva la Fase 4.
@@ -439,6 +439,22 @@ con i libri in piedi mostrati come dorsi.
   (`shelf_items` va in cascata, `library_items` no).
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
   esclude i libri già presenti. Resta valido anche il percorso da `AddBookSheet`.
+- **Posizione del libro** (`shelf_items.display`, per scaffale): `spine` in piedi (dorso),
+  `stack` sdraiato, `cover` di fronte (copertina 2:3, o copertina generata con colore e titolo del
+  dorso se manca). La mensola dispone **blocchi** (`lib/shelfUnits.ts`): un dorso, una copertina o
+  una pila; i sdraiati consecutivi nell'ordine formano una pila (il primo in basso) fino
+  all'altezza di un dorso in piedi, poi ne comincia un'altra. Riordino e riflusso restano
+  sull'ordine piatto dei libri: le pile si ricompongono da sole. Componenti condivisi
+  `ShelfBookFace` (sceglie fra `Spine`, `LyingSpine`, `BookCoverFace`), usati anche dalla copia
+  trascinata e dalle anteprime dell'elenco. Il client può modificare solo questa colonna di
+  `shelf_items` (grant per colonna + policy).
+  - **Cassetto delle posizioni** (`DisplayDrawer`): durante il trascinamento compare una
+    linguetta "‹" sul bordo destro del mobile; portandoci il libro si apre un cassetto con tre
+    zone di rilascio (In verticale / In orizzontale / Di fronte, con miniatura; quella attuale
+    evidenziata). Rilasciato lì, il libro cambia posizione e non ordine; sopra il cassetto
+    l'ordine non cambia. Il cambio è ottimistico, in fila con riordino e rimozione.
+  - **Menu contestuale** (`BookDisplayMenu`, popover shadcn ancorato al libro), per mouse e
+    tastiera: tasto destro o tasto menu / Maiusc+F10, stesse tre voci con la spunta.
 - **Riordino senza modalità** (dettaglio scaffale): un tap su un dorso apre il libro, la
   **pressione lunga** la solleva e si trascina; al rilascio è già salvato. Niente pulsante
   "Riordina" né "Fine": una modalità non darebbe vantaggi, perché dentro il mobile scorrevole
