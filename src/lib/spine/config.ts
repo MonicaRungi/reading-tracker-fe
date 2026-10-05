@@ -1,7 +1,6 @@
 /**
  * Costanti della pipeline della foto del dorso, in un solo posto: vanno
- * tarate su foto reali (poca luce, luce calda, luce fredda) con la pagina di
- * prova /dev/spine, che mostra i tempi di ogni passaggio.
+ * tarate su foto reali (poca luce, luce calda, luce fredda).
  */
 
 export type SpinePreset = "original" | "enhanced" | "vivid";
