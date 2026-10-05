@@ -1,4 +1,5 @@
 import type { ShelfBook, ShelfTheme } from "@/api/shelves";
+import type { SpineUrls } from "@/api/spines";
 import { Spine } from "@/components/shared/Spine";
 
 const PREVIEW_SPINE_HEIGHT = 76;
@@ -7,9 +8,13 @@ const PREVIEW_SPINE_HEIGHT = 76;
 export function ShelfPreview({
   theme,
   books,
+  spineUrls,
+  onPhotoError,
 }: {
   theme: ShelfTheme;
   books: ShelfBook[];
+  spineUrls: SpineUrls;
+  onPhotoError: () => void;
 }) {
   return (
     // cornice sottile: angoli superiori come quelli della card, squadrata in
@@ -24,8 +29,10 @@ export function ShelfPreview({
             <Spine
               key={shelf_item_id}
               book={library_item.book}
+              spine_url={library_item.spine_path ? spineUrls[library_item.spine_path] : undefined}
               spine_ratio={library_item.spine_ratio}
               height={PREVIEW_SPINE_HEIGHT}
+              onPhotoError={onPhotoError}
             />
           ))}
         </div>

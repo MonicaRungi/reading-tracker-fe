@@ -5,6 +5,7 @@ import { getShelf } from "@/api/shelves";
 import type { ShelfBook } from "@/api/shelves";
 import { useAuth } from "@/hooks/useAuth";
 import { useShelfEditor } from "@/hooks/useShelfEditor";
+import { useSpineUrls } from "@/hooks/useSpineUrls";
 import { useAddBooksToShelf } from "./useAddBooksToShelf";
 import { useShelfReorder } from "./useShelfReorder";
 
@@ -34,6 +35,12 @@ export function useShelfDetailData() {
   );
   const addBooks = useAddBooksToShelf({ userId, shelfId, shelvedItemIds });
   const reorder = useShelfReorder({ userId, shelfId, books: shelf?.books ?? EMPTY_BOOKS });
+  // URL firmati di tutte le costole con foto dello scaffale, in un'unica richiesta
+  const spinePaths = useMemo(
+    () => shelf?.books.map((book) => book.library_item.spine_path) ?? [],
+    [shelf],
+  );
+  const spineUrls = useSpineUrls(spinePaths);
 
   return {
     data: {
@@ -43,6 +50,7 @@ export function useShelfDetailData() {
       isError: shelfQuery.isError,
       addBooks: addBooks.data,
       reorder: reorder.data,
+      spineUrls: spineUrls.urls,
     },
     ui: {
       ...editor.ui,
@@ -58,6 +66,7 @@ export function useShelfDetailData() {
       openShelfMenu: () => shelf && editor.actions.openMenu(shelf),
       addBooks: addBooks.actions,
       reorder: reorder.actions,
+      refreshSpineUrls: spineUrls.refresh,
     },
   };
 }

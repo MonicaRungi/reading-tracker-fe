@@ -1,11 +1,12 @@
 import { Hand } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { ShelfBook } from "@/api/shelves";
+import type { SpineUrls } from "@/api/spines";
 import { Spine } from "@/components/shared/Spine";
 import { SHELF_SPINE_HEIGHT } from "@/lib/shelfLayout";
 
 /** Copia della costola che segue il dito: sollevata, inclinata, con l'etichetta "Sposta". */
-export function DraggedSpine({ book }: { book: ShelfBook }) {
+export function DraggedSpine({ book, spineUrls }: { book: ShelfBook; spineUrls: SpineUrls }) {
   const { t } = useTranslation();
 
   return (
@@ -19,6 +20,7 @@ export function DraggedSpine({ book }: { book: ShelfBook }) {
       </span>
       <Spine
         book={book.library_item.book}
+        spine_url={book.library_item.spine_path ? spineUrls[book.library_item.spine_path] : undefined}
         spine_ratio={book.library_item.spine_ratio}
         height={SHELF_SPINE_HEIGHT}
         className="-translate-y-2 rotate-6 scale-105 shadow-[0_14px_22px_rgb(0_0_0/40%)]"

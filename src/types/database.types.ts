@@ -424,6 +424,7 @@ export type Database = {
         Args: { p_authors: string[]; p_query: string; p_title: string }
         Returns: boolean
       }
+      list_orphan_spines: { Args: { p_min_age?: string }; Returns: string[] }
       reorder_shelf: {
         Args: { p_item_ids: string[]; p_shelf_id: string }
         Returns: undefined

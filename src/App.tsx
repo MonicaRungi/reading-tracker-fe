@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { FullScreenLayout } from "@/components/layout/FullScreenLayout";
@@ -18,6 +19,10 @@ import ShelvesPage from "@/pages/ShelvesPage";
 import ShelfDetailPage from "@/pages/ShelfDetailPage";
 import { useTheme } from "./hooks/useTheme";
 
+// Pagina di prova della pipeline della costola: import.meta.env.DEV vale false
+// nella build di produzione, quindi pagina e import spariscono dal bundle.
+const DevSpinePage = import.meta.env.DEV ? lazy(() => import("@/pages/DevSpinePage")) : null;
+
 function App() {
   useTheme();
 
@@ -26,6 +31,16 @@ function App() {
       <Route path="/" element={<Navigate to="/library" replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      {DevSpinePage && (
+        <Route
+          path="/dev/spine"
+          element={
+            <Suspense fallback={null}>
+              <DevSpinePage />
+            </Suspense>
+          }
+        />
+      )}
 
       <Route element={<AuthGuard />}>
         <Route element={<AppLayout />}>

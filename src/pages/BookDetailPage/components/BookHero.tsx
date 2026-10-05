@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -5,7 +6,14 @@ import { formatAuthors } from "@/lib/format";
 import type { LibraryItem } from "@/api/library";
 import type { ReadingStatus } from "@/api/library";
 
-export function BookHero({ item }: { item: LibraryItem }) {
+export function BookHero({
+  item,
+  spine,
+}: {
+  item: LibraryItem;
+  /** Costola accanto alla copertina (SpineSection), alla stessa altezza. */
+  spine?: ReactNode;
+}) {
   const { t } = useTranslation();
 
   const metaParts = [
@@ -16,8 +24,8 @@ export function BookHero({ item }: { item: LibraryItem }) {
   ].filter(Boolean);
 
   return (
-    <div className="flex gap-4">
-      <div className="h-[144px] w-[96px] shrink-0 overflow-hidden rounded-xl bg-secondary shadow-sm">
+    <div className="flex gap-3">
+      <div className="h-[144px] w-[96px] shrink-0 overflow-hidden rounded-[10px] bg-secondary shadow-sm">
         {item.book.cover_url ? (
           <img
             src={item.book.cover_url}
@@ -31,7 +39,9 @@ export function BookHero({ item }: { item: LibraryItem }) {
         )}
       </div>
 
-      <div className="min-w-0 flex-1 pt-1">
+      {spine}
+
+      <div className="min-w-0 flex-1 pl-1 pt-1">
         <h1 className="text-[20px] font-bold leading-tight text-foreground">
           {item.book.title}
         </h1>

@@ -27,6 +27,8 @@ export default function ShelvesPage() {
       ) : (
         <ShelfList
           shelves={data.shelves}
+          spineUrls={data.spineUrls}
+          onPhotoError={actions.refreshSpineUrls}
           isLoading={data.isLoading}
           onOpenShelf={actions.openShelf}
           onOpenMenu={actions.openMenu}

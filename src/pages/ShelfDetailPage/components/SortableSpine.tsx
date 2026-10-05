@@ -15,9 +15,13 @@ import { cn } from "@/lib/utils";
  */
 export function SortableSpine({
   book,
+  spineUrl,
+  onPhotoError,
   onOpen,
 }: {
   book: ShelfBook;
+  spineUrl: string | undefined;
+  onPhotoError: () => void;
   onOpen: () => void;
 }) {
   const { t } = useTranslation();
@@ -56,8 +60,10 @@ export function SortableSpine({
     >
       <Spine
         book={book.library_item.book}
+        spine_url={spineUrl}
         spine_ratio={book.library_item.spine_ratio}
         height={SHELF_SPINE_HEIGHT}
+        onPhotoError={onPhotoError}
         className={cn(isDragging && "invisible")}
       />
       {isDragging && (

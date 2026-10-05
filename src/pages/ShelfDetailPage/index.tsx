@@ -71,6 +71,8 @@ export default function ShelfDetailPage() {
             theme={shelf.color_theme}
             books={data.reorder.orderedBooks}
             activeBook={data.reorder.activeBook}
+            spineUrls={data.spineUrls}
+            onPhotoError={actions.refreshSpineUrls}
             showHint={ui.reorder.showHint && shelf.books.length > 1}
             onOpenBook={actions.openBook}
             onDragStart={actions.reorder.dragStart}

@@ -401,6 +401,25 @@ con i libri in piedi mostrati come costole.
 - **Foto della costola**: collegata al `library_item` (per utente), non al catalogo `books`.
   `spine_ratio` (larghezza/altezza) è salvato nel DB, così il layout riserva lo spazio prima
   che l'immagine sia scaricata.
+  - **Dove**: dettaglio libro, accanto alla copertina e alla stessa altezza (`SpineSection`;
+    badge fotocamera se non c'è ancora una foto). Tap → `SpineCaptureSheet`: consigli di scatto,
+    "Scatta" (fotocamera nativa, `capture="environment"`) o "Galleria" → 4 angoli
+    (`SpineCropper`) → tre rese affiancate (Originale / Migliorato predefinito / Vivido), avviso
+    "La foto sembra sfocata" con "Rifai" / "Usa comunque" → salvataggio. Con una foto già
+    presente lo sheet offre anche "Rimuovi la foto" (con conferma: torna la costola generata).
+  - **Pipeline** (`lib/spine/`, in un worker con ripiego sul main thread): raddrizzamento
+    prospettico, miglioramento che non cambia la tinta (bilanciamento, esposizione e punti di
+    nero/bianco stimati sulla foto intera; livelli, gamma e curva sulla sola luminanza),
+    controllo di nitidezza, compressione WebP o JPEG sotto 512 KB (Safari produce JPEG). Le
+    costanti stanno in `lib/spine/config.ts`. Si carica solo l'immagine elaborata.
+  - **Storage**: bucket privato `spines`, path `{user_id}/{library_item_id}-{timestamp}.{webp|jpg}`
+    (`api/spines`). Sostituzione = nuovo file + aggiornamento del libro + eliminazione del
+    vecchio; se il DB fallisce il file nuovo viene tolto. Eliminando un libro si toglie prima la
+    sua foto. I file rimasti orfani li elimina la GitHub Action notturna.
+  - **Visualizzazione**: URL firmati (1 h) in un'unica richiesta per pagina (`useSpineUrls`,
+    `staleTime` 50 min). `SpinePhoto` mostra un segnaposto della misura della foto finché l'URL
+    non arriva o se l'immagine non si carica; in quel caso chiede URL nuovi, al massimo una
+    volta al minuto.
 - **Elenco**: header con titolo, sottotitolo e pulsante "+" circolare; card con anteprima a
   mini-mensola (primi 12 libri), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
   Dopo la creazione si apre il dettaglio dello scaffale.

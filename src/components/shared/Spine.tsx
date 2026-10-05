@@ -3,6 +3,7 @@ import type { SpineBook } from "@/api/shelves";
 import { SHELF_SPINE_HEIGHT } from "@/lib/shelfLayout";
 import { generatedSpine } from "@/lib/spine/generated";
 import { cn } from "@/lib/utils";
+import { SpinePhoto } from "./SpinePhoto";
 
 /** Corpo del titolo sulla mensola del dettaglio; scala con l'altezza della costola. */
 const TITLE_FONT_SIZE = 11;
@@ -15,9 +16,10 @@ type SpineStyle = CSSProperties & {
 };
 
 /**
- * Costola di un libro: la foto se c'è (Fase 3), altrimenti quella generata.
- * Le dimensioni arrivano da `spine_ratio` / `generatedSpine`, quindi lo
- * spazio è riservato prima che un'eventuale immagine sia scaricata.
+ * Costola di un libro: la foto se c'è, altrimenti quella generata.
+ * `spine_ratio` c'è se e solo se il libro ha una foto (vincolo nel DB): lo
+ * spazio della foto è riservato subito, con un segnaposto finché l'URL firmato
+ * non arriva, così la mensola non "salta" durante il caricamento.
  * L'aspetto (volume, ombre) sta nelle utility `spine` / `spine-title` di index.css.
  */
 export function Spine({
@@ -26,23 +28,24 @@ export function Spine({
   spine_ratio,
   height,
   className,
+  onPhotoError,
 }: {
   book: SpineBook;
   spine_url?: string | null;
   spine_ratio?: number | null;
   height: number;
   className?: string;
+  /** L'immagine non si carica (es. URL firmato scaduto): chi la mostra può rigenerarlo. */
+  onPhotoError?: () => void;
 }) {
-  if (spine_url && spine_ratio) {
+  if (spine_ratio) {
     return (
-      <img
-        src={spine_url}
-        alt=""
-        className={cn(
-          "shrink-0 rounded-[3px_3px_1px_1px] object-cover shadow-[0_2px_3px_rgb(0_0_0/16%)]",
-          className,
-        )}
-        style={{ width: Math.round(height * spine_ratio), height }}
+      <SpinePhoto
+        url={spine_url}
+        width={Math.round(height * spine_ratio)}
+        height={height}
+        className={className}
+        onError={onPhotoError}
       />
     );
   }

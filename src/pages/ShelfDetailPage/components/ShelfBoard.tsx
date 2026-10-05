@@ -21,6 +21,7 @@ import type {
 import { SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import type { SortingStrategy } from "@dnd-kit/sortable";
 import type { ShelfBook, ShelfTheme } from "@/api/shelves";
+import type { SpineUrls } from "@/api/spines";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import {
   layoutShelfRows,
@@ -56,6 +57,8 @@ export function ShelfBoard({
   theme,
   books,
   activeBook,
+  spineUrls,
+  onPhotoError,
   showHint,
   onOpenBook,
   onDragStart,
@@ -67,6 +70,8 @@ export function ShelfBoard({
   theme: ShelfTheme;
   books: ShelfBook[];
   activeBook: ShelfBook | null;
+  spineUrls: SpineUrls;
+  onPhotoError: () => void;
   showHint: boolean;
   onOpenBook: (libraryItemId: string) => void;
   onDragStart: (event: DragStartEvent) => void;
@@ -152,6 +157,8 @@ export function ShelfBoard({
               <ShelfRow
                 key={index}
                 books={row}
+                spineUrls={spineUrls}
+                onPhotoError={onPhotoError}
                 onOpenBook={onOpenBook}
               />
             ))}
@@ -162,7 +169,7 @@ export function ShelfBoard({
         {activeBook && <RemoveDropZone />}
 
         <DragOverlay dropAnimation={null}>
-          {activeBook && <DraggedSpine book={activeBook} />}
+          {activeBook && <DraggedSpine book={activeBook} spineUrls={spineUrls} />}
         </DragOverlay>
       </DndContext>
     </div>
