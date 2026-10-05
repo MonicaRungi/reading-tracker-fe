@@ -313,6 +313,7 @@ export type Database = {
         Row: {
           added_at: string
           decor_key: string | null
+          display: string
           id: string
           item_type: string
           library_item_id: string | null
@@ -322,6 +323,7 @@ export type Database = {
         Insert: {
           added_at?: string
           decor_key?: string | null
+          display?: string
           id?: string
           item_type?: string
           library_item_id?: string | null
@@ -331,6 +333,7 @@ export type Database = {
         Update: {
           added_at?: string
           decor_key?: string | null
+          display?: string
           id?: string
           item_type?: string
           library_item_id?: string | null
@@ -423,6 +426,11 @@ export type Database = {
       library_book_matches: {
         Args: { p_authors: string[]; p_query: string; p_title: string }
         Returns: boolean
+      }
+      list_orphan_spines: { Args: { p_min_age?: string }; Returns: string[] }
+      reorder_shelf: {
+        Args: { p_item_ids: string[]; p_shelf_id: string }
+        Returns: undefined
       }
       search_library: {
         Args: { p_query?: string; p_status?: string }

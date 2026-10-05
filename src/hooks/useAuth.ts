@@ -27,11 +27,6 @@ export function useAuth() {
     return () => subscription.subscription.unsubscribe();
   }, []);
 
-  async function signInWithMagicLink(email: string) {
-    const { error } = await supabase.auth.signInWithOtp({ email });
-    if (error) throw error;
-  }
-
   async function signInWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -59,7 +54,6 @@ export function useAuth() {
     avatarUrl,
     isAuthenticated: Boolean(state.session),
     isLoading: state.isLoading,
-    signInWithMagicLink,
     signInWithGoogle,
     signOut,
   };

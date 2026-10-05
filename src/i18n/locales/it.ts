@@ -2,6 +2,7 @@ export const it = {
   nav: {
     library: "Libreria",
     search: "Cerca",
+    shelves: "Scaffali",
     profile: "Profilo",
   },
   common: {
@@ -26,15 +27,6 @@ export const it = {
     featureDiscoverSub: "Trova ispirazione per la tua prossima lettura.",
     featureLibraryTitle: "La tua libreria, ovunque",
     featureLibrarySub: "Sempre con te, su tutti i tuoi dispositivi.",
-    or: "oppure",
-    emailLabel: "La tua email",
-    emailPlaceholder: "nome@email.it",
-    sendMagicLink: "Invia magic link",
-    magicLinkHint:
-      "Ti invieremo un link di accesso alla tua email.\nNessuna password, niente complicazioni.",
-    checkEmail: "Controlla la tua email",
-    magicLinkSentTo: "Abbiamo inviato il link a",
-    changeEmail: "Usa un'altra email",
     continueWithGoogle: "Continua con Google",
     signOut: "Esci",
     featureSafe: "Sicuro",
@@ -59,6 +51,180 @@ export const it = {
     bookCount_one: "{{count}} libro",
     bookCount_other: "{{count}} libri",
     searchPlaceholder: "Cerca per titolo o autore",
+  },
+  shelves: {
+    title: "Scaffali",
+    subtitle:
+      "Organizza i tuoi libri per temi, stati d'animo o come preferisci.",
+    emptyTitle: "Ancora nessuno scaffale",
+    emptySubtitle: "Crea uno scaffale e metti in fila i tuoi libri.",
+    emptyCta: "Crea uno scaffale",
+    previewEmpty: "Scaffale vuoto",
+    openMenu: "Opzioni per {{name}}",
+    themes: {
+      wood: "Legno",
+      white: "Bianco",
+      night: "Notte",
+      sage: "Salvia",
+      lilac: "Lilla",
+      terracotta: "Terracotta",
+    },
+    form: {
+      createTitle: "Nuovo scaffale",
+      editTitle: "Modifica scaffale",
+      nameLabel: "Nome",
+      namePlaceholder: "Es. Preferiti, Lista dei desideri…",
+      themeLabel: "Tema della mensola",
+      create: "Crea scaffale",
+      nameError: {
+        required: "Dai un nome allo scaffale",
+        taken: "Hai già uno scaffale con questo nome",
+      },
+    },
+    menu: {
+      edit: "Modifica nome e tema",
+      delete: "Elimina scaffale",
+    },
+    delete: {
+      title: "Eliminare “{{name}}”?",
+      description:
+        "Lo scaffale verrà eliminato. I libri restano nella tua libreria.",
+      confirm: "Elimina",
+    },
+    toast: {
+      created: "Scaffale creato",
+      updated: "Scaffale aggiornato",
+      deleted: "Scaffale eliminato",
+      booksAdded_one: "Libro aggiunto allo scaffale",
+      booksAdded_other: "{{count}} libri aggiunti allo scaffale",
+    },
+    detail: {
+      addBooks: "Aggiungi libri",
+      openBook: "Apri {{title}}",
+      emptyTitle: "Scaffale vuoto",
+      emptySubtitle:
+        "Aggiungi i libri della tua libreria: li vedrai qui come dorsi sulla mensola.",
+      notFoundTitle: "Scaffale non trovato",
+      notFoundSubtitle: "Potrebbe essere stato eliminato.",
+      backToList: "Torna agli scaffali",
+    },
+    display: {
+      menuLabel: "Posizione di {{title}}",
+      options: {
+        spine: "In verticale",
+        stack: "In orizzontale",
+        cover: "Di fronte",
+      },
+      saveError: "Non è stato possibile cambiare la posizione",
+    },
+    reorder: {
+      hint: "Tieni premuto e trascina per riordinare",
+      moving: "Sposta",
+      removeZone: "Trascina qui per rimuovere",
+      roleDescription: "libro, tieni premuto per spostarlo",
+      removed: "“{{title}}” tolto dallo scaffale",
+      undo: "Annulla",
+      saveError: "Non è stato possibile salvare il nuovo ordine",
+      a11y: {
+        instructions:
+          "Invio apre il libro. Spazio lo prende: con le frecce lo sposti, di nuovo spazio lo lascia, Esc annulla. Per toglierlo dallo scaffale portalo sulla zona in fondo. Il tasto menu, o Maiusc+F10, sceglie se metterlo in verticale, in orizzontale o di fronte.",
+        picked: "Hai preso {{title}}.",
+        moved: "{{title}} in posizione {{position}}.",
+        dropped: "{{title}} sistemato.",
+        cancelled: "Spostamento di {{title}} annullato.",
+      },
+    },
+    addBooks: {
+      title: "Aggiungi libri",
+      selectBooks: "Seleziona i libri",
+      submit_one: "Aggiungi {{count}} libro",
+      submit_other: "Aggiungi {{count}} libri",
+      emptyLibrary: "La tua libreria è vuota",
+      noResults: "Nessun libro da aggiungere",
+      noResultsSub:
+        "Sono già tutti su questo scaffale, oppure nessuno corrisponde alla ricerca.",
+    },
+  },
+  spine: {
+    section: {
+      add: "Aggiungi la foto del dorso",
+      manage: "Foto del dorso: sostituisci o rimuovi",
+    },
+    capture: {
+      addTitle: "Foto del dorso",
+      replaceTitle: "Sostituisci la foto",
+      cropTitle: "Ritaglia il dorso",
+      reviewTitle: "Scegli la resa",
+      camera: "Scatta foto",
+      gallery: "Scegli da galleria",
+      loading: "Apro la foto…",
+      tips: {
+        light: "Luce naturale e diffusa, senza riflessi sulla copertina.",
+        straight: "Tieni il dorso dritto, al centro dell'inquadratura.",
+        close: "Il dorso deve riempire quasi tutta l'altezza.",
+      },
+      cropSubtitle: "Regola gli angoli per includere solo il dorso.",
+      rotateLeft: "Ruota a sinistra",
+      rotateRight: "Ruota a destra",
+      reviewSubtitle: "Scegli il risultato che preferisci.",
+      retake: "Rifai",
+      next: "Avanti",
+      processing: "Elaboro…",
+      presetsLabel: "Resa della foto",
+      blurWarning: "La foto sembra sfocata, vuoi rifarla?",
+      useAnyway: "Usa comunque",
+      save: "Salva il dorso",
+      saving: "Salvataggio…",
+    },
+    remove: {
+      action: "Rimuovi la foto",
+      title: "Rimuovere la foto del dorso?",
+      description: "Tornerà il dorso generato. Puoi sempre scattarne un'altra.",
+      confirm: "Rimuovi",
+    },
+    toast: {
+      saved: "Dorso salvato",
+      removed: "Foto del dorso rimossa",
+      saveError: "Non è stato possibile salvare il dorso",
+      loadError: "Non riesco ad aprire questa foto",
+      processError: "Non è stato possibile elaborare la foto",
+    },
+    presets: {
+      original: "Originale",
+      enhanced: "Migliorata",
+      vivid: "Vivida",
+    },
+    crop: {
+      corners: {
+        topLeft: "Angolo in alto a sinistra",
+        topRight: "Angolo in alto a destra",
+        bottomRight: "Angolo in basso a destra",
+        bottomLeft: "Angolo in basso a sinistra",
+      },
+    },
+  },
+  // Pagina di prova /dev/spine (solo sviluppo): da togliere con la pagina
+  dev: {
+    spine: {
+      title: "Prova pipeline dorso",
+      mode: "Elaborazione: {{mode}}",
+      camera: "Scatta",
+      gallery: "Galleria",
+      photoInfo: "{{name}} · {{mb}} MB · {{ow}}×{{oh}} → ridotta a {{w}}×{{h}}",
+      cornersHint: "Trascina i 4 angoli sui bordi del dorso, poi elabora.",
+      process: "Elabora",
+      processing: "Elaborazione…",
+      result: "Dorso {{w}}×{{h}}, rapporto {{ratio}}",
+      blur: "nitidezza {{score}} (soglia {{threshold}}): {{verdict}}",
+      sharp: "nitida",
+      blurry: "sfocata",
+      loadTimings: "Tempi di caricamento",
+      processTimings: "Tempi di elaborazione",
+      encode: "Comprimi",
+      encoded: "{{type}} · {{kb}} KB · qualità {{quality}} · {{ms}} ms",
+      download: "Scarica",
+      ms: "{{ms}} ms",
+    },
   },
   status: {
     to_read: "Da leggere",
@@ -101,7 +267,6 @@ export const it = {
   },
   import: {
     goodreads: "Importa da Goodreads",
-    storygraph: "Importa da StoryGraph",
     connectTitle: "Importa la tua libreria",
     connectDescription:
       "Sincronizza i libri dal tuo account Goodreads e aggiungili alla tua libreria.",
@@ -291,8 +456,7 @@ export const it = {
         "I nuovi obiettivi inizieranno nella prima settimana disponibile, senza sovrapporsi con quelli attivi.",
       pickerStart: "Partenza",
       pickerSave: "Salva obiettivi",
-      pickerNothingAvailable:
-        "Hai già programmato un obiettivo per ogni tipo.",
+      pickerNothingAvailable: "Hai già programmato un obiettivo per ogni tipo.",
       // Modifica e archiviazione
       editSheetTitle: "Modifica obiettivo",
       editSave: "Salva",
@@ -337,7 +501,8 @@ export const it = {
     notUnlocked: "Da sbloccare",
     feature: "Metti in evidenza",
     unfeature: "Rimuovi dall'evidenza",
-    featuredNote: "Puoi avere fino a {{count}} badge in evidenza sul tuo profilo.",
+    featuredNote:
+      "Puoi avere fino a {{count}} badge in evidenza sul tuo profilo.",
     featuredLimitReached:
       "Hai già {{count}} badge in evidenza: rimuovine uno per aggiungere questo.",
     featuredAdded: "Badge messo in evidenza",
@@ -365,7 +530,8 @@ export const it = {
     goalRenewalHint: "Puoi impostarne uno nuovo per questa settimana.",
     bookRelease: "È uscito un libro che aspettavi",
     empty: "Nessuna notifica",
-    emptySub: "Qui troverai badge sbloccati, obiettivi da rinnovare e libri in uscita.",
+    emptySub:
+      "Qui troverai badge sbloccati, obiettivi da rinnovare e libri in uscita.",
     retentionHint: "Le notifiche vengono eliminate dopo 30 giorni.",
     // Promemoria di uscita
     releaseOn: "Esce {{date}}",

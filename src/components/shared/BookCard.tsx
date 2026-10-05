@@ -12,7 +12,7 @@ export function BookCard({ item }: { item: LibraryItem }) {
       onClick={() => navigate(`/book/${item.id}`)}
     >
       {/* Copertina verticale 2:3 */}
-      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-[#F1EFEC] shadow-card">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-[10px] bg-[#F1EFEC] shadow-card">
         {item.book.cover_url ? (
           <img
             src={item.book.cover_url}

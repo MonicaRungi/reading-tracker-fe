@@ -10,10 +10,18 @@ const MIN_REFRESH_MS = 600;
 /** Movimento minimo prima di decidere se il gesto è verticale od orizzontale. */
 const DIRECTION_LOCK_PX = 10;
 
+/** Area con scroll proprio (es. la mensola): il pull parte solo se è in cima. */
+function scrolledAreaOf(target: Element | null): boolean {
+  const area = target?.closest("[data-scroll-area]");
+  return area ? area.scrollTop > 0 : false;
+}
+
 /**
  * Pull-to-refresh sulla pagina (scroll della window). Parte solo con la pagina
  * in cima, un dito e un gesto verticale; si ignora se è aperto un dialog o un
  * bottom sheet, o se il tocco parte da un elemento `[data-no-pull-refresh]`.
+ * Dentro un'area `[data-scroll-area]` con scroll proprio parte solo se anche
+ * quell'area è in cima, così il gesto scorre l'area invece di aggiornare.
  * Attivo **solo nella PWA installata**, dove il browser non offre il suo: in una
  * scheda del browser restano il pull-to-refresh e il rimbalzo nativi.
  */
@@ -33,6 +41,32 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     let isPulling = false;
     let current = 0;
     let refreshing = false;
+    // Elemento da cui è partito il tocco. Se durante il gesto viene smontato (es.
+    // un dorso che cambia riga mentre lo si trascina), touchmove/touchend non
+    // risalgono più fino a window: li si ascolta anche lì, come fa dnd-kit.
+    let touchTarget: EventTarget | null = null;
+    let lastEvent: Event | null = null;
+
+    function listenOnTarget(target: EventTarget) {
+      touchTarget = target;
+      target.addEventListener("touchmove", onTouchMove as EventListener, { passive: true });
+      target.addEventListener("touchend", onTouchEnd);
+      target.addEventListener("touchcancel", onTouchEnd);
+    }
+
+    function stopListeningOnTarget() {
+      touchTarget?.removeEventListener("touchmove", onTouchMove as EventListener);
+      touchTarget?.removeEventListener("touchend", onTouchEnd);
+      touchTarget?.removeEventListener("touchcancel", onTouchEnd);
+      touchTarget = null;
+    }
+
+    /** Lo stesso evento arriva due volte (elemento + window) finché l'elemento è montato. */
+    function isDuplicate(event: Event) {
+      if (event === lastEvent) return true;
+      lastEvent = event;
+      return false;
+    }
 
     const update = (value: number) => {
       current = value;
@@ -40,6 +74,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     };
 
     function onTouchStart(event: TouchEvent) {
+      stopListeningOnTarget();
       start = null;
       isPulling = false;
       if (refreshing || event.touches.length !== 1 || window.scrollY > 0) return;
@@ -47,12 +82,14 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
       if (target?.closest('[role="dialog"], [role="alertdialog"], [data-no-pull-refresh]')) {
         return;
       }
+      if (scrolledAreaOf(target)) return;
       if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return;
       start = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      if (event.target) listenOnTarget(event.target);
     }
 
     function onTouchMove(event: TouchEvent) {
-      if (!start) return;
+      if (!start || isDuplicate(event)) return;
       const dx = event.touches[0].clientX - start.x;
       const dy = event.touches[0].clientY - start.y;
 
@@ -78,6 +115,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     }
 
     async function onTouchEnd() {
+      stopListeningOnTarget();
       if (!start) return;
       start = null;
       if (!isPulling || current < PULL_THRESHOLD) {
@@ -105,6 +143,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     window.addEventListener("touchend", onTouchEnd);
     window.addEventListener("touchcancel", onTouchEnd);
     return () => {
+      stopListeningOnTarget();
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);

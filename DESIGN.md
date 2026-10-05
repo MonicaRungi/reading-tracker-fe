@@ -9,17 +9,18 @@ devono essere discusse e registrate qui.
 ## 1. Product structure
 
 L'applicazione è una **SPA mobile-first** per uso personale (multi-utente, ma senza multi-tenancy).
-Un unico codebase, un'unica face. L'accesso è protetto da autenticazione Supabase (magic link +
+Un unico codebase, un'unica face. L'accesso è protetto da autenticazione Supabase (solo
 Google OAuth).
 
 ### 1.1 Navigazione
 
-Tre sezioni principali, accessibili dalla **bottom navigation** (mobile-first):
+Quattro sezioni principali, accessibili dalla **bottom navigation** (mobile-first):
 
 | Tab | Icona | Contenuto |
 |---|---|---|
 | Home / Libreria | house | Banner "Continua a leggere" + griglia libri |
 | Cerca | search | Ricerca testuale / ISBN / scan barcode |
+| Scaffali | library | Elenco scaffali e mensole con i dorsi (§16) |
 | Profilo | user | Statistiche, preferenze tema, logout |
 
 La bottom nav è sempre visibile nell'app shell autenticata. Le pagine di dettaglio (libro, scaffale)
@@ -29,9 +30,9 @@ sono push-navigate sopra la tab corrente — la bottom nav resta visibile.
 
 ```
 / (root)
-  ├── non autenticato → /login (magic link + Google)
+  ├── non autenticato → /login (Google OAuth)
   ├── autenticato → /library (home)
-  └── /auth/callback (magic link redirect handler)
+  └── /auth/callback (redirect di ritorno da Google OAuth)
 ```
 
 Il route guard vive in `components/layout/AuthGuard.tsx` — non nelle singole pagine.
@@ -99,6 +100,9 @@ src/
 - **Bottom nav safe area**: `pb-safe` o `env(safe-area-inset-bottom)`.
 - **Spacing verticale** tra sezioni: `space-y-5` o `gap-5`.
 - Niente scroll orizzontale a livello pagina.
+- **Scroll fra le rotte** (`useScrollRestoration`, chiamato in `App.tsx`): una navigazione in
+  avanti (link, tab, `navigate`) apre la pagina dall'alto; indietro/avanti del browser riporta
+  alla posizione lasciata. Riguarda solo lo scroll della finestra, non le aree con scroll proprio.
 
 ### 4.2 Griglia
 
@@ -118,6 +122,8 @@ La firma visiva dell'app:
 
 - **Font**: sans di sistema (`font-sans`, ovvero `-apple-system, system-ui`). Nessun font esterno
   da caricare — l'app è mobile-first e deve restare leggera.
+  **Eccezione**: il titolo sui dorsi dei libri (§16) usa il serif di sistema (`font-serif`:
+  "New York" su iOS, Georgia altrove), sempre senza font da scaricare.
 - **Accento (Corallo)**: `#E0644A` — il colore primario dell'app. Usato per CTA, chip attivi,
   barre di avanzamento, icone bottom nav attive, badge stato "In lettura".
 - **Soft Corallo**: `#FBE9E3` — sfondo pill/chip attivi, card "In lettura" nel banner, sfondo hero login.
@@ -221,6 +227,8 @@ Il bottom sheet di aggiunta è il punto unico per impostare stato e scaffali:
 | Stelle voto | `RatingStars` | interattive o read-only, 1-5 |
 | Barra avanzamento | `ProgressBar` | colore accent, border-radius pieno |
 | Aggiunta libro | `AddBookSheet` | bottom sheet con stati + scaffali |
+| Dorso libro | `Spine` | foto del dorso o dorso generato (§16) |
+| Crea/modifica scaffale | `ShelfFormSheet` | nome + selettore tema (`ShelfThemePicker`) |
 | Date picker | `DatePickerPopover` | Popover + Calendar di shadcn |
 | Ricerca | `SearchBar` | campo unificato titolo/autore/ISBN |
 | Scanner barcode | `BarcodeScanner` | full-width viewfinder + scan line |
@@ -241,11 +249,12 @@ secondarie `variant="outline"`; azioni distruttive `variant="destructive"` + `Al
 - **Client**: `@supabase/supabase-js`, singleton in `src/lib/supabase.ts`.
 - **Session**: gestita da `useAuth()` (hook globale in `src/hooks/useAuth.ts`), che wrappa
   `supabase.auth.getSession()` e ascolta `onAuthStateChange`.
-- **Magic link**: `supabase.auth.signInWithOtp({ email })` — nessuna password.
-- **Google OAuth**: `supabase.auth.signInWithOAuth({ provider: 'google' })`.
+- **Google OAuth**: `supabase.auth.signInWithOAuth({ provider: 'google' })` — unico metodo di
+  accesso. Il magic link è stato rimosso (incompatibile con la PWA installata su iOS: il link
+  si apre in Safari, non nell'app).
 - **Logout**: `supabase.auth.signOut()` + redirect a `/login`.
-- **Callback route**: `/auth/callback` gestisce il token del magic link
-  (`supabase.auth.exchangeCodeForSession`).
+- **Callback route**: `/auth/callback` è il `redirectTo` di Google OAuth: supabase-js scambia
+  il code della URL e la pagina attende `SIGNED_IN` per andare a `/library`.
 - **Route guard**: `<AuthGuard>` in `components/layout/AuthGuard.tsx` — redirect a `/login`
   se non autenticato. Non codificare guard nelle pagine.
 - Le chiamate a Supabase nelle Edge Function passano il token JWT dell'utente nell'header
@@ -328,8 +337,149 @@ le function con fetch diretto dal frontend — sempre via `supabase.functions.in
   Mai committare `.env` su Git (è in `.gitignore`).
 - **RLS**: le policy garantiscono l'isolamento per utente a livello DB. Il frontend non filtra
   mai per `user_id` nelle query — ci pensa Supabase automaticamente via `auth.uid()`.
-- **Realtime**: non usato nell'MVP. Se aggiunto in futuro, i subscription vanno in hook
-  dedicati con cleanup su `useEffect` return.
-- **Storage**: non usato nell'MVP (le copertine vengono dalle API esterne).
+- **Realtime**: in uso per le notifiche (badge sbloccati, rinnovo obiettivi, uscite libri).
+  I subscription vivono in hook dedicati (`useNotificationsRealtime`) con cleanup su
+  `useEffect` return.
+- **Storage**: in uso solo per le foto dei dorsi (bucket privato `spines`, §16). Le
+  copertine continuano ad arrivare dalle API esterne.
 - **Keep-alive**: GitHub Action nella repo backend che fa una query ogni ~5 giorni per evitare
   la pausa del progetto free.
+
+---
+
+## 16. Scaffali a mensola
+
+Gli scaffali sono l'unico concetto di "scaffale" dell'app e hanno un'unica vista: la mensola,
+con i libri in piedi mostrati come dorsi.
+
+- **Rotte**: `/shelves` (elenco: crea, modifica, elimina) e `/shelves/:shelfId` (mensola).
+  Uno `:shelfId` inesistente o nascosto dalla RLS mostra un `EmptyState` con ritorno all'elenco.
+- **Tema della mensola**: `wood` | `white` | `night` | `sage` | `lilac` | `terracotta`, scelto alla creazione e
+  modificabile. È **indipendente dal dark mode dell'app**: i colori sono CSS variables per
+  attributo (`[data-shelf-theme="…"]` in `index.css`: `--shelf-back`, `--shelf-board`,
+  `--shelf-board-light`, `--shelf-board-shadow`, `--shelf-plank-grain`, `--shelf-wall-grain`)
+  e non vengono ridefiniti sotto `.dark`. Ogni tema ha il suo piano (legno, bianco, blu notte,
+  salvia, malva, cotto). Mai hex dei temi nei componenti.
+- **Effetto legno** (tutti i temi): venatura generata da un SVG inline (`feTurbulence`
+  stirato nel verso delle fibre) — orizzontale sui piani con fibre scure e chiare, verticale
+  sulla parete a pannelli con le fughe fra le assi. Ogni tema tinge le venature con i propri
+  colori (Bianco: legno sbiancato e leggero). Nessuna immagine da scaricare; per ritoccarla si
+  cambiano `baseFrequency` (fittezza) e la riga alpha di `feColorMatrix` (intensità).
+  La texture della parete si ripete a piastrelle: lì `stitchTiles='stitch'` e una regione del
+  filtro pari alla piastrella (`x='0' y='0' width='100%' height='100%'`) sono obbligatori, senza
+  si vedono le giunzioni. I piani invece stirano una sola texture su tutta la lunghezza
+  (`100% 100%`): non hanno giunzioni e non vanno toccati, perché quelle due opzioni cambiano la
+  densità del rumore e le venature si appiattiscono. La parete resta ferma
+  mentre le mensole scorrono (sfondo con `background-attachment` predefinito, non `local`).
+- **Cornice** (`shelf-frame`): bordo sottile dello stesso materiale dei piani del tema (6 px,
+  5 px sotto i 640 px), con luce dall'alto e ombra interna. È un elemento esterno che non
+  scorre: dentro c'è la parete, con lo scroll proprio, così i dorsi non passano sopra il
+  bordo. Spessore e raggio si regolano con `--shelf-frame-width` / `--shelf-frame-radius`
+  (anteprime: 4 px senza raggio, perché gli angoli li arrotonda la card; campioni: 3 px).
+- **Utility della mensola** (`index.css`): `shelf-wall` (parete con luce dall'alto),
+  `shelf-board` (mobile: righe impilate, gap 28 px), `shelf-books` (riga di dorsi allineati in
+  basso, min-height 190 px / 168 px sotto i 640 px), `shelf-plank` (piano con venatura, bordo
+  frontale e ombra; altezza regolabile con `--plank-height` per anteprime e campioni), `spine` e
+  `spine-title` (volume, ombre, titolo verticale con ellissi). Gradienti e pseudo-elementi
+  stanno lì, non nei componenti.
+- **Dettaglio**: header con nome e numero di libri sotto il titolo; il mobile occupa quasi
+  tutta la larghezza e riempie l'altezza fino alla bottom nav. La pagina non scrolla: scorrono
+  solo le mensole dentro il mobile (`overflow-y-auto`, `overscroll-contain`). Il mobile è
+  marcato `data-scroll-area`, così nella PWA il pull-to-refresh parte solo se le mensole sono
+  in cima (`usePullToRefresh`). I dorsi sono `data-no-pull-refresh`: una tirata verso il
+  basso che parte da un dorso è sempre uno spostamento. L'hook ascolta la fine del tocco
+  anche sull'elemento di partenza, perché se viene smontato durante il gesto (un dorso che
+  cambia riga) gli eventi non risalgono più fino a `window`.
+- **Layout a flusso**: la larghezza del contenitore è misurata con `ResizeObserver`
+  (`useElementWidth`); i dorsi riempiono una riga finché c'è spazio, poi si passa alla
+  mensola successiva (`lib/shelfLayout.ts`). Niente coordinate libere: l'ordine è `position`.
+  Le righe hanno altezza fissa, così la variazione d'altezza dei dorsi non sposta le tavole.
+- **Dorso generato** (`lib/spine/generated.ts`), deterministica da `book.id`:
+  colore da una palette curata di 12 toni da rilegatura (mai estratto dalla copertina:
+  le immagini esterne sono cross-origin), larghezza proporzionale a `page_count` (18–44 px
+  all'altezza di riferimento 160 px), altezza ±8%, un libro su 8 leggermente inclinato (max
+  1,2°), solo il titolo in verticale (`writing-mode: vertical-rl`, serif 11 px a 150 px di
+  altezza) con ellissi, colore del testo scelto dalla luminanza. Volume e bordi in rilievo
+  separano i dorsi anche quando il loro colore è vicino a quello della parete.
+- **Foto del dorso**: collegata al `library_item` (per utente), non al catalogo `books`.
+  `spine_ratio` (larghezza/altezza) è salvato nel DB, così il layout riserva lo spazio prima
+  che l'immagine sia scaricata.
+  - **Dove**: dettaglio libro, accanto alla copertina e alla stessa altezza (`SpineSection`).
+    Senza foto è uno spazio tratteggiato corallo (40 × 144 px, angoli come la copertina) con "+";
+    con la foto mostra il dorso fotografato. Tap → `SpineCaptureSheet`, in tre tappe:
+    1. **Foto del dorso**: illustrazione `spine-photo` (variante chiara e scura), tre
+       consigli con la lampadina, "Scatta foto" (pieno; fotocamera nativa,
+       `capture="environment"`) e "Scegli da galleria" (bordato), impilati. Con una foto già
+       presente anche "Rimuovi la foto" (con conferma: torna il dorso generato).
+    2. **Ritaglia il dorso**: barra propria "Annulla · titolo · Avanti" al posto della X;
+       "Annulla" torna alla tappa 1. Foto su fondo scuro con i 4 angoli (`SpineCropper`),
+       "Ruota a sinistra" / "Ruota a destra" (90°, gli angoli tornano al rettangolo iniziale).
+    3. **Scegli la resa**: titolo centrato, tre card (Originale / Migliorata predefinita /
+       Vivida; quella scelta ha bordo corallo e spunta), "Salva il dorso". Se la foto sembra
+       sfocata, al posto del pulsante compare l'avviso con "Rifai" / "Usa comunque".
+  - **Pipeline** (`lib/spine/`, in un worker con ripiego sul main thread): raddrizzamento
+    prospettico, miglioramento che non cambia la tinta (bilanciamento, esposizione e punti di
+    nero/bianco stimati sulla foto intera; livelli, gamma e curva sulla sola luminanza),
+    controllo di nitidezza, compressione WebP o JPEG sotto 512 KB (Safari produce JPEG). Le
+    costanti stanno in `lib/spine/config.ts`. Si carica solo l'immagine elaborata.
+  - **Storage**: bucket privato `spines`, path `{user_id}/{library_item_id}-{timestamp}.{webp|jpg}`
+    (`api/spines`). Sostituzione = nuovo file + aggiornamento del libro + eliminazione del
+    vecchio; se il DB fallisce il file nuovo viene tolto. Eliminando un libro si toglie prima la
+    sua foto. I file rimasti orfani li elimina la GitHub Action notturna.
+  - **Visualizzazione**: URL firmati (1 h) in un'unica richiesta per pagina (`useSpineUrls`,
+    `staleTime` 50 min). `SpinePhoto` mostra un segnaposto della misura della foto finché l'URL
+    non arriva o se l'immagine non si carica; in quel caso chiede URL nuovi, al massimo una
+    volta al minuto.
+- **Elenco**: header con titolo, sottotitolo e pulsante "+" circolare; card con anteprima a
+  mini-mensola (primi 12 libri, sempre come dorsi in piedi), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
+  Dopo la creazione si apre il dettaglio dello scaffale.
+- **Selettore tema**: griglia a 2 colonne (3 righe con 6 temi) di anteprime (parete, dorsi, piano) con la label sotto; il
+  tema scelto ha bordo e testo corallo. Niente decorazioni finché non arriva la Fase 4.
+- **Eliminazione**: `ConfirmDialog` con testo esplicito — i libri restano in libreria
+  (`shelf_items` va in cascata, `library_items` no).
+- **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
+  esclude i libri già presenti. Resta valido anche il percorso da `AddBookSheet`.
+- **Posizione del libro** (`shelf_items.display`, per scaffale): `spine` in piedi (dorso),
+  `stack` sdraiato, `cover` di fronte (copertina 2:3, o copertina generata con colore e titolo del
+  dorso se manca). La mensola dispone **blocchi** (`lib/shelfUnits.ts`): un dorso, una copertina o
+  una pila; i sdraiati consecutivi nell'ordine formano una pila (il primo in basso) fino
+  all'altezza di un dorso in piedi, poi ne comincia un'altra. Riordino e riflusso restano
+  sull'ordine piatto dei libri: le pile si ricompongono da sole. Componenti condivisi
+  `ShelfBookFace` (sceglie fra `Spine`, `LyingSpine`, `BookCoverFace`), usati anche dalla copia
+  trascinata e dalle anteprime dell'elenco. Il client può modificare solo questa colonna di
+  `shelf_items` (grant per colonna + policy).
+  - **Cassetto delle posizioni** (`DisplayDrawer`): durante il trascinamento compare una
+    linguetta "‹" sul bordo destro del mobile; portandoci il libro si apre un cassetto con tre
+    zone di rilascio (In verticale / In orizzontale / Di fronte, con miniatura; quella attuale
+    evidenziata). Rilasciato lì, il libro cambia posizione e non ordine; sopra il cassetto
+    l'ordine non cambia. Il cambio è ottimistico, in fila con riordino e rimozione.
+  - **Menu contestuale** (`BookDisplayMenu`, popover shadcn ancorato al libro), per mouse e
+    tastiera: tasto destro o tasto menu / Maiusc+F10, stesse tre voci con la spunta.
+- **Riordino senza modalità** (dettaglio scaffale): un tap su un dorso apre il libro, la
+  **pressione lunga** la solleva e si trascina; al rilascio è già salvato. Niente pulsante
+  "Riordina" né "Fine": una modalità non darebbe vantaggi, perché dentro il mobile scorrevole
+  la pressione lunga serve comunque a distinguere il trascinamento dallo scroll. Il click
+  che il browser emette subito dopo un trascinamento viene ignorato (300 ms), così il libro
+  appena spostato non si apre. Da tastiera: Invio apre, Spazio prende il libro, frecce lo
+  spostano, Esc annulla.
+  - **Suggerimento** "Tieni premuto e trascina per riordinare" in fondo alle mensole, finché
+    non si è riordinato una volta (`rt.shelfReorderHintSeen` in localStorage).
+  - **Durante il trascinamento**: la copia del dorso segue il dito, sollevata e inclinata,
+    con l'etichetta "Sposta" (`DragOverlay`); al suo posto un segnaposto tratteggiato
+    (`--shelf-placeholder` del tema). In fondo al mobile compare la zona
+    "Trascina qui per rimuovere".
+  - **dnd-kit** (`@dnd-kit/core` + `sortable`): sensori mouse (5 px), touch (pressione di
+    250 ms, tolleranza 5 px; dorsi con `touch-action: manipulation` e senza menu di sistema
+    iOS, quindi prima dell'attivazione lo scroll resta nativo) e tastiera. Annunci e
+    istruzioni per screen reader in italiano via `t()`.
+  - **Riflusso dal vivo**: niente trasformazioni di dnd-kit (stirerebbero dorsi di larghezza
+    diversa). L'ordine cambia subito e il layout a flusso ricompone le righe. Collisione con
+    `pointerWithin` (solo sopra un dorso o la zona "rimuovi") e almeno 8 px di movimento fra
+    due spostamenti: senza, al punto di a capo il riflusso si alimenta da solo all'infinito.
+  - **Salvataggio**: una sola chiamata a `reorder_shelf` al rilascio, ottimistica (`onMutate`
+    + rollback e toast in `onError`), in fila con le altre mutation dello scaffale (`scope`).
+  - **Rimozione**: rilasciando sulla zona in fondo; ottimistica, con toast "Annulla" per 5 s
+    che reinserisce il libro e lo rimette nella posizione di prima. Il libro resta in libreria.
+- **QueryKey**: `['shelves', userId]` per l'elenco, `['shelf', userId, shelfId]` per il
+  dettaglio. Le mutation sugli scaffali invalidano entrambe; aggiunta ed eliminazione di un
+  libro invalidano anche queste.

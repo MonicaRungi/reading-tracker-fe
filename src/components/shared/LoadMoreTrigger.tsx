@@ -4,13 +4,17 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 /**
  * Sentinella per lo scroll infinito: chiama `onLoadMore` quando entra nel
  * viewport (con un margine, così la pagina successiva arriva prima del fondo).
+ * Dentro un contenitore che scrolla (es. uno sheet) passare `root`: il margine
+ * vale rispetto al contenitore, non alla finestra.
  */
 export function LoadMoreTrigger({
   onLoadMore,
   isLoading,
+  root,
 }: {
   onLoadMore: () => void;
   isLoading: boolean;
+  root?: Element | null;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const onLoadMoreRef = useRef(onLoadMore);
@@ -28,11 +32,11 @@ export function LoadMoreTrigger({
       (entries) => {
         if (entries[0]?.isIntersecting) onLoadMoreRef.current();
       },
-      { rootMargin: "400px 0px" },
+      { root, rootMargin: "400px 0px" },
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [isLoading]);
+  }, [isLoading, root]);
 
   return (
     <div ref={ref} className="flex justify-center py-6">

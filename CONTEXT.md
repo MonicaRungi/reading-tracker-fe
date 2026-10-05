@@ -65,6 +65,9 @@ rating       int check (rating between 1 and 5)   -- nullable
 started_at   date                                  -- nullable
 finished_at  date                                  -- nullable
 current_page int default 0
+spine_path   text                                  -- foto dorso nel bucket 'spines'
+spine_ratio  numeric(6,4) check (spine_ratio > 0)  -- larghezza / altezza della foto
+             -- check: (spine_path is null) = (spine_ratio is null)
 added_at     timestamptz not null default now()
 updated_at   timestamptz not null default now()
 unique (user_id, book_id)
@@ -73,23 +76,34 @@ RLS: select/insert/update/delete solo sulle proprie righe (`user_id = auth.uid()
 
 ### `shelves`
 ```sql
-id         uuid primary key default gen_random_uuid()
-user_id    uuid not null references auth.users(id) on delete cascade
-name       text not null
-created_at timestamptz not null default now()
+id          uuid primary key default gen_random_uuid()
+user_id     uuid not null references auth.users(id) on delete cascade
+name        text not null
+color_theme text not null default 'wood'
+            check (color_theme in ('wood','white','night','sage','lilac','terracotta'))
+created_at  timestamptz not null default now()
 unique (user_id, name)
 ```
 RLS: select/insert/update/delete solo i propri scaffali.
 
-### `shelf_items` (join table)
+### `shelf_items`
 ```sql
+id               uuid primary key default gen_random_uuid()
 shelf_id         uuid not null references shelves(id) on delete cascade
-library_item_id  uuid not null references library_items(id) on delete cascade
+library_item_id  uuid references library_items(id) on delete cascade  -- null per le decorazioni
+item_type        text not null default 'book' check (item_type in ('book','decor'))
+decor_key        text                -- solo per item_type = 'decor' (Fase 4)
+position         int not null default 0
 added_at         timestamptz not null default now()
-primary key (shelf_id, library_item_id)
+-- check: (item_type = 'book' and library_item_id is not null)
+--     or (item_type = 'decor' and decor_key is not null)
+unique (shelf_id, library_item_id) where library_item_id is not null
 ```
-RLS: operazioni consentite solo se lo scaffale appartiene all'utente corrente
+RLS: select/insert/delete consentiti solo se lo scaffale appartiene all'utente corrente
 (policy con `exists (select 1 from shelves s where s.id = shelf_id and s.user_id = auth.uid())`).
+Nessuna policy di update: il riordino passa dalla RPC `reorder_shelf` (Fase 2).
+Trigger `before insert`: se `position` è 0 o null la imposta a `max(position) + 1` dello
+scaffale (accodamento). Il frontend non passa mai `position` in insert.
 
 ### `reading_log`
 ```sql
@@ -278,7 +292,8 @@ leggendo suggerimenti "da fare" più vecchi di questa sezione, sono superati):
 - shadcn/ui, TanStack Query, react-router-dom, i18next (`src/i18n/locales/it.ts`) configurati
 - supabase-js client in `src/lib/supabase.ts`
 - **Auth reale**: `useAuth` collegato a `supabase.auth.getSession` + `onAuthStateChange`,
-  `AuthGuard`, solo Google OAuth (niente più magic link/route `/auth/callback` per OTP)
+  `AuthGuard`, solo Google OAuth (magic link rimosso dal codice). `/auth/callback` resta: è il
+  `redirectTo` di Google OAuth
 - **PWA**: manifest configurato (nome corretto "Shelfy", non più "Reading Tracker"), icone reali
   in `public/` (`pwa-192x192.png`, `pwa-512x512.png`, `apple-touch-icon.png`)
 - **Data layer reale** in `src/api/` — mock sostituiti con chiamate Supabase per
@@ -298,21 +313,21 @@ correggi questa sezione di conseguenza invece di fidarti ciecamente.
 
 - **Import Goodreads**: fatto — non come bottom sheet ma come pagina dedicata
   `src/pages/GoodreadsImportPage/` (header, preview dati, stato importazione, gestione errori,
-  risultato finale), raggiungibile da `ImportButton` in `ProfilePage`. È predisposto anche un
-  secondo import da **StoryGraph** (icona + entry i18n già presenti in `ImportButton`), ma senza
-  logica dedicata verificata — probabilmente solo un placeholder per ora, da confermare.
+  risultato finale), raggiungibile da `ImportButton` in `ProfilePage`. L'import da StoryGraph
+  non è più previsto: icona e stringa i18n sono state rimosse.
+- **Obiettivi di lettura con badge**: fatto (`GoalsPage`, `GoalOnboardingPage`, `BadgesPage`).
 
 ### Sviluppi futuri (post-MVP)
 
+**In corso — Scaffali a mensola** (DESIGN.md §16), a fasi:
+1. Vista mensola con dorsi generati, temi, crea/modifica/elimina, aggiunta libri — fatto
+2. Riordino drag & drop (RPC `reorder_shelf`) e rimozione dallo scaffale
+3. Foto del dorso (bucket `spines`, pipeline immagine lato client, URL firmati)
+4. Elementi decorativi ed esportazione della mensola come immagine
+
 In ordine di priorità non definito — da discutere quando si riprende in mano il progetto:
 
-1. **Obiettivi di lettura con badge** — reading goals (es. libri/anno, pagine/settimana) con
-   achievement da sbloccare
-2. **Note e citazioni per libro** — appunti e passaggi salvabili legati a un `library_item`
-3. **Scaffali personalizzati** — l'idea "malsana" di scaffali custom oltre a quelli base
-   (dettagli da definire, intenzionalmente rimandata)
-4. **Import StoryGraph** — da verificare se è solo un placeholder UI (icona + stringa i18n) o se
-   c'è già logica dietro; se manca, replicare il pattern di `GoodreadsImportPage`
+1. **Note e citazioni per libro** — appunti e passaggi salvabili legati a un `library_item`
 
 ---
 
@@ -321,7 +336,7 @@ In ordine di priorità non definito — da discutere quando si riprende in mano 
 https://www.figma.com/design/IVLzqb8RfIYj4cchHtR1I1
 
 Schermate disponibili (nell'ordine del file):
-- **0 · Login** — sfondo pesca, Google + magic link, feature pill
+- **0 · Login** — sfondo pesca, Google + magic link (il magic link non è più nell'app), feature pill
 - **1 · Libreria** — banner "Continua a leggere" + swipe + griglia copertine
 - **2 · Cerca** — ricerca testuale/ISBN/scan, lista risultati con "Aggiungi"
 - **2b · Aggiungi libro** — bottom sheet su schermata Cerca
@@ -339,8 +354,8 @@ Schermate disponibili (nell'ordine del file):
   autenticato, prima sospetta la RLS (policy mancante o sbagliata) non il codice.
 - **QueryKey con userId**: ogni queryKey include l'userId per evitare cache condivisa tra
   utenti diversi sullo stesso device: `['library', userId]`, `['shelves', userId]`, ecc.
-- **Copertine**: arrivano come URL da Google Books / Open Library. Non usare Supabase Storage
-  (non necessario nell'MVP).
+- **Copertine**: arrivano come URL da Google Books / Open Library. Supabase Storage è usato
+  solo per le foto dei dorsi (bucket privato `spines`).
 - **Tema**: persistito in `localStorage['rt.theme']`, default `auto` (segue sistema).
   Applicato come classe `.dark` su `<html>`.
 - **Safe area iOS** (PWA): usare `env(safe-area-inset-top/bottom)` per bottom nav e status
