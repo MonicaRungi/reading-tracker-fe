@@ -14,10 +14,14 @@ import GoalOnboardingPage from "@/pages/GoalOnboardingPage";
 import BadgesPage from "@/pages/BadgesPage";
 import NotificationsPage from "@/pages/NotificationsPage";
 import GoalsPage from "@/pages/GoalsPage";
+import ShelvesPage from "@/pages/ShelvesPage";
+import ShelfDetailPage from "@/pages/ShelfDetailPage";
 import { useTheme } from "./hooks/useTheme";
+import { useScrollRestoration } from "./hooks/useScrollRestoration";
 
 function App() {
   useTheme();
+  useScrollRestoration();
 
   return (
     <Routes>
@@ -29,6 +33,8 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/shelves" element={<ShelvesPage />} />
+          <Route path="/shelves/:shelfId" element={<ShelfDetailPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/book/:id" element={<BookDetailPage />} />
           <Route

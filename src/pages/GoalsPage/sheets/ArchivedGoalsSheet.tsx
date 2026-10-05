@@ -3,7 +3,7 @@ import type { ReadingGoal } from "@/api/goals";
 import { Sheet, SheetTitle } from "@/components/ui/sheet";
 import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { formatDayMonth } from "@/lib/format";
-import { SecondaryGoalIcon } from "./components/SecondaryGoalIcon";
+import { SecondaryGoalIcon } from "../components/SecondaryGoalIcon";
 
 export function ArchivedGoalsSheet({
   open,

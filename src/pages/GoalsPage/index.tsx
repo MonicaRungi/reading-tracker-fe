@@ -11,10 +11,10 @@ import { PrimaryGoalCard } from "./components/PrimaryGoalCard";
 import { SecondaryGoalCard } from "./components/SecondaryGoalCard";
 import { RenewalPrompt } from "./components/RenewalPrompt";
 import { ArchivedGoalsRow } from "./components/ArchivedGoalsRow";
-import { RenewGoalSheet } from "./RenewGoalSheet";
-import { SecondaryGoalsSheet } from "./SecondaryGoalsSheet";
-import { EditGoalTargetSheet } from "./EditGoalTargetSheet";
-import { ArchivedGoalsSheet } from "./ArchivedGoalsSheet";
+import { RenewGoalSheet } from "./sheets/RenewGoalSheet";
+import { SecondaryGoalsSheet } from "./sheets/SecondaryGoalsSheet";
+import { EditGoalTargetSheet } from "./sheets/EditGoalTargetSheet";
+import { ArchivedGoalsSheet } from "./sheets/ArchivedGoalsSheet";
 
 export default function GoalsPage() {
   const { t } = useTranslation();

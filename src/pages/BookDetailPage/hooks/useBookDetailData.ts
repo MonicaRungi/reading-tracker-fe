@@ -13,6 +13,7 @@ import {
   deleteReminder,
   getReminderForBook,
 } from "@/api/releaseReminders";
+import { removeSpineFile } from "@/api/spines";
 import { useAuth } from "@/hooks/useAuth";
 import { upcomingReleaseDate } from "@/lib/releaseDate";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
@@ -21,6 +22,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useSpineCapture } from "./useSpineCapture";
 
 export function useBookDetailData() {
   const { id } = useParams<{ id: string }>();
@@ -43,6 +45,7 @@ export function useBookDetailData() {
   });
 
   const item = items.find((i) => i.id === id);
+  const spine = useSpineCapture(item);
 
   // --- Promemoria di uscita (solo libri con data completa nel futuro) ------
   const releaseDate = upcomingReleaseDate(item?.book.published_date);
@@ -133,10 +136,19 @@ export function useBookDetailData() {
   });
 
   const { mutate: mutateDelete, isPending: isDeleting } = useMutation({
-    mutationFn: () => deleteLibraryItem(id!),
+    mutationFn: async () => {
+      // prima la foto del dorso: dopo, nessuna riga la referenzierebbe più
+      if (item?.spine_path) await removeSpineFile(item.spine_path);
+      await deleteLibraryItem(id!);
+    },
     onSuccess: async () => {
-      await invalidate();
-      navigate(-1); // torna alla libreria dopo la cancellazione
+      await Promise.all([
+        invalidate(),
+        // il libro sparisce anche dagli scaffali (shelf_items in cascata)
+        queryClient.invalidateQueries({ queryKey: ["shelves", user?.id] }),
+        queryClient.invalidateQueries({ queryKey: ["shelf", user?.id] }),
+      ]);
+      navigate(-1); // torna alla pagina precedente (libreria o scaffale)
     },
     onError: () => toast.error("Errore nella rimozione del libro"),
   });
@@ -159,8 +171,9 @@ export function useBookDetailData() {
       pageCountInput,
       releaseDate,
       hasReminder: Boolean(reminder),
+      spine: spine.data,
     },
-    ui: { progressInput, showDatePicker, showMenu },
+    ui: { progressInput, showDatePicker, showMenu, spine: spine.ui },
     actions: {
       goBack: () => navigate(-1),
       updateStatus: mutateStatus,
@@ -182,6 +195,7 @@ export function useBookDetailData() {
       isUpdatingProgress,
       isRating,
       isDeleting,
+      spine: spine.actions,
     },
   };
 }

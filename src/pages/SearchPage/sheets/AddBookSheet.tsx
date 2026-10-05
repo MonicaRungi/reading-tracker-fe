@@ -5,9 +5,9 @@ import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { Button } from "@/components/ui/button";
 import type { BookMeta } from "@/api/books";
 import type { ReadingStatus } from "@/api/library";
-import { SelectedBookSummary } from "./components/SelectedBookSummary";
-import { BookMetaDetails } from "./components/BookMetaDetails";
-import { ReadingStatusPicker } from "./components/ReadingStatusPicker";
+import { SelectedBookSummary } from "../components/SelectedBookSummary";
+import { BookMetaDetails } from "../components/BookMetaDetails";
+import { ReadingStatusPicker } from "../components/ReadingStatusPicker";
 import { ReleaseReminderCard } from "@/components/shared/ReleaseReminderCard";
 
 interface AddBookSheetProps {

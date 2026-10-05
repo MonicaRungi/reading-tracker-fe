@@ -11,9 +11,12 @@ import { ReadingDates } from "./components/ReadingDates";
 import { ProgressSection } from "./components/ProgressSection";
 import { RatingSection } from "./components/RatingSection";
 import { StatusCta } from "./components/StatusCta";
-import { BookMenuSheet } from "./components/BookMenuSheet";
-import { DatePickerSheet } from "./components/DatePickerSheet";
+import { BookMenuSheet } from "./sheets/BookMenuSheet";
+import { DatePickerSheet } from "./sheets/DatePickerSheet";
 import { ReleaseReminderCard } from "@/components/shared/ReleaseReminderCard";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { SpineSection } from "./components/SpineSection";
+import { SpineCaptureSheet } from "./sheets/SpineCaptureSheet";
 import { useEffect } from "react";
 
 export default function BookDetailPage() {
@@ -62,7 +65,17 @@ export default function BookDetailPage() {
       />
 
       <div className={cn("flex-1 space-y-5 px-4 pb-8", showCta && "pb-28")}>
-        <BookHero item={item} />
+        <BookHero
+          item={item}
+          spine={
+            <SpineSection
+              item={item}
+              spineUrl={data.spine.spineUrl}
+              onOpen={actions.spine.open}
+              onPhotoError={actions.spine.refreshUrls}
+            />
+          }
+        />
 
         {!item.book.isbn13 && <IncompleteDataBadge />}
 
@@ -136,6 +149,41 @@ export default function BookDetailPage() {
           actions.deleteItem();
           actions.setShowMenu(false);
         }}
+      />
+
+      <SpineCaptureSheet
+        open={ui.spine.isOpen}
+        step={ui.spine.step}
+        hasPhoto={data.spine.hasPhoto}
+        photo={data.spine.photo}
+        quad={data.spine.quad}
+        processed={data.spine.processed}
+        preset={ui.spine.preset}
+        showBlurWarning={ui.spine.showBlurWarning}
+        isLoadingPhoto={ui.spine.isLoadingPhoto}
+        isProcessing={ui.spine.isProcessing}
+        isSaving={ui.spine.isSaving}
+        onClose={actions.spine.close}
+        onPickFile={actions.spine.pickFile}
+        onQuadChange={actions.spine.setQuad}
+        onRotateLeft={actions.spine.rotateLeft}
+        onRotateRight={actions.spine.rotateRight}
+        onProcess={actions.spine.processCrop}
+        onPresetChange={actions.spine.setPreset}
+        onAcceptBlur={actions.spine.acceptBlur}
+        onRetake={actions.spine.retake}
+        onSave={actions.spine.save}
+        onRemove={actions.spine.askRemove}
+      />
+
+      <ConfirmDialog
+        open={ui.spine.confirmRemove}
+        onOpenChange={actions.spine.setConfirmRemove}
+        title={t("spine.remove.title")}
+        description={t("spine.remove.description")}
+        confirmLabel={t("spine.remove.confirm")}
+        isPending={ui.spine.isRemoving}
+        onConfirm={actions.spine.confirmRemove}
       />
 
       <DatePickerSheet

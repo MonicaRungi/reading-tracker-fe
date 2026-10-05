@@ -3,7 +3,7 @@ import { useSearchData } from "./hooks/useSearchData";
 import { SearchHeader } from "./components/SearchHeader";
 import { BarcodeScanner } from "./components/BarcodeScanner";
 import { SearchResults } from "./components/SearchResults";
-import { AddBookSheet } from "./AddBookSheet";
+import { AddBookSheet } from "./sheets/AddBookSheet";
 import { Button } from "@/components/ui/button";
 import { Keyboard } from "lucide-react";
 

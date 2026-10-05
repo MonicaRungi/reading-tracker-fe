@@ -5,7 +5,7 @@ import { BackHeader } from "@/components/shared/BackHeader";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { useBadgesData } from "./hooks/useBadgesData";
 import { AllBadgesSection } from "./components/AllBadgesSection";
-import { FeaturedBadgesSheet } from "./FeaturedBadgesSheet";
+import { FeaturedBadgesSheet } from "./sheets/FeaturedBadgesSheet";
 
 export default function BadgesPage() {
   const { t } = useTranslation();

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Sheet } from "@/components/ui/sheet";
 import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
-import { MenuAction } from "./MenuAction";
+import { MenuAction } from "@/components/shared/MenuAction";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 

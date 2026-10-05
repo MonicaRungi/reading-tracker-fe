@@ -18,7 +18,8 @@ src/
   pages/<Name>Page/
     index.tsx              # solo composizione JSX — vedi "Pages contain no logic"
     schema.ts              # schema di validazione, se la pagina possiede un form
-    <Entity>Sheet.tsx      # sheet/dialog page-local (es. AddBookSheet, StatusSheet)
+    components/            # componenti page-local (es. BookHero, ProgressSection)
+    sheets/                # sheet/dialog page-local (es. AddBookSheet, BookMenuSheet)
     hooks/
       use<Name>Data.ts     # tutta la logica data/state per questa pagina
   lib/                     # utility cross-cutting (format.ts, barcode.ts, ecc.)
@@ -55,7 +56,8 @@ page/component — estrailo nel suo file, anche se usato solo da quella pagina.
 Regola di placement — **è riusabile in ≥2 pagine/feature?**
 
 - Sì → `components/shared/<Component>.tsx`
-- No → page-local, sibling all'`index.tsx` della pagina
+- No → page-local: gli sheet/dialog in `pages/<Name>Page/sheets/`, gli altri componenti in
+  `pages/<Name>Page/components/`
 
 Quando un componente page-local è necessario in una seconda pagina, promuovilo a
 `components/shared/` — non duplicarlo.
@@ -67,7 +69,8 @@ Quando un componente page-local è necessario in una seconda pagina, promuovilo 
 - `components/shared/` — componenti domain-agnostic riusabili (BookCard, StatusBadge,
   RatingStars, ProgressBar, ecc.). Estendi un componente shared esistente prima di crearne uno nuovo.
 - `pages/<Name>Page/` — tutto ciò che è specifico a una pagina: composizione (`index.tsx`),
-  schema di validazione (`schema.ts`), sheet/dialog page-local, e la cartella `hooks/`.
+  schema di validazione (`schema.ts`), componenti page-local (`components/`), sheet/dialog
+  page-local (`sheets/`) e la cartella `hooks/`.
 
 ## Data layer convention (`src/api/`)
 
@@ -90,7 +93,7 @@ le firme e i tipi restano invariati, così pages, hooks e mutations non toccano 
 
 - Cartella page: `<Name>Page/` (PascalCase, suffisso `Page`)
 - Page data hook: `hooks/use<Name>Data.ts`
-- Sheet/dialog page-local: `<Entity>Sheet.tsx` o `<Entity>Dialog.tsx`
+- Sheet/dialog page-local: `sheets/<Entity>Sheet.tsx` o `sheets/<Entity>Dialog.tsx`
 - Cartella dominio API: lowercase (`books/`, `library/`, `shelves/`)
 - Componente shared: PascalCase, nessun prefisso page (es. `BookCard.tsx`, `StatusBadge.tsx`)
 

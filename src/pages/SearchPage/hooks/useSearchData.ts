@@ -12,6 +12,7 @@ import type { LibraryItem, ReadingStatus } from "@/api/library";
 import { createLibraryMatcher } from "@/lib/bookMatch";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
 import { listShelves, createShelf } from "@/api/shelves";
+import { DEFAULT_SHELF_THEME } from "@/lib/shelfThemes";
 import { createReminder } from "@/api/releaseReminders";
 import { upcomingReleaseDate } from "@/lib/releaseDate";
 
@@ -106,6 +107,10 @@ export function useSearchData() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["library", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["stats", user?.id] });
+      if (selectedShelfIds.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ["shelves", user?.id] });
+        queryClient.invalidateQueries({ queryKey: ["shelf", user?.id] });
+      }
       void invalidateProgressQueries(queryClient, user?.id);
       toast.success(t("search.bookAdded"));
       closeSheet();
@@ -114,7 +119,11 @@ export function useSearchData() {
   });
 
   const { mutate: addShelf, isPending: isCreatingShelf } = useMutation({
-    mutationFn: () => createShelf(user!.id, newShelfName.trim()),
+    mutationFn: () =>
+      createShelf(user!.id, {
+        name: newShelfName.trim(),
+        color_theme: DEFAULT_SHELF_THEME,
+      }),
     onSuccess: (shelf) => {
       queryClient.invalidateQueries({ queryKey: ["shelves", user?.id] });
       setSelectedShelfIds((prev) => [...prev, shelf.id]);

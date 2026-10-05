@@ -1,4 +1,4 @@
-import { Home, Search, User } from "lucide-react";
+import { Home, Library, Search, User } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { to: "/library", icon: Home, labelKey: "nav.library" },
   { to: "/search", icon: Search, labelKey: "nav.search" },
+  { to: "/shelves", icon: Library, labelKey: "nav.shelves" },
   { to: "/profile", icon: User, labelKey: "nav.profile" },
 ] as const;
 
