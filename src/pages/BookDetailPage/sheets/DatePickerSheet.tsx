@@ -5,6 +5,11 @@ import { Sheet } from "@/components/ui/sheet";
 import { BottomSheetContent } from "@/components/shared/BottomSheetContent";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { CalendarHeader } from "../components/CalendarHeader";
+import { MonthGrid } from "../components/MonthGrid";
+import { YearGrid } from "../components/YearGrid";
+import { useMonthYearPicker } from "../hooks/useMonthYearPicker";
 
 interface DatePickerSheetProps {
   open: "started" | "finished" | null;
@@ -34,9 +39,13 @@ export function DatePickerSheet({
   const [draft, setDraft] = useState<Date | undefined | null>(null);
   const selected =
     draft !== null ? draft : currentValue ? new Date(currentValue) : undefined;
+  const picker = useMonthYearPicker(selected);
+  const { shownMonth, firstYear } = picker.data;
+  const { view } = picker.ui;
 
   function close() {
     setDraft(null);
+    picker.actions.reset();
     onClose();
   }
 
@@ -59,23 +68,67 @@ export function DatePickerSheet({
           {label}
         </h2>
 
-        <Calendar
-          key={open}
-          mode="single"
-          selected={selected}
-          onSelect={setDraft}
-          defaultMonth={selected}
-          locale={it}
-          disabled={
-            open === "finished" && startedAt
-              ? { before: new Date(startedAt) }
-              : undefined
-          }
-          classNames={{
-            selected: "bg-primary text-primary-foreground hover:bg-primary focus:bg-primary",
-            today: "text-primary font-semibold",
-          }}
+        <CalendarHeader
+          month={shownMonth}
+          isPickerOpen={view !== "days"}
+          onPrevious={picker.actions.previousMonth}
+          onNext={picker.actions.nextMonth}
+          onTogglePicker={picker.actions.togglePicker}
         />
+
+        {/* mesi e anni coprono i giorni senza cambiare l'altezza dello sheet */}
+        <div className="relative mb-4">
+          <div
+            inert={view !== "days"}
+            className={cn("transition-opacity duration-200", view !== "days" && "opacity-0")}
+          >
+            <Calendar
+              mode="single"
+              selected={selected}
+              onSelect={setDraft}
+              month={shownMonth}
+              onMonthChange={picker.actions.goToMonth}
+              hideNavigation
+              locale={it}
+              disabled={
+                open === "finished" && startedAt
+                  ? { before: new Date(startedAt) }
+                  : undefined
+              }
+              className="p-0"
+              classNames={{
+                month_caption: "hidden",
+                day: "group/day relative aspect-square h-full w-full rounded-full p-0 text-center select-none [&>button]:rounded-full",
+                selected: "bg-primary text-primary-foreground hover:bg-primary focus:bg-primary",
+                today: "text-primary font-semibold",
+              }}
+            />
+          </div>
+
+          {view !== "days" && (
+            <div
+              key={view}
+              className="absolute inset-x-0 top-0 animate-in fade-in zoom-in-95 duration-200"
+            >
+              {view === "months" ? (
+                <MonthGrid
+                  year={shownMonth.getFullYear()}
+                  selectedMonth={shownMonth.getMonth()}
+                  onChooseMonth={picker.actions.chooseMonth}
+                  onOpenYears={picker.actions.openYears}
+                />
+              ) : (
+                <YearGrid
+                  firstYear={firstYear}
+                  selectedYear={shownMonth.getFullYear()}
+                  onChooseYear={picker.actions.chooseYear}
+                  onPrevious={picker.actions.previousYears}
+                  onNext={picker.actions.nextYears}
+                />
+              )}
+            </div>
+          )}
+        </div>
 
         <Button
           onClick={handleSave}

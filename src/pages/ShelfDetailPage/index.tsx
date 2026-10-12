@@ -102,9 +102,11 @@ export default function ShelfDetailPage() {
         isFetchingNextPage={data.addBooks.isFetchingNextPage}
         query={ui.addBooks.query}
         selectedIds={ui.addBooks.selectedIds}
+        areAllSelected={ui.addBooks.areAllSelected}
         isAdding={ui.addBooks.isAdding}
         onQueryChange={actions.addBooks.setQuery}
         onToggle={actions.addBooks.toggle}
+        onToggleAll={actions.addBooks.toggleAll}
         onLoadMore={actions.addBooks.loadMore}
         onSubmit={actions.addBooks.submit}
         onClose={actions.addBooks.close}

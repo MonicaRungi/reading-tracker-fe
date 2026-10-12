@@ -19,9 +19,11 @@ export function AddBooksToShelfSheet({
   isFetchingNextPage,
   query,
   selectedIds,
+  areAllSelected,
   isAdding,
   onQueryChange,
   onToggle,
+  onToggleAll,
   onLoadMore,
   onSubmit,
   onClose,
@@ -34,9 +36,11 @@ export function AddBooksToShelfSheet({
   isFetchingNextPage: boolean;
   query: string;
   selectedIds: ReadonlySet<string>;
+  areAllSelected: boolean;
   isAdding: boolean;
   onQueryChange: (query: string) => void;
   onToggle: (libraryItemId: string) => void;
+  onToggleAll: () => void;
   onLoadMore: () => void;
   onSubmit: () => void;
   onClose: () => void;
@@ -62,6 +66,19 @@ export function AddBooksToShelfSheet({
             placeholder={t("library.searchPlaceholder")}
           />
         </div>
+
+        {/* agisce sui libri visibili: con la ricerca, solo su quelli trovati */}
+        {!isLoading && options.length > 1 && (
+          <div className="-mt-1 flex justify-end pb-1">
+            <button
+              type="button"
+              onClick={onToggleAll}
+              className="rounded-lg px-2 py-1 text-[14px] font-medium text-primary transition-colors active:bg-secondary focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              {areAllSelected ? t("shelves.addBooks.deselectAll") : t("shelves.addBooks.selectAll")}
+            </button>
+          </div>
+        )}
 
         {/* overflow-x-hidden: l'area di tocco del checkbox (after:-inset-x-3)
             sporgerebbe a destra creando uno scroll orizzontale */}

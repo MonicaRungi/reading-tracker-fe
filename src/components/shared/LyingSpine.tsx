@@ -38,19 +38,14 @@ export function LyingSpine({
   if (spine_ratio) {
     const thickness = Math.round(height * spine_ratio);
     return (
-      // la foto del dorso è verticale: si ruota di 90° dentro un riquadro orizzontale
-      <div
-        className={cn("relative shrink-0 overflow-hidden rounded-[1px_3px_3px_1px]", className)}
-        style={{ width: height, height: thickness }}
-      >
-        <SpinePhoto
-          url={spine_url}
-          width={thickness}
-          height={height}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90"
-          onError={onPhotoError}
-        />
-      </div>
+      <SpinePhoto
+        url={spine_url}
+        width={height}
+        height={thickness}
+        lying
+        className={className}
+        onError={onPhotoError}
+      />
     );
   }
 
