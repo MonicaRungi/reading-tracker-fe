@@ -419,7 +419,9 @@ con i libri in piedi mostrati come dorsi.
        con i lati del ritaglio e un mirino, sopra il dito o di lato vicino al bordo alto.
     3. **Scegli la resa**: titolo centrato, tre card (Originale / Migliorata predefinita /
        Vivida; quella scelta ha bordo corallo e spunta), "Salva il dorso". Se la foto sembra
-       sfocata, al posto del pulsante compare l'avviso con "Rifai" / "Usa comunque".
+       sfocata, al posto del pulsante compare l'avviso con "Rifai" / "Usa comunque". La sfocatura
+       si misura con il metodo "re-blur" (`lib/spine/quality.ts`: 0 nitida … 1 sfocata, soglia 0,4),
+       che non scambia la grana delle foto con poca luce né il contrasto alto per nitidezza.
   - **Pipeline** (`lib/spine/`, in un worker con ripiego sul main thread): raddrizzamento
     prospettico, miglioramento che non cambia la tinta (bilanciamento, esposizione e punti di
     nero/bianco stimati sulla foto intera; livelli, gamma e curva sulla sola luminanza),
