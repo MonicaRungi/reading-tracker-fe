@@ -1,56 +1,54 @@
-import { useState } from "react";
+import type { CSSProperties } from "react";
+import { useImageLoad } from "@/hooks/useImageLoad";
 import { cn } from "@/lib/utils";
 
+type SpinePhotoStyle = CSSProperties & {
+  "--spine-width": string;
+  "--spine-height": string;
+  "--spine-image"?: string;
+};
+
 /**
- * Foto del dorso con lo spazio già riservato: segnaposto finché l'URL
- * firmato non arriva o se l'immagine non si carica (mai l'icona "immagine
- * rotta"). Su errore chiede un URL nuovo con `onError`.
+ * Foto del dorso come sfondo (utility `spine-photo` / `spine-photo-lying` di
+ * index.css): niente <img>, che su iOS con la pressione lunga si ingrandisce o
+ * si seleziona, e le stesse luci e ombre del dorso generato. Lo spazio è
+ * riservato subito: segnaposto finché l'URL firmato non arriva o se
+ * l'immagine non si carica; su errore chiede un URL nuovo con `onError`.
+ * `width`/`height` sono quelli del riquadro: per il libro sdraiato la lunghezza
+ * e lo spessore, la foto si ruota da sé.
  */
 export function SpinePhoto({
   url,
   width,
   height,
+  lying = false,
   className,
   onError,
 }: {
   url: string | null | undefined;
   width: number;
   height: number;
+  lying?: boolean;
   className?: string;
   onError?: () => void;
 }) {
-  // l'errore vale per l'URL che l'ha prodotto: uno nuovo si riprova
-  const [failedUrl, setFailedUrl] = useState<string | null>(null);
-  const size = { width, height };
-
-  if (!url || failedUrl === url) {
-    return (
-      <div
-        aria-hidden="true"
-        className={cn(
-          "shrink-0 animate-pulse rounded-[3px_3px_1px_1px] bg-[rgb(128_128_128/25%)]",
-          className,
-        )}
-        style={size}
-      />
-    );
-  }
+  const status = useImageLoad(url, onError);
+  const isLoaded = Boolean(url) && status === "loaded";
+  const style: SpinePhotoStyle = {
+    "--spine-width": `${width}px`,
+    "--spine-height": `${height}px`,
+    "--spine-image": isLoaded ? `url("${url}")` : undefined,
+  };
 
   return (
-    <img
-      src={url}
-      alt=""
-      loading="lazy"
-      decoding="async"
-      onError={() => {
-        setFailedUrl(url);
-        onError?.();
-      }}
+    <div
+      aria-hidden="true"
       className={cn(
-        "shrink-0 rounded-[3px_3px_1px_1px] object-cover shadow-[0_2px_3px_rgb(0_0_0/16%)]",
+        lying ? "spine-photo-lying" : "spine-photo",
+        !isLoaded && "animate-pulse",
         className,
       )}
-      style={size}
+      style={style}
     />
   );
 }

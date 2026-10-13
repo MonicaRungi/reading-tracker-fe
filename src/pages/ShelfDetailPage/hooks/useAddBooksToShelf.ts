@@ -52,6 +52,9 @@ export function useAddBooksToShelf({
     [libraryQuery.data, shelvedItemIds],
   );
 
+  // "Seleziona tutti" agisce sui libri visibili (filtrati dalla ricerca e già caricati)
+  const areAllSelected = options.length > 0 && options.every((item) => selectedIds.has(item.id));
+
   const add = useMutation({
     mutationFn: () => addBooksToShelf(shelfId, [...selectedIds]),
     onSuccess: async () => {
@@ -79,6 +82,7 @@ export function useAddBooksToShelf({
       isOpen,
       query,
       selectedIds,
+      areAllSelected,
       isAdding: add.isPending,
     },
     actions: {
@@ -94,6 +98,15 @@ export function useAddBooksToShelf({
           const next = new Set(prev);
           if (next.has(libraryItemId)) next.delete(libraryItemId);
           else next.add(libraryItemId);
+          return next;
+        }),
+      toggleAll: () =>
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          for (const item of options) {
+            if (areAllSelected) next.delete(item.id);
+            else next.add(item.id);
+          }
           return next;
         }),
       loadMore: () => void libraryQuery.fetchNextPage(),

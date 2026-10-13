@@ -14,6 +14,7 @@ export type ShelfItemDisplay = "spine" | "stack" | "cover"
 
 /** Un libro posato su uno scaffale, nell'ordine della mensola. */
 export interface ShelfBook {
+  item_type: "book"
   shelf_item_id: string
   position: number
   display: ShelfItemDisplay
@@ -22,7 +23,21 @@ export interface ShelfBook {
   }
 }
 
-/** Scaffale nell'elenco: conteggio + i primi libri per l'anteprima a mensola. */
+/**
+ * Una decorazione sulla mensola (pianta, calamaio, ...): si sposta e si toglie
+ * come un libro. `decor_key` è la chiave del catalogo in `lib/decor.ts`.
+ */
+export interface ShelfDecor {
+  item_type: "decor"
+  shelf_item_id: string
+  position: number
+  decor_key: string
+}
+
+/** Un elemento della mensola, nell'ordine dello scaffale. */
+export type ShelfEntry = ShelfBook | ShelfDecor
+
+/** Scaffale nell'elenco: conteggio + i primi libri per l'anteprima a mensola (solo libri). */
 export interface Shelf {
   id: string
   name: string
@@ -31,12 +46,12 @@ export interface Shelf {
   preview: ShelfBook[]
 }
 
-/** Scaffale aperto: tutti i libri, ordinati per `position`. */
+/** Scaffale aperto: tutti gli elementi (libri e decorazioni), ordinati per `position`. */
 export interface ShelfDetail {
   id: string
   name: string
   color_theme: ShelfTheme
-  books: ShelfBook[]
+  items: ShelfEntry[]
 }
 
 export interface ShelfInput {

@@ -72,10 +72,13 @@ export const SPINE_PIPELINE = {
   maxInputSide: 2000,
   /** Altezza del dorso raddrizzato (mai ingrandita oltre la risoluzione disponibile). */
   outputHeight: 1200,
-  /** Sotto questa varianza del Laplaciano la foto è considerata sfocata. */
-  blurThreshold: 60,
+  /**
+   * Sopra questa sfocatura (0 nitida … 1 molto sfocata, vedi quality.ts) la foto
+   * è considerata sfocata. Tarata il 13/10/2026: foto mossa reale 0,68; nitide 0,08–0,17.
+   */
+  blurThreshold: 0.4,
   /** Lato lungo della versione ridotta su cui si misura la nitidezza. */
-  blurSampleSide: 512,
+  blurSampleSide: 256,
   /** Limite del bucket `spines`. */
   maxBytes: 512 * 1024,
   /** Qualità iniziale e minima della compressione; si scende a passi di qualityStep. */

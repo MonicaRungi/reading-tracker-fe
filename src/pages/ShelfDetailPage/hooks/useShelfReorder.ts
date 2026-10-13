@@ -4,8 +4,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { DragEndEvent, DragMoveEvent, DragStartEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { toast } from "sonner";
-import { addBookToShelf, removeShelfItem, reorderShelf, setShelfItemDisplay } from "@/api/shelves";
-import type { ShelfBook, ShelfDetail, ShelfItemDisplay } from "@/api/shelves";
+import {
+  addBookToShelf,
+  addDecorToShelf,
+  removeShelfItem,
+  reorderShelf,
+  setShelfItemDisplay,
+} from "@/api/shelves";
+import type { ShelfBook, ShelfDetail, ShelfEntry, ShelfItemDisplay } from "@/api/shelves";
 import { getBooleanPreference, setBooleanPreference } from "@/lib/preferences";
 import { displayFromDropId, SHELF_DISPLAY_TAB_ID, SHELF_REMOVE_ZONE_ID } from "@/lib/shelfLayout";
 
@@ -39,25 +45,25 @@ function sameOrder(a: readonly string[], b: readonly string[]) {
   return a.length === b.length && a.every((id, i) => id === b[i]);
 }
 
-function withPositions(books: ShelfBook[]): ShelfBook[] {
-  return books.map((book, i) => ({ ...book, position: i + 1 }));
+function withPositions(items: ShelfEntry[]): ShelfEntry[] {
+  return items.map((item, i) => ({ ...item, position: i + 1 }));
 }
 
 /**
- * Riordino del dettaglio scaffale, senza modalità dedicata: un tap apre il
- * libro, la pressione lunga solleva il dorso. Durante il trascinamento l'ordine vive in `draftOrder`
+ * Riordino del dettaglio scaffale (libri e decorazioni), senza modalità
+ * dedicata: un tap apre il libro, la pressione lunga solleva l'elemento. Durante il trascinamento l'ordine vive in `draftOrder`
  * (riflusso dal vivo delle righe); al rilascio diventa ottimistico in cache e
- * parte una sola chiamata a reorder_shelf. Rilasciando sulla zona "rimuovi" il
- * libro esce dallo scaffale, con "Annulla".
+ * parte una sola chiamata a reorder_shelf. Rilasciando sulla zona "rimuovi"
+ * l'elemento esce dallo scaffale, con "Annulla".
  */
 export function useShelfReorder({
   userId,
   shelfId,
-  books,
+  items,
 }: {
   userId: string | undefined;
   shelfId: string;
-  books: ShelfBook[];
+  items: ShelfEntry[];
 }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -73,23 +79,30 @@ export function useShelfReorder({
   const lastSwapDelta = useRef<{ x: number; y: number } | null>(null);
   const ignoreClicksUntil = useRef(0);
 
-  const orderedBooks = useMemo(() => {
-    if (!draftOrder) return books;
-    const byId = new Map(books.map((book) => [book.shelf_item_id, book]));
+  const orderedItems = useMemo(() => {
+    if (!draftOrder) return items;
+    const byId = new Map(items.map((item) => [item.shelf_item_id, item]));
     return draftOrder.flatMap((id) => byId.get(id) ?? []);
-  }, [books, draftOrder]);
+  }, [items, draftOrder]);
 
   /** Aggiorna la cache dello scaffale e ritorna lo stato precedente per il rollback. */
-  async function updateCachedBooks(update: (books: ShelfBook[]) => ShelfBook[]) {
+  async function updateCachedItems(update: (items: ShelfEntry[]) => ShelfEntry[]) {
     await queryClient.cancelQueries({ queryKey: shelfKey });
     const previous = queryClient.getQueryData<ShelfDetail | null>(shelfKey);
     if (previous) {
       queryClient.setQueryData<ShelfDetail>(shelfKey, {
         ...previous,
-        books: withPositions(update(previous.books)),
+        items: withPositions(update(previous.items)),
       });
     }
     return previous;
+  }
+
+  /** Nome dell'elemento nei messaggi: titolo del libro o nome della decorazione. */
+  function labelOf(item: ShelfEntry) {
+    return item.item_type === "book"
+      ? item.library_item.book.title
+      : t(`shelves.decor.items.${item.decor_key}`);
   }
 
   function invalidateShelves() {
@@ -105,8 +118,8 @@ export function useShelfReorder({
     scope: { id: `shelf-order-${shelfId}` },
     mutationFn: (order: string[]) => reorderShelf(shelfId, order),
     onMutate: async (order) => {
-      const previous = await updateCachedBooks((current) => {
-        const byId = new Map(current.map((book) => [book.shelf_item_id, book]));
+      const previous = await updateCachedItems((current) => {
+        const byId = new Map(current.map((item) => [item.shelf_item_id, item]));
         return order.flatMap((id) => byId.get(id) ?? []);
       });
       setDraftOrder(null);
@@ -126,9 +139,12 @@ export function useShelfReorder({
 
   const undoRemove = useMutation({
     scope: { id: `shelf-order-${shelfId}` },
-    // il libro torna in coda, poi l'ordine precedente lo rimette al suo posto
-    mutationFn: async ({ removed, order }: { removed: ShelfBook; order: string[] }) => {
-      const newId = await addBookToShelf(shelfId, removed.library_item.id);
+    // l'elemento torna in coda, poi l'ordine precedente lo rimette al suo posto
+    mutationFn: async ({ removed, order }: { removed: ShelfEntry; order: string[] }) => {
+      const newId =
+        removed.item_type === "book"
+          ? await addBookToShelf(shelfId, removed.library_item.id)
+          : await addDecorToShelf(shelfId, removed.decor_key);
       await reorderShelf(
         shelfId,
         order.map((id) => (id === removed.shelf_item_id ? newId : id)),
@@ -140,24 +156,28 @@ export function useShelfReorder({
 
   const remove = useMutation({
     scope: { id: `shelf-order-${shelfId}` },
-    mutationFn: (book: ShelfBook) => removeShelfItem(book.shelf_item_id),
-    onMutate: async (book) => {
-      const previous = await updateCachedBooks((current) =>
-        current.filter((item) => item.shelf_item_id !== book.shelf_item_id),
+    mutationFn: (removed: ShelfEntry) => removeShelfItem(removed.shelf_item_id),
+    onMutate: async (removed) => {
+      const previous = await updateCachedItems((current) =>
+        current.filter((item) => item.shelf_item_id !== removed.shelf_item_id),
       );
       return { previous };
     },
-    onSuccess: (_data, book, context) => {
-      const order = context?.previous?.books.map((item) => item.shelf_item_id) ?? [];
-      toast.success(t("shelves.reorder.removed", { title: book.library_item.book.title }), {
+    onSuccess: (_data, removed, context) => {
+      const order = context?.previous?.items.map((item) => item.shelf_item_id) ?? [];
+      const message =
+        removed.item_type === "book"
+          ? t("shelves.reorder.removed", { title: labelOf(removed) })
+          : t("shelves.decor.removed", { name: labelOf(removed) });
+      toast.success(message, {
         duration: UNDO_DURATION_MS,
         action: {
           label: t("shelves.reorder.undo"),
-          onClick: () => undoRemove.mutate({ removed: book, order }),
+          onClick: () => undoRemove.mutate({ removed, order }),
         },
       });
     },
-    onError: (_error, _book, context) => {
+    onError: (_error, _removed, context) => {
       if (context?.previous) queryClient.setQueryData(shelfKey, context.previous);
       toast.error(t("common.error"));
     },
@@ -169,8 +189,10 @@ export function useShelfReorder({
     mutationFn: ({ book, display }: { book: ShelfBook; display: ShelfItemDisplay }) =>
       setShelfItemDisplay(book.shelf_item_id, display),
     onMutate: async ({ book, display }) => {
-      const previous = await updateCachedBooks((current) =>
-        current.map((item) => (item.shelf_item_id === book.shelf_item_id ? { ...item, display } : item)),
+      const previous = await updateCachedItems((current) =>
+        current.map((item) =>
+          item.item_type === "book" && item.shelf_item_id === book.shelf_item_id ? { ...item, display } : item,
+        ),
       );
       return { previous };
     },
@@ -191,7 +213,7 @@ export function useShelfReorder({
     lastSwapDelta.current = null;
     setIsDrawerOpen(false);
     setActiveId(String(event.active.id));
-    setDraftOrder(books.map((book) => book.shelf_item_id));
+    setDraftOrder(items.map((item) => item.shelf_item_id));
   }
 
   // Riflusso dal vivo: l'elemento trascinato prende subito il posto di quello
@@ -229,19 +251,21 @@ export function useShelfReorder({
     ignoreClicksUntil.current = Date.now() + CLICK_AFTER_DRAG_MS;
     setActiveId(null);
     setIsDrawerOpen(false);
+    const original = items.map((item) => item.shelf_item_id);
     const display = displayFromDropId(over?.id) as ShelfItemDisplay | null;
     if (display) {
-      // rilasciato su una posizione del cassetto: cambia come sta, non dove sta
-      setDraftOrder(null);
-      const book = books.find((item) => item.shelf_item_id === active.id);
-      if (book && book.display !== display) setDisplay.mutate({ book, display });
+      // rilasciato su una posizione del cassetto: resta dove è stato portato e
+      // cambia come sta. Le due mutation sono in fila: prima l'ordine.
+      if (draftOrder && !sameOrder(draftOrder, original)) reorder.mutate(draftOrder);
+      else setDraftOrder(null);
+      const book = items.find((entry) => entry.shelf_item_id === active.id);
+      if (book?.item_type === "book" && book.display !== display) setDisplay.mutate({ book, display });
       return;
     }
-    const original = books.map((book) => book.shelf_item_id);
     if (over?.id === SHELF_REMOVE_ZONE_ID) {
       setDraftOrder(null);
-      const book = books.find((item) => item.shelf_item_id === active.id);
-      if (book) remove.mutate(book);
+      const removed = items.find((item) => item.shelf_item_id === active.id);
+      if (removed) remove.mutate(removed);
       return;
     }
     if (draftOrder && !sameOrder(draftOrder, original)) reorder.mutate(draftOrder);
@@ -255,12 +279,12 @@ export function useShelfReorder({
     setDraftOrder(null);
   }
 
-  const activeBook = activeId
-    ? (books.find((book) => book.shelf_item_id === activeId) ?? null)
+  const activeItem = activeId
+    ? (items.find((item) => item.shelf_item_id === activeId) ?? null)
     : null;
 
   return {
-    data: { orderedBooks, activeBook },
+    data: { orderedItems, activeItem },
     ui: { activeId, showHint: !hintSeen, menu, isDrawerOpen },
     actions: {
       openMenu,

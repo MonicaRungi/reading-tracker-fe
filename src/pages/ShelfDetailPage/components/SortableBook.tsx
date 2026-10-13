@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
  * dorso per spostarlo. Niente transform di dnd-kit:
  * l'ordine cambia dal vivo e il layout a flusso sposta i dorsi; al posto
  * di quello trascinato resta un segnaposto tratteggiato (la copia segue il
- * dito nel DragOverlay). Tenuto premuto senza spostarlo apre il menu della
- * posizione (come anche il tasto destro). Da tastiera: Invio apre, Spazio sposta,
+ * dito nel DragOverlay); portato sulla linguetta a destra apre il cassetto delle
+ * posizioni (o tasto destro). Da tastiera: Invio apre, Spazio sposta,
  * tasto menu o Maiusc+F10 apre il menu della posizione.
  */
 export function SortableBook({

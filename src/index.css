@@ -513,6 +513,76 @@
   box-shadow: inset 0 1px 0 rgb(0 0 0 / 18%), inset 0 -1px 0 rgb(0 0 0 / 18%);
 }
 
+/*
+ * Dorso fotografato: la foto è lo sfondo (non un <img>, che su iOS con la
+ * pressione lunga si ingrandisce o si seleziona) e prende le stesse luci e
+ * ombre del dorso generato. Senza --spine-image resta il segnaposto grigio.
+ */
+@utility spine-photo {
+  position: relative;
+  flex: 0 0 var(--spine-width);
+  width: var(--spine-width);
+  height: var(--spine-height);
+  border-radius: 3px 3px 1px 1px;
+  background:
+    linear-gradient(
+      90deg,
+      rgb(255 255 255 / 10%),
+      transparent 18% 80%,
+      rgb(0 0 0 / 14%)
+    ),
+    var(--spine-image, none) center / cover no-repeat,
+    rgb(128 128 128 / 25%);
+  box-shadow:
+    1px 0 1px rgb(255 255 255 / 12%) inset,
+    -1px 0 1px rgb(0 0 0 / 14%) inset,
+    0 2px 3px rgb(0 0 0 / 16%);
+}
+
+/*
+ * Dorso fotografato di un libro sdraiato: la foto (verticale) è ruotata di 90°
+ * in ::before, la luce dall'alto come in spine-lying sta in ::after, sopra la foto.
+ * --spine-width è la lunghezza, --spine-height lo spessore.
+ */
+@utility spine-photo-lying {
+  position: relative;
+  flex: 0 0 var(--spine-width);
+  width: var(--spine-width);
+  height: var(--spine-height);
+  overflow: hidden;
+  border-radius: 1px 3px 3px 1px;
+  background: rgb(128 128 128 / 25%);
+  box-shadow: 0 2px 3px rgb(0 0 0 / 16%);
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--spine-height);
+    height: var(--spine-width);
+    translate: -50% -50%;
+    rotate: -90deg;
+    background: var(--spine-image, none) center / cover no-repeat;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      rgb(255 255 255 / 12%),
+      transparent 25% 75%,
+      rgb(0 0 0 / 16%)
+    );
+    box-shadow:
+      0 1px 1px rgb(255 255 255 / 12%) inset,
+      0 -1px 1px rgb(0 0 0 / 14%) inset;
+  }
+}
+
 @utility pt-safe {
   padding-top: env(safe-area-inset-top);
 }

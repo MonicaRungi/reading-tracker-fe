@@ -3,6 +3,7 @@ import type {
   Shelf,
   ShelfBook,
   ShelfDetail,
+  ShelfEntry,
   ShelfInput,
   ShelfItemDisplay,
   ShelfTheme,
@@ -11,13 +12,15 @@ import type {
 /** Libri mostrati nell'anteprima a mensola dell'elenco scaffali. */
 const PREVIEW_SIZE = 12
 
-const SHELF_BOOK_SELECT =
-  "id, position, display, library_item:library_items(id, spine_path, spine_ratio, book:books(id, title, authors, page_count, cover_url))" as const
+const SHELF_ITEM_SELECT =
+  "id, position, display, item_type, decor_key, library_item:library_items(id, spine_path, spine_ratio, book:books(id, title, authors, page_count, cover_url))" as const
 
 type ShelfItemRow = {
   id: string
   position: number
   display: string
+  item_type: string
+  decor_key: string | null
   library_item: ShelfBook["library_item"] | null
 }
 
@@ -29,20 +32,34 @@ type ShelfListRow = {
   preview: ShelfItemRow[]
 }
 
-// Gli elementi decorativi (Fase 4) non hanno library_item: qui servono solo i libri.
-function toShelfBooks(rows: ShelfItemRow[]): ShelfBook[] {
-  return rows.flatMap((row) =>
-    row.library_item
+function toShelfEntries(rows: ShelfItemRow[]): ShelfEntry[] {
+  return rows.flatMap((row): ShelfEntry[] => {
+    if (row.item_type === "decor" && row.decor_key) {
+      return [
+        {
+          item_type: "decor",
+          shelf_item_id: row.id,
+          position: row.position,
+          decor_key: row.decor_key,
+        },
+      ]
+    }
+    return row.library_item
       ? [
           {
+            item_type: "book",
             shelf_item_id: row.id,
             position: row.position,
             display: row.display as ShelfItemDisplay,
             library_item: row.library_item,
           },
         ]
-      : [],
-  )
+      : []
+  })
+}
+
+function onlyBooks(entries: ShelfEntry[]): ShelfBook[] {
+  return entries.filter((entry): entry is ShelfBook => entry.item_type === "book")
 }
 
 function toShelf(row: ShelfListRow): Shelf {
@@ -51,14 +68,17 @@ function toShelf(row: ShelfListRow): Shelf {
     name: row.name,
     color_theme: row.color_theme as ShelfTheme,
     book_count: row.book_count[0]?.count ?? 0,
-    preview: toShelfBooks(row.preview),
+    preview: onlyBooks(toShelfEntries(row.preview)),
   }
 }
 
 export async function listShelves(): Promise<Shelf[]> {
   const { data, error } = await supabase
     .from("shelves")
-    .select(`id, name, color_theme, book_count:shelf_items(count), preview:shelf_items(${SHELF_BOOK_SELECT})` as const)
+    .select(`id, name, color_theme, book_count:shelf_items(count), preview:shelf_items(${SHELF_ITEM_SELECT})` as const)
+    // conteggio e anteprima solo dei libri: le decorazioni non contano
+    .eq("book_count.item_type", "book")
+    .eq("preview.item_type", "book")
     .order("created_at", { ascending: true })
     .order("position", { referencedTable: "preview", ascending: true })
     .limit(PREVIEW_SIZE, { referencedTable: "preview" })
@@ -70,7 +90,7 @@ export async function listShelves(): Promise<Shelf[]> {
 export async function getShelf(shelfId: string): Promise<ShelfDetail | null> {
   const { data, error } = await supabase
     .from("shelves")
-    .select(`id, name, color_theme, items:shelf_items(${SHELF_BOOK_SELECT})` as const)
+    .select(`id, name, color_theme, items:shelf_items(${SHELF_ITEM_SELECT})` as const)
     .eq("id", shelfId)
     .order("position", { referencedTable: "items", ascending: true })
     .maybeSingle()
@@ -82,7 +102,7 @@ export async function getShelf(shelfId: string): Promise<ShelfDetail | null> {
     id: data.id,
     name: data.name,
     color_theme: data.color_theme as ShelfTheme,
-    books: toShelfBooks(data.items),
+    items: toShelfEntries(data.items),
   }
 }
 
@@ -138,6 +158,17 @@ export async function addBookToShelf(
   const { data, error } = await supabase
     .from("shelf_items")
     .insert({ shelf_id: shelfId, library_item_id: libraryItemId })
+    .select("id")
+    .single()
+  if (error) throw error
+  return data.id
+}
+
+/** Accoda una decorazione allo scaffale e ne ritorna lo shelf_item (serve anche all'"Annulla"). */
+export async function addDecorToShelf(shelfId: string, decorKey: string): Promise<string> {
+  const { data, error } = await supabase
+    .from("shelf_items")
+    .insert({ shelf_id: shelfId, item_type: "decor", decor_key: decorKey })
     .select("id")
     .single()
   if (error) throw error

@@ -34,6 +34,18 @@ export function displayFromDropId(id: string | number | undefined): string | nul
 const MOBILE_QUERY = "(width < 40rem)";
 
 /**
+ * Altezza di una riga fino al piano di sopra: il `min-height` di `shelf-books`
+ * (index.css, 168 px su mobile e 190 px oltre). Serve alle decorazioni appese,
+ * che vanno dal piano di sopra a quello sotto.
+ */
+export function shelfRowHeight(): number {
+  return window.matchMedia(MOBILE_QUERY).matches ? 168 : 190;
+}
+
+/** Spazio fra il piano di una riga e la riga sotto: deve combaciare con il gap di `shelf-board` (index.css). */
+export const SHELF_ROW_GAP = 28;
+
+/**
  * Padding orizzontale di una riga (`shelf-books` in index.css): lo spazio utile
  * per i dorsi è la larghezza interna del mobile meno questo valore per lato.
  */

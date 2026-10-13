@@ -229,7 +229,7 @@ Il bottom sheet di aggiunta è il punto unico per impostare stato e scaffali:
 | Aggiunta libro | `AddBookSheet` | bottom sheet con stati + scaffali |
 | Dorso libro | `Spine` | foto del dorso o dorso generato (§16) |
 | Crea/modifica scaffale | `ShelfFormSheet` | nome + selettore tema (`ShelfThemePicker`) |
-| Date picker | `DatePickerPopover` | Popover + Calendar di shadcn |
+| Date picker | `DatePickerSheet` | Calendar di shadcn in un bottom sheet; pillola "mese anno" che apre la griglia dei mesi (3×4) e da lì quella degli anni (12 per pagina); scegliere mese o anno torna ai giorni senza chiudere, si salva solo con Conferma |
 | Ricerca | `SearchBar` | campo unificato titolo/autore/ISBN |
 | Scanner barcode | `BarcodeScanner` | full-width viewfinder + scan line |
 | Grafico attività | `ActivityChart` | bar chart pagine/giorno o settimana |
@@ -414,9 +414,14 @@ con i libri in piedi mostrati come dorsi.
     2. **Ritaglia il dorso**: barra propria "Annulla · titolo · Avanti" al posto della X;
        "Annulla" torna alla tappa 1. Foto su fondo scuro con i 4 angoli (`SpineCropper`),
        "Ruota a sinistra" / "Ruota a destra" (90°, gli angoli tornano al rettangolo iniziale).
+       Gli angoli hanno un'area di tocco di 44 px; trascinandoli mantengono la distanza dal dito
+       (non saltano sotto il dito) e una lente rotonda (`CropLoupe`, 3×) mostra il punto ingrandito
+       con i lati del ritaglio e un mirino, sopra il dito o di lato vicino al bordo alto.
     3. **Scegli la resa**: titolo centrato, tre card (Originale / Migliorata predefinita /
        Vivida; quella scelta ha bordo corallo e spunta), "Salva il dorso". Se la foto sembra
-       sfocata, al posto del pulsante compare l'avviso con "Rifai" / "Usa comunque".
+       sfocata, al posto del pulsante compare l'avviso con "Rifai" / "Usa comunque". La sfocatura
+       si misura con il metodo "re-blur" (`lib/spine/quality.ts`: 0 nitida … 1 sfocata, soglia 0,4),
+       che non scambia la grana delle foto con poca luce né il contrasto alto per nitidezza.
   - **Pipeline** (`lib/spine/`, in un worker con ripiego sul main thread): raddrizzamento
     prospettico, miglioramento che non cambia la tinta (bilanciamento, esposizione e punti di
     nero/bianco stimati sulla foto intera; livelli, gamma e curva sulla sola luminanza),
@@ -427,9 +432,11 @@ con i libri in piedi mostrati come dorsi.
     vecchio; se il DB fallisce il file nuovo viene tolto. Eliminando un libro si toglie prima la
     sua foto. I file rimasti orfani li elimina la GitHub Action notturna.
   - **Visualizzazione**: URL firmati (1 h) in un'unica richiesta per pagina (`useSpineUrls`,
-    `staleTime` 50 min). `SpinePhoto` mostra un segnaposto della misura della foto finché l'URL
-    non arriva o se l'immagine non si carica; in quel caso chiede URL nuovi, al massimo una
-    volta al minuto.
+    `staleTime` 50 min). `SpinePhoto` mostra la foto come **sfondo CSS** (utility `spine-photo` /
+    `spine-photo-lying`), non come `<img>`: su iOS la pressione lunga non la ingrandisce né la
+    seleziona, e prende le stesse luci e ombre del dorso generato. Il caricamento lo segue
+    `useImageLoad`: segnaposto della misura della foto finché l'URL non arriva o se l'immagine non
+    si carica; in quel caso chiede URL nuovi, al massimo una volta al minuto.
 - **Elenco**: header con titolo, sottotitolo e pulsante "+" circolare; card con anteprima a
   mini-mensola (primi 12 libri, sempre come dorsi in piedi), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
   Dopo la creazione si apre il dettaglio dello scaffale.
@@ -438,7 +445,23 @@ con i libri in piedi mostrati come dorsi.
 - **Eliminazione**: `ConfirmDialog` con testo esplicito — i libri restano in libreria
   (`shelf_items` va in cascata, `library_items` no).
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
-  esclude i libri già presenti. Resta valido anche il percorso da `AddBookSheet`.
+  esclude i libri già presenti. "Seleziona tutti" / "Deseleziona tutti" (con almeno 2 libri)
+  agisce sui libri visibili, cioè quelli trovati dalla ricerca e già caricati. Resta valido anche il percorso da `AddBookSheet`.
+- **Decorazioni** (`shelf_items.item_type = 'decor'`, `decor_key`): oggetti illustrati (pianta,
+  cactus, candela, busto, …) dal catalogo `lib/decor.ts`; immagini WebP con trasparenza in
+  `src/assets/decor/`, a 3× l'altezza a schermo, con margini tagliati e aloni dello scontorno
+  ripuliti. Ogni voce ha l'altezza rispetto a un dorso in piedi e l'eventuale parte che sporge sotto
+  la base (es. foglie ricadenti, disegnate davanti al bordo del piano). Si aggiungono dal pulsante ✨
+  nell'header (sheet "Decorazioni", griglia 3 colonne, un tocco = in fondo alla mensola); si spostano
+  e si tolgono come i libri (con "Annulla"), ma non si aprono e stanno sempre sul piano: niente
+  cassetto delle posizioni (provato "Sopra i libri", tolto perché confondeva). Le decorazioni **appese**
+  (`hanging`, es. il filo di polaroid) sono alte quanto tutta la riga (`shelfRowHeight()`, uguale al
+  `min-height` di `shelf-books`) e agganciate in alto: il filo, che nell'immagine parte dal bordo
+  superiore, tocca il piano di sopra. Per i libri, rilasciando
+  sul cassetto si salva anche lo spostamento fatto nello stesso trascinamento.
+  Immagini come sfondo CSS (niente `<img>`: su iOS la pressione lunga lo ingrandirebbe). Non contano
+  nel numero di libri e non compaiono nell'anteprima dell'elenco. Una chiave non più in catalogo
+  resta nello scaffale (e nell'ordine) ma non si disegna.
 - **Posizione del libro** (`shelf_items.display`, per scaffale): `spine` in piedi (dorso),
   `stack` sdraiato, `cover` di fronte (copertina 2:3, o copertina generata con colore e titolo del
   dorso se manca). La mensola dispone **blocchi** (`lib/shelfUnits.ts`): un dorso, una copertina o

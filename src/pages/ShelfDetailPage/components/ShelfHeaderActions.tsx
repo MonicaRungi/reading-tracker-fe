@@ -1,15 +1,17 @@
-import { MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal, Plus, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
-/** Azioni a destra nell'header del dettaglio: aggiungi libri e menu ⋯. */
+/** Azioni a destra nell'header del dettaglio: aggiungi libri, aggiungi una decorazione e menu ⋯. */
 export function ShelfHeaderActions({
   shelfName,
   onAddBooks,
+  onAddDecor,
   onOpenMenu,
 }: {
   shelfName: string;
   onAddBooks: () => void;
+  onAddDecor: () => void;
   onOpenMenu: () => void;
 }) {
   const { t } = useTranslation();
@@ -24,6 +26,15 @@ export function ShelfHeaderActions({
         className="rounded-full text-primary"
       >
         <Plus className="size-5" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onAddDecor}
+        aria-label={t("shelves.decor.add")}
+        className="rounded-full text-primary"
+      >
+        <Sparkles className="size-5" />
       </Button>
       <Button
         variant="ghost"

@@ -29,7 +29,7 @@ export interface ProcessedSpine {
   height: number;
   /** larghezza / altezza: va in library_items.spine_ratio. */
   ratio: number;
-  /** Varianza del Laplaciano del dorso raddrizzato, prima del miglioramento. */
+  /** Sfocatura del dorso raddrizzato prima del miglioramento: 0 nitida … 1 molto sfocata. */
   blurScore: number;
   isBlurry: boolean;
   results: { preset: SpinePreset; image: ImageData }[];
@@ -146,8 +146,8 @@ export class SpineEngine {
       width,
       height,
       ratio: width / height,
-      blurScore: Math.round(score * 10) / 10,
-      isBlurry: score < SPINE_PIPELINE.blurThreshold,
+      blurScore: Math.round(score * 1000) / 1000,
+      isBlurry: score > SPINE_PIPELINE.blurThreshold,
       results,
       timings,
     };
