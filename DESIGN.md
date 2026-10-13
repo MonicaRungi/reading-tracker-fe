@@ -447,6 +447,21 @@ con i libri in piedi mostrati come dorsi.
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
   esclude i libri già presenti. "Seleziona tutti" / "Deseleziona tutti" (con almeno 2 libri)
   agisce sui libri visibili, cioè quelli trovati dalla ricerca e già caricati. Resta valido anche il percorso da `AddBookSheet`.
+- **Decorazioni** (`shelf_items.item_type = 'decor'`, `decor_key`): oggetti illustrati (pianta,
+  cactus, candela, busto, …) dal catalogo `lib/decor.ts`; immagini WebP con trasparenza in
+  `src/assets/decor/`, a 3× l'altezza a schermo, con margini tagliati e aloni dello scontorno
+  ripuliti. Ogni voce ha l'altezza rispetto a un dorso in piedi e l'eventuale parte che sporge sotto
+  la base (es. foglie ricadenti, disegnate davanti al bordo del piano). Si aggiungono dal pulsante ✨
+  nell'header (sheet "Decorazioni", griglia 3 colonne, un tocco = in fondo alla mensola); si spostano
+  e si tolgono come i libri (con "Annulla"), ma non si aprono e stanno sempre sul piano: niente
+  cassetto delle posizioni (provato "Sopra i libri", tolto perché confondeva). Le decorazioni **appese**
+  (`hanging`, es. il filo di polaroid) sono alte quanto tutta la riga (`shelfRowHeight()`, uguale al
+  `min-height` di `shelf-books`) e agganciate in alto: il filo, che nell'immagine parte dal bordo
+  superiore, tocca il piano di sopra. Per i libri, rilasciando
+  sul cassetto si salva anche lo spostamento fatto nello stesso trascinamento.
+  Immagini come sfondo CSS (niente `<img>`: su iOS la pressione lunga lo ingrandirebbe). Non contano
+  nel numero di libri e non compaiono nell'anteprima dell'elenco. Una chiave non più in catalogo
+  resta nello scaffale (e nell'ordine) ma non si disegna.
 - **Posizione del libro** (`shelf_items.display`, per scaffale): `spine` in piedi (dorso),
   `stack` sdraiato, `cover` di fronte (copertina 2:3, o copertina generata con colore e titolo del
   dorso se manca). La mensola dispone **blocchi** (`lib/shelfUnits.ts`): un dorso, una copertina o

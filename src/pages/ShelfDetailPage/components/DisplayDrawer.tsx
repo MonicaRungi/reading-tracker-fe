@@ -12,7 +12,8 @@ const OPTION_IDS = OPTIONS.map(displayDropId);
 /**
  * Durante il trascinamento: una linguetta sul bordo destro del mobile. Portandoci
  * il libro si apre il cassetto con le tre posizioni; rilasciandolo su una di
- * esse il libro cambia posizione (in piedi, sdraiato, di fronte).
+ * esse il libro cambia posizione (in piedi, sdraiato, di fronte). Le
+ * decorazioni non hanno il cassetto.
  */
 export function DisplayDrawer({
   isOpen,

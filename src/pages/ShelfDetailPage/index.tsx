@@ -11,6 +11,7 @@ import { ShelfBoard } from "./components/ShelfBoard";
 import { BookDisplayMenu } from "./components/BookDisplayMenu";
 import { ShelfHeaderActions } from "./components/ShelfHeaderActions";
 import { AddBooksToShelfSheet } from "./sheets/AddBooksToShelfSheet";
+import { AddDecorSheet } from "./sheets/AddDecorSheet";
 
 export default function ShelfDetailPage() {
   const { t } = useTranslation();
@@ -46,18 +47,19 @@ export default function ShelfDetailPage() {
     <div className="flex h-[calc(100svh-5rem-var(--safe-area-inset-top))] flex-col overflow-hidden">
       <BackHeader
         title={shelf.name}
-        subtitle={t("library.bookCount", { count: shelf.books.length })}
+        subtitle={t("library.bookCount", { count: data.bookCount })}
         onBack={actions.goToList}
         action={
           <ShelfHeaderActions
             shelfName={shelf.name}
             onAddBooks={actions.addBooks.open}
+            onAddDecor={actions.addDecor.open}
             onOpenMenu={actions.openShelfMenu}
           />
         }
       />
 
-      {shelf.books.length === 0 ? (
+      {data.isEmpty ? (
         <EmptyState
           size="lg"
           icon={Library}
@@ -70,12 +72,12 @@ export default function ShelfDetailPage() {
         <div className="flex min-h-0 flex-1 flex-col px-2 pb-4 pt-2">
           <ShelfBoard
             theme={shelf.color_theme}
-            books={data.reorder.orderedBooks}
-            activeBook={data.reorder.activeBook}
+            items={data.reorder.orderedItems}
+            activeItem={data.reorder.activeItem}
             isDrawerOpen={ui.reorder.isDrawerOpen}
             spineUrls={data.spineUrls}
             onPhotoError={actions.refreshSpineUrls}
-            showHint={ui.reorder.showHint && shelf.books.length > 1}
+            showHint={ui.reorder.showHint && shelf.items.length > 1}
             onOpenBook={actions.openBook}
             onOpenMenu={actions.reorder.openMenu}
             onDragStart={actions.reorder.dragStart}
@@ -110,6 +112,13 @@ export default function ShelfDetailPage() {
         onLoadMore={actions.addBooks.loadMore}
         onSubmit={actions.addBooks.submit}
         onClose={actions.addBooks.close}
+      />
+
+      <AddDecorSheet
+        open={ui.addDecor.isOpen}
+        addingKey={ui.addDecor.addingKey}
+        onAdd={actions.addDecor.add}
+        onClose={actions.addDecor.close}
       />
 
       <ShelfMenuSheet

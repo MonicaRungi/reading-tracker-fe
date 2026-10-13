@@ -20,7 +20,7 @@ import type {
 } from "@dnd-kit/core";
 import { SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import type { SortingStrategy } from "@dnd-kit/sortable";
-import type { ShelfBook, ShelfTheme } from "@/api/shelves";
+import type { ShelfBook, ShelfEntry, ShelfTheme } from "@/api/shelves";
 import type { SpineUrls } from "@/api/spines";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import {
@@ -30,9 +30,10 @@ import {
   SHELF_STACK_MAX_HEIGHT,
   shelfRowInset,
 } from "@/lib/shelfLayout";
+import { decorByKey } from "@/lib/decor";
 import { buildShelfUnits } from "@/lib/shelfUnits";
 import { cn } from "@/lib/utils";
-import { DraggedSpine } from "./DraggedSpine";
+import { DraggedItem } from "./DraggedItem";
 import { RemoveDropZone } from "./RemoveDropZone";
 import { DisplayDrawer } from "./DisplayDrawer";
 import { ReorderHint } from "./ReorderHint";
@@ -45,7 +46,7 @@ const noTransformStrategy: SortingStrategy = () => null;
 // I rettangoli dei dorsi cambiano a ogni riflusso: vanno rimisurati sempre.
 const MEASURING = { droppable: { strategy: MeasuringStrategy.Always } };
 
-// Invio apre il libro (vedi SortableSpine): da tastiera lo spostamento parte solo con Spazio.
+// Invio apre il libro (vedi SortableBook): da tastiera lo spostamento parte solo con Spazio.
 const KEYBOARD_CODES = { start: ["Space"], cancel: ["Escape"], end: ["Space", "Enter"] };
 
 /**
@@ -53,13 +54,14 @@ const KEYBOARD_CODES = { start: ["Space"], cancel: ["Escape"], end: ["Space", "E
  * passa alla mensola successiva. La larghezza disponibile è misurata sul
  * mobile, quindi il layout si adatta a rotazione e resize.
  * Con la pressione lunga i dorsi si trascinano (anche fra righe diverse);
- * durante il trascinamento compaiono in fondo la zona "rimuovi" e a destra la
- * linguetta del cassetto delle posizioni.
+ * durante il trascinamento compaiono in fondo la zona "rimuovi" e, per i
+ * libri, a destra la linguetta del cassetto delle posizioni. Le decorazioni
+ * stanno sulla mensola come i libri.
  */
 export function ShelfBoard({
   theme,
-  books,
-  activeBook,
+  items,
+  activeItem,
   isDrawerOpen,
   spineUrls,
   onPhotoError,
@@ -73,8 +75,8 @@ export function ShelfBoard({
   className,
 }: {
   theme: ShelfTheme;
-  books: ShelfBook[];
-  activeBook: ShelfBook | null;
+  items: ShelfEntry[];
+  activeItem: ShelfEntry | null;
   isDrawerOpen: boolean;
   spineUrls: SpineUrls;
   onPhotoError: () => void;
@@ -101,19 +103,23 @@ export function ShelfBoard({
     }),
   );
 
-  // i libri diventano blocchi (in piedi, copertine, pile), poi righe a flusso
+  // gli elementi diventano blocchi (in piedi, copertine, pile, decorazioni), poi righe a flusso
   const rows = useMemo(() => {
     const available = width - 2 * shelfRowInset();
     if (available <= 0) return [];
-    const units = buildShelfUnits(books, SHELF_SPINE_HEIGHT, SHELF_STACK_MAX_HEIGHT);
+    const units = buildShelfUnits(items, SHELF_SPINE_HEIGHT, SHELF_STACK_MAX_HEIGHT);
     return layoutShelfRows(units, (unit) => unit.width, available, SHELF_SPINE_GAP);
-  }, [books, width]);
+  }, [items, width]);
 
-  const itemIds = useMemo(() => books.map((book) => book.shelf_item_id), [books]);
+  const itemIds = useMemo(() => items.map((item) => item.shelf_item_id), [items]);
 
   const announcements = useMemo<Announcements>(() => {
-    const titleOf = (id: UniqueIdentifier | undefined) =>
-      books.find((book) => book.shelf_item_id === id)?.library_item.book.title ?? "";
+    const titleOf = (id: UniqueIdentifier | undefined) => {
+      const item = items.find((entry) => entry.shelf_item_id === id);
+      if (!item) return "";
+      if (item.item_type === "book") return item.library_item.book.title;
+      return decorByKey(item.decor_key) ? t(`shelves.decor.items.${item.decor_key}`) : "";
+    };
     const positionOf = (id: UniqueIdentifier | undefined) => itemIds.indexOf(String(id)) + 1;
     return {
       onDragStart: ({ active }) => t("shelves.reorder.a11y.picked", { title: titleOf(active.id) }),
@@ -128,7 +134,7 @@ export function ShelfBoard({
       onDragCancel: ({ active }) =>
         t("shelves.reorder.a11y.cancelled", { title: titleOf(active.id) }),
     };
-  }, [books, itemIds, t]);
+  }, [items, itemIds, t]);
 
   // la cornice resta ferma; dentro scorre la parete con le mensole
   return (
@@ -171,11 +177,13 @@ export function ShelfBoard({
           </div>
         </SortableContext>
 
-        {activeBook && <RemoveDropZone />}
-        {activeBook && <DisplayDrawer isOpen={isDrawerOpen} currentDisplay={activeBook.display} />}
+        {activeItem && <RemoveDropZone />}
+        {activeItem?.item_type === "book" && (
+          <DisplayDrawer isOpen={isDrawerOpen} currentDisplay={activeItem.display} />
+        )}
 
         <DragOverlay dropAnimation={null}>
-          {activeBook && <DraggedSpine book={activeBook} spineUrls={spineUrls} />}
+          {activeItem && <DraggedItem item={activeItem} spineUrls={spineUrls} />}
         </DragOverlay>
       </DndContext>
     </div>
