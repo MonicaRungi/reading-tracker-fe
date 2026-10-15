@@ -450,6 +450,19 @@ con i libri in piedi mostrati come dorsi.
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
   esclude i libri già presenti. "Seleziona tutti" / "Deseleziona tutti" (con almeno 2 libri)
   agisce sui libri visibili, cioè quelli trovati dalla ricerca e già caricati. Resta valido anche il percorso da `AddBookSheet`.
+- **Condividi lo scaffale** (menu ⋯ del dettaglio → `ShareShelfSheet`): l'immagine si ridisegna su canvas
+  (`lib/shelfExport/`, 1080 px di larghezza) con le misure della mensola a schermo: la larghezza delle
+  righe è misurata sulla pagina (`[data-shelf-board]`), altezze, piani e margini sono quelli del
+  dispositivo, quindi le righe vanno a capo negli stessi punti; stesse pile, decorazioni e righe chiuse centrate.
+  Sfondo e testi seguono il tema dell’app (chiaro: crema `--card`; scuro: `--background`), e accanto alla
+  firma "Shelfy" in basso c’è l’illustrazione dei libri (`books-hero.png` o `books-hero-dark.png`); in alto
+  nome e numero di libri. Colori e venature della mensola dal CSS del tema; se il browser considera "sporche" le venature SVG, l'immagine si rifà senza.
+  Le copertine di Google Books (senza CORS) passano dalla Edge Function `cover-proxy` (solo utenti
+  loggati, solo host di Google Books, solo immagini fino a 2 MB); Open Library e le foto dei dorsi
+  (Storage) si scaricano diretti. Un'immagine che non si carica diventa dorso o copertina generati.
+  Lo sheet mostra l'anteprima e poi "Condividi" (foglio del telefono, `navigator.share` con il file) o
+  "Salva l'immagine" dove la condivisione di file non c'è: due tocchi, perché Safari apre il foglio
+  di condivisione solo subito dopo un gesto.
 - **Righe**: quelle chiuse (il blocco successivo è andato a capo) sono centrate; l'ultima, ancora da
   riempire, resta allineata a sinistra.
 - **Decorazioni** (`shelf_items.item_type = 'decor'`, `decor_key`): oggetti illustrati (pianta,

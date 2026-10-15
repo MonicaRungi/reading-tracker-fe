@@ -91,6 +91,18 @@ export const it = {
     menu: {
       edit: "Modifica nome e tema",
       delete: "Elimina scaffale",
+      share: "Condividi lo scaffale",
+    },
+    share: {
+      title: "Condividi lo scaffale",
+      subtitle: "Ecco l'immagine della tua mensola, pronta da condividere.",
+      preparing: "Preparo l'immagine…",
+      error: "Non è stato possibile creare l'immagine",
+      share: "Condividi",
+      download: "Salva l'immagine",
+      shareError: "Non è stato possibile condividere l'immagine",
+      previewAlt: "Anteprima dello scaffale {{name}}",
+      footer: "Shelfy",
     },
     delete: {
       title: "Eliminare “{{name}}”?",
@@ -565,7 +577,7 @@ export const it = {
     empty: "Nessuna notifica",
     emptySub:
       "Qui troverai badge sbloccati, obiettivi da rinnovare e libri in uscita.",
-    retentionHint: "Le notifiche vengono eliminate dopo 30 giorni.",
+    retentionHint: "Le notifiche vengono eliminate automaticamente dopo 30 giorni.",
     // Promemoria di uscita
     releaseOn: "Esce {{date}}",
     reminderAsk: "Vuoi un promemoria il giorno dell'uscita?",

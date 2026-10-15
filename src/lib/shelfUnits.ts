@@ -63,6 +63,8 @@ export function buildShelfUnits(
   entries: readonly ShelfEntry[],
   height: number,
   maxStackHeight: number,
+  /** Altezza della riga per le decorazioni appese (default: quella della pagina). */
+  rowHeight?: number,
 ): ShelfUnit[] {
   const units: ShelfUnit[] = [];
   let stack: ShelfBookUnit | null = null;
@@ -72,7 +74,7 @@ export function buildShelfUnits(
       stack = null;
       const decor = decorByKey(entry.decor_key);
       if (!decor) continue;
-      const size = decorSize(decor, height);
+      const size = decorSize(decor, height, rowHeight);
       units.push({ key: entry.shelf_item_id, kind: "decor", decor: entry, width: size.width, height: size.height });
       continue;
     }

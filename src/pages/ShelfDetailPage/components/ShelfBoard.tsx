@@ -160,6 +160,8 @@ export function ShelfBoard({
             ref={ref}
             // scroll proprio: il pull-to-refresh parte solo se è in cima
             data-scroll-area=""
+            // l'esportazione misura qui la larghezza delle righe
+            data-shelf-board=""
             className="shelf-board shelf-wall min-h-0 flex-1 overflow-y-auto overscroll-contain"
           >
             {rows.map((row, index) => (

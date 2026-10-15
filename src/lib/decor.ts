@@ -125,10 +125,11 @@ export function decorByKey(key: string): DecorDefinition | null {
  * Ingombro a schermo dell'immagine intera, per un dorso di riferimento alto
  * `spineHeight`. `rise` è quanto l'immagine sale oltre la riga senza occupare
  * spazio (le appese attraversano lo spazio fra le righe fino al piano di sopra).
+ * `rowHeight` di default è quella della pagina; l'esportazione usa sempre quella mobile.
  */
-export function decorSize(decor: DecorDefinition, spineHeight: number) {
+export function decorSize(decor: DecorDefinition, spineHeight: number, rowHeight = shelfRowHeight()) {
   if (decor.hanging) {
-    const height = shelfRowHeight() + SHELF_ROW_GAP;
+    const height = rowHeight + SHELF_ROW_GAP;
     return { width: Math.round(height * decor.aspect), height, overhang: 0, rise: SHELF_ROW_GAP };
   }
   // l'altezza "appoggiata" esclude la parte che sporge sotto la base
