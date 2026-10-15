@@ -74,9 +74,11 @@ export const SPINE_PIPELINE = {
   outputHeight: 1200,
   /**
    * Sopra questa sfocatura (0 nitida … 1 molto sfocata, vedi quality.ts) la foto
-   * è considerata sfocata. Tarata il 13/10/2026: foto mossa reale 0,68; nitide 0,08–0,17.
+   * è considerata sfocata. Prima taratura (13/10) su uno screenshot: foto mossa 0,68,
+   * parti nitide della UI 0,08–0,17. Con 0,4 i dorsi veri nitidi (zone uniformi,
+   * pochi bordi) risultavano sfocati: alzata a 0,55 il 15/10, da rifinire su foto vere.
    */
-  blurThreshold: 0.4,
+  blurThreshold: 0.55,
   /** Lato lungo della versione ridotta su cui si misura la nitidezza. */
   blurSampleSide: 256,
   /** Limite del bucket `spines`. */

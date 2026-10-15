@@ -25,6 +25,8 @@ Quattro sezioni principali, accessibili dalla **bottom navigation** (mobile-firs
 
 La bottom nav è sempre visibile nell'app shell autenticata. Le pagine di dettaglio (libro, scaffale)
 sono push-navigate sopra la tab corrente — la bottom nav resta visibile.
+Unica eccezione: con la tastiera virtuale aperta la bottom nav si nasconde (`useVirtualKeyboard`), perché
+su iOS un elemento fixed in basso salirebbe sopra la tastiera, a metà schermo.
 
 ### 1.2 Flusso auth
 
@@ -66,7 +68,8 @@ src/
   api/          facade tipizzato verso Supabase e Edge Function
   components/
     ui/         primitivi shadcn (generati; non editare a mano)
-    layout/     app shell (AppLayout, BottomNav, AuthGuard)
+    layout/     app shell (AppLayout, BottomNav, AuthGuard, AppErrorBoundary: al posto della pagina
+                bianca, in caso di errore di render, mostra "Ricarica" e i dettagli dell'errore)
     shared/     componenti prodotto riusabili (BookCard, StatusBadge, RatingStars, …)
   hooks/        hook globali (useAuth, useTheme, useBarcode)
   i18n/         setup i18next + locales/it.ts (source of truth)
@@ -447,6 +450,8 @@ con i libri in piedi mostrati come dorsi.
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
   esclude i libri già presenti. "Seleziona tutti" / "Deseleziona tutti" (con almeno 2 libri)
   agisce sui libri visibili, cioè quelli trovati dalla ricerca e già caricati. Resta valido anche il percorso da `AddBookSheet`.
+- **Righe**: quelle chiuse (il blocco successivo è andato a capo) sono centrate; l'ultima, ancora da
+  riempire, resta allineata a sinistra.
 - **Decorazioni** (`shelf_items.item_type = 'decor'`, `decor_key`): oggetti illustrati (pianta,
   cactus, candela, busto, …) dal catalogo `lib/decor.ts`; immagini WebP con trasparenza in
   `src/assets/decor/`, a 3× l'altezza a schermo, con margini tagliati e aloni dello scontorno
