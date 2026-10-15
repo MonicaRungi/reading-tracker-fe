@@ -6,13 +6,16 @@ import "@/i18n"
 import { queryClient } from "@/lib/queryClient"
 import "./index.css"
 import App from "./App.tsx"
+import { AppErrorBoundary } from "@/components/layout/AppErrorBoundary"
 import { AppToaster } from "@/components/layout/AppToaster"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <App />
+        <AppErrorBoundary>
+          <App />
+        </AppErrorBoundary>
         <AppToaster />
       </BrowserRouter>
     </QueryClientProvider>

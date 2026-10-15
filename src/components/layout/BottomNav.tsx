@@ -1,6 +1,7 @@
 import { Home, Library, Search, User } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useVirtualKeyboard } from "@/hooks/useVirtualKeyboard";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -10,8 +11,15 @@ const TABS = [
   { to: "/profile", icon: User, labelKey: "nav.profile" },
 ] as const;
 
+/**
+ * Barra di navigazione in basso. Con la tastiera aperta si nasconde: su iOS gli
+ * elementi fixed in basso salgono sopra la tastiera, a metà schermo.
+ */
 export function BottomNav() {
   const { t } = useTranslation();
+  const isKeyboardOpen = useVirtualKeyboard();
+
+  if (isKeyboardOpen) return null;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-border bg-card py-3">

@@ -12,6 +12,7 @@ import {
   setShelfItemDisplay,
 } from "@/api/shelves";
 import type { ShelfBook, ShelfDetail, ShelfEntry, ShelfItemDisplay } from "@/api/shelves";
+import { decorByKey } from "@/lib/decor";
 import { getBooleanPreference, setBooleanPreference } from "@/lib/preferences";
 import { displayFromDropId, SHELF_DISPLAY_TAB_ID, SHELF_REMOVE_ZONE_ID } from "@/lib/shelfLayout";
 
@@ -102,7 +103,7 @@ export function useShelfReorder({
   function labelOf(item: ShelfEntry) {
     return item.item_type === "book"
       ? item.library_item.book.title
-      : t(`shelves.decor.items.${item.decor_key}`);
+      : t(`shelves.decor.items.${decorByKey(item.decor_key)?.key ?? item.decor_key}`);
   }
 
   function invalidateShelves() {

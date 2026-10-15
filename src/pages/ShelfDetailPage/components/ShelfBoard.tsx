@@ -118,7 +118,8 @@ export function ShelfBoard({
       const item = items.find((entry) => entry.shelf_item_id === id);
       if (!item) return "";
       if (item.item_type === "book") return item.library_item.book.title;
-      return decorByKey(item.decor_key) ? t(`shelves.decor.items.${item.decor_key}`) : "";
+      const decor = decorByKey(item.decor_key);
+      return decor ? t(`shelves.decor.items.${decor.key}`) : "";
     };
     const positionOf = (id: UniqueIdentifier | undefined) => itemIds.indexOf(String(id)) + 1;
     return {
@@ -167,6 +168,8 @@ export function ShelfBoard({
               <ShelfRow
                 key={index}
                 units={row}
+                // tutte tranne l'ultima: il blocco successivo non c'entrava
+                isFull={index < rows.length - 1}
                 spineUrls={spineUrls}
                 onPhotoError={onPhotoError}
                 onOpenBook={onOpenBook}
