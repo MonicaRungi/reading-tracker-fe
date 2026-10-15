@@ -39,8 +39,11 @@ const MOBILE_QUERY = "(width < 40rem)";
  * che vanno dal piano di sopra a quello sotto.
  */
 export function shelfRowHeight(): number {
-  return window.matchMedia(MOBILE_QUERY).matches ? 168 : 190;
+  return window.matchMedia(MOBILE_QUERY).matches ? SHELF_ROW_HEIGHT_MOBILE : 190;
 }
+
+/** Altezza di una riga su mobile (`shelf-books`): l'esportazione impagina sempre così. */
+export const SHELF_ROW_HEIGHT_MOBILE = 168;
 
 /** Spazio fra il piano di una riga e la riga sotto: deve combaciare con il gap di `shelf-board` (index.css). */
 export const SHELF_ROW_GAP = 28;

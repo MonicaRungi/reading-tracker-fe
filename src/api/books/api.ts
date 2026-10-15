@@ -1,6 +1,45 @@
 import { supabase } from "@/lib/supabase";
 import type { Book, BookMeta } from "./types";
 
+/** Host di copertine senza CORS: per disegnarle su un canvas passano da cover-proxy. */
+const PROXIED_COVER_HOSTS = new Set(["books.google.com", "books.googleusercontent.com"]);
+
+/**
+ * Copertina come Blob leggibile da un canvas (esportazione della mensola), o
+ * null se non si carica. Google Books passa dalla Edge Function cover-proxy;
+ * le altre fonti (Open Library) mandano già il CORS. Niente invoke(): con
+ * un'immagine come risposta la leggerebbe come testo.
+ */
+export async function fetchCoverBlob(coverUrl: string): Promise<Blob | null> {
+  let host: string;
+  try {
+    host = new URL(coverUrl).hostname;
+  } catch {
+    return null;
+  }
+  try {
+    if (!PROXIED_COVER_HOSTS.has(host)) {
+      const direct = await fetch(coverUrl, { mode: "cors" });
+      return direct.ok ? await direct.blob() : null;
+    }
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return null;
+    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cover-proxy`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url: coverUrl }),
+    });
+    return res.ok ? await res.blob() : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Cerca libri per titolo, autore o ISBN tramite Edge Function. */
 export async function searchBooks(query: string): Promise<BookMeta[]> {
   const { data, error } = await supabase.functions.invoke<BookMeta[]>(

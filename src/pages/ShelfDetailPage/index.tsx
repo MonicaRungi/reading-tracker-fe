@@ -12,6 +12,7 @@ import { BookDisplayMenu } from "./components/BookDisplayMenu";
 import { ShelfHeaderActions } from "./components/ShelfHeaderActions";
 import { AddBooksToShelfSheet } from "./sheets/AddBooksToShelfSheet";
 import { AddDecorSheet } from "./sheets/AddDecorSheet";
+import { ShareShelfSheet } from "./sheets/ShareShelfSheet";
 
 export default function ShelfDetailPage() {
   const { t } = useTranslation();
@@ -121,8 +122,21 @@ export default function ShelfDetailPage() {
         onClose={actions.addDecor.close}
       />
 
+      <ShareShelfSheet
+        open={ui.share.isOpen}
+        shelfName={shelf.name}
+        status={ui.share.status}
+        previewUrl={ui.share.previewUrl}
+        canShare={ui.share.canShare}
+        onShare={actions.share.share}
+        onDownload={actions.share.download}
+        onRetry={actions.share.retry}
+        onClose={actions.share.close}
+      />
+
       <ShelfMenuSheet
         shelfName={ui.menuTarget?.name ?? null}
+        onShare={actions.shareFromMenu}
         onEdit={actions.editFromMenu}
         onDelete={actions.deleteFromMenu}
         onClose={actions.closeMenu}

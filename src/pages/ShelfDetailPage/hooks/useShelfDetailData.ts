@@ -8,6 +8,7 @@ import { useShelfEditor } from "@/hooks/useShelfEditor";
 import { useSpineUrls } from "@/hooks/useSpineUrls";
 import { useAddBooksToShelf } from "./useAddBooksToShelf";
 import { useAddDecor } from "./useAddDecor";
+import { useShelfExport } from "./useShelfExport";
 import { useShelfReorder } from "./useShelfReorder";
 
 // riferimento stabile: un [] nuovo a ogni render invaliderebbe i memo del riordino
@@ -43,6 +44,7 @@ export function useShelfDetailData() {
   // URL firmati di tutti i dorsi con foto dello scaffale, in un'unica richiesta
   const spinePaths = useMemo(() => books.map((book) => book.library_item.spine_path), [books]);
   const spineUrls = useSpineUrls(spinePaths);
+  const exportShelf = useShelfExport({ shelf, items, bookCount: books.length, spineUrls: spineUrls.urls });
 
   return {
     data: {
@@ -61,6 +63,7 @@ export function useShelfDetailData() {
       addBooks: addBooks.ui,
       addDecor: addDecor.ui,
       reorder: reorder.ui,
+      share: exportShelf.ui,
     },
     actions: {
       ...editor.actions,
@@ -72,6 +75,11 @@ export function useShelfDetailData() {
       addBooks: addBooks.actions,
       addDecor: addDecor.actions,
       reorder: reorder.actions,
+      share: exportShelf.actions,
+      shareFromMenu: () => {
+        editor.actions.closeMenu();
+        void exportShelf.actions.open();
+      },
       refreshSpineUrls: spineUrls.refresh,
     },
   };
