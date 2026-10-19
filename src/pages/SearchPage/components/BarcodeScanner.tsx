@@ -30,7 +30,10 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
   const onDetectedRef = useRef(onDetected);
 
   const [torch, setTorch] = useState(false);
-  const [permissionDenied, setPermissionDenied] = useState(false);
+  // Fuori da HTTPS/localhost il browser non espone la fotocamera.
+  const [permissionDenied, setPermissionDenied] = useState(
+    () => !navigator.mediaDevices?.getUserMedia,
+  );
   const [detectedIsbn, setDetectedIsbn] = useState<string | null>(null);
 
   // Cambiando questa chiave riavviamo completamente lo scanner.
@@ -169,7 +172,7 @@ export function BarcodeScanner({ onDetected }: BarcodeScannerProps) {
 
     setTorch(false);
     setDetectedIsbn(null);
-    setPermissionDenied(false);
+    setPermissionDenied(!navigator.mediaDevices?.getUserMedia);
 
     setScanKey((current) => current + 1);
   }

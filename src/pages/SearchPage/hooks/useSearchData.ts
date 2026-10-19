@@ -18,6 +18,10 @@ import { upcomingReleaseDate } from "@/lib/releaseDate";
 
 export type SearchTab = "search" | "scan";
 
+const SEARCH_DEBOUNCE_MS = 300;
+/** I metadati di un libro non cambiano nel giro di minuti. */
+const SEARCH_STALE_TIME_MS = 10 * 60 * 1000;
+
 export interface SearchResult {
   book: BookMeta;
   libraryItem: LibraryItem | null;
@@ -37,15 +41,18 @@ export function useSearchData() {
   const [newShelfName, setNewShelfName] = useState("");
   const [isAddingShelf, setIsAddingShelf] = useState(false);
   const [scanResetKey, setScanResetKey] = useState(0);
-  const [scannerOpen, setScannerOpen] = useState(false);
   const [remindRelease, setRemindRelease] = useState(false);
 
-  const debouncedQuery = useDebounce(query, 400);
+  const debouncedQuery = useDebounce(query, SEARCH_DEBOUNCE_MS);
+  const searchQuery = debouncedQuery.trim();
 
+  // Il signal di TanStack annulla la richiesta quando la query cambia; i
+  // risultati restano in cache per tornare su una ricerca già fatta.
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["books", "search", debouncedQuery],
-    queryFn: () => searchBooks(debouncedQuery),
-    enabled: debouncedQuery.trim().length >= 2,
+    queryKey: ["books-search", user?.id, searchQuery],
+    queryFn: ({ signal }) => searchBooks(searchQuery, signal),
+    enabled: searchQuery.length >= 2,
+    staleTime: SEARCH_STALE_TIME_MS,
   });
 
   const { data: shelves = [] } = useQuery({
@@ -135,7 +142,6 @@ export function useSearchData() {
 
   const setTab = useCallback((next: SearchTab | "") => {
     if (next) setTabState(next);
-    if (next === "scan") setScannerOpen(true);
   }, []);
 
   const setStatus = useCallback((next: ReadingStatus | "") => {
@@ -182,27 +188,16 @@ export function useSearchData() {
     },
   });
 
-  const handleScanError = useCallback(() => {
-    toast.error(t("search.scanLookupError"));
-    resetScanner();
-  }, [t, resetScanner]);
-
   const confirmNewShelf = useCallback(() => {
     if (newShelfName.trim()) addShelf();
   }, [addShelf, newShelfName]);
-
-  async function handleDetected(isbn: string) {
-    setScannerOpen(false);
-
-    await handleScan(isbn);
-  }
 
   return {
     data: {
       results,
       isLoading,
       isError,
-      hasQuery: debouncedQuery.trim().length >= 2,
+      hasQuery: searchQuery.length >= 2,
       shelves,
     },
     ui: {
@@ -216,7 +211,6 @@ export function useSearchData() {
       isAddingBook,
       isCreatingShelf,
       scanResetKey,
-      scannerOpen,
       releaseDate,
       remindRelease,
     },
@@ -226,8 +220,9 @@ export function useSearchData() {
       openSheet,
       selectResult,
       closeSheet,
-      handleDetected,
-      handleScanError,
+      // Lo scanner resta montato durante il lookup: ha già fermato la camera
+      // e mostra "cerco…"; resetScanner lo fa ripartire (errore o sheet chiuso).
+      handleDetected: (isbn: string) => handleScan(isbn),
       setStatus,
       setSelectedShelfIds,
       setNewShelfName,

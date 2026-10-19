@@ -1,3 +1,4 @@
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { Book, BookMeta } from "./types";
 
@@ -40,19 +41,26 @@ export async function fetchCoverBlob(coverUrl: string): Promise<Blob | null> {
   }
 }
 
-/** Cerca libri per titolo, autore o ISBN tramite Edge Function. */
-export async function searchBooks(query: string): Promise<BookMeta[]> {
+/**
+ * Cerca libri per titolo, autore o ISBN tramite Edge Function. `signal`
+ * annulla la richiesta quando la query è superata da una più recente.
+ */
+export async function searchBooks(
+  query: string,
+  signal?: AbortSignal,
+): Promise<BookMeta[]> {
   const { data, error } = await supabase.functions.invoke<BookMeta[]>(
     "book-search",
     {
       body: { q: query },
+      signal,
     },
   );
   if (error) throw error;
   return data ?? [];
 }
 
-/** Lookup preciso per ISBN (usato dallo scanner). */
+/** Lookup preciso per ISBN (usato dallo scanner). null = ISBN sconosciuto (404). */
 export async function lookupBookByIsbn(isbn: string): Promise<BookMeta | null> {
   const { data, error } = await supabase.functions.invoke<BookMeta>(
     "book-lookup",
@@ -60,84 +68,48 @@ export async function lookupBookByIsbn(isbn: string): Promise<BookMeta | null> {
       body: { isbn },
     },
   );
+  if (error instanceof FunctionsHttpError && error.context.status === 404) return null;
   if (error) throw error;
   return data ?? null;
 }
 
 /**
- * Persiste un BookMeta nel catalogo condiviso.
- * Riusa la riga esistente se isbn13 già presente, altrimenti inserisce.
+ * Persiste un BookMeta nel catalogo condiviso tramite la Edge Function
+ * book-save (unico punto di scrittura di `books`): riusa la riga esistente se
+ * l'ISBN è già presente, altrimenti completa i metadati, sceglie la copertina
+ * migliore e inserisce.
  */
 export async function upsertBook(meta: BookMeta): Promise<Book> {
-  if (meta.isbn13) {
-    const { data: existing, error } = await supabase
-      .from("books")
-      .select("*")
-      .eq("isbn13", meta.isbn13)
-      .maybeSingle();
-    if (error) throw error;
-    if (existing) {
-      // Libro già a catalogo senza data completa: la aggiunge se ora la fonte
-      // la fornisce (serve al promemoria di uscita).
-      if (!existing.published_date && meta.published_date) {
-        const { data: updated } = await supabase
-          .from("books")
-          .update({ published_date: meta.published_date })
-          .eq("id", existing.id)
-          .select("*")
-          .maybeSingle();
-        return updated ?? existing;
-      }
-      return existing;
-    }
-  }
-
-  const { data, error } = await supabase
-    .from("books")
-    .insert({
-      isbn13: meta.isbn13,
-      title: meta.title ?? "",
-      authors: meta.authors,
-      cover_url: meta.cover_url,
-      page_count: meta.page_count,
-      published_year: meta.published_year,
-      published_date: meta.published_date ?? null,
-      publisher: meta.publisher,
-      description: meta.description,
-      genres: meta.genres,
-      source: meta.source,
-    })
-    .select("*")
-    .single();
+  const { data, error } = await supabase.functions.invoke<Book>("book-save", {
+    body: { book: meta },
+  });
   if (error) throw error;
+  if (!data) throw new Error("book-save: risposta vuota");
   return data;
 }
 
+/** Numero di pagine corretto dall'utente (solo libri nella sua libreria). */
 export async function updateBookPageCount(
   bookId: string,
   pageCount: number,
 ): Promise<Book> {
-  const { data, error } = await supabase
-    .from("books")
-    .update({ page_count: pageCount })
-    .eq("id", bookId)
-    .select("*")
-    .single();
+  const { data, error } = await supabase.rpc("set_book_page_count", {
+    p_book_id: bookId,
+    p_page_count: pageCount,
+  });
   if (error) throw error;
   return data;
 }
 
-export async function enrichBookCover(
-  bookId: string,
-  isbn13: string,
-): Promise<void> {
-  const { data } = await supabase.functions.invoke("book-lookup", {
-    body: { isbn: isbn13 },
+/**
+ * Rifà il fetch dei metadati e, se ne trova una migliore, della copertina.
+ * Riempie solo i campi vuoti. Solo per libri nella libreria dell'utente.
+ */
+export async function refreshBook(bookId: string): Promise<Book> {
+  const { data, error } = await supabase.functions.invoke<Book>("book-save", {
+    body: { bookId, refresh: true },
   });
-  if (!data?.cover_url) return;
-
-  await supabase
-    .from("books")
-    .update({ cover_url: data.cover_url })
-    .eq("id", bookId);
+  if (error) throw error;
+  if (!data) throw new Error("book-save: risposta vuota");
+  return data;
 }
