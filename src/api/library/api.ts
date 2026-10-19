@@ -122,13 +122,12 @@ export async function updateStatus(
     .single();
   if (error) throw error;
 
-  if (missingPages > 0) await logPagesRead(current.user_id, missingPages);
+  if (missingPages > 0) await logPagesRead(missingPages);
 
   return data as LibraryItem;
 }
 
 export async function updateProgress(
-  userId: string,
   itemId: string,
   newPage: number,
 ): Promise<LibraryItem> {
@@ -149,7 +148,7 @@ export async function updateProgress(
     .single();
   if (error) throw error;
 
-  if (delta > 0) await logPagesRead(userId, delta);
+  if (delta > 0) await logPagesRead(delta);
 
   return data as LibraryItem;
 }
@@ -174,31 +173,16 @@ export async function updateDate(
   return data as LibraryItem;
 }
 
-async function logPagesRead(userId: string, delta: number): Promise<void> {
-  const log_date = today();
-  const { data: existing, error: fetchError } = await supabase
-    .from("reading_log")
-    .select("pages_read")
-    .eq("user_id", userId)
-    .eq("log_date", log_date)
-    .maybeSingle();
-  if (fetchError) throw fetchError;
-
-  const { error } = await supabase.from("reading_log").upsert(
-    {
-      user_id: userId,
-      log_date,
-      pages_read: (existing?.pages_read ?? 0) + delta,
-    },
-    { onConflict: "user_id,log_date" },
-  );
+/**
+ * Somma il delta alla riga di oggi di reading_log e al totale del profilo
+ * (badge pagine), in modo atomico nel DB. La data è quella locale dell'utente.
+ */
+async function logPagesRead(delta: number): Promise<void> {
+  const { error } = await supabase.rpc("log_pages_read", {
+    p_log_date: today(),
+    p_delta: delta,
+  });
   if (error) throw error;
-
-  const { error: incrementError } = await supabase.rpc(
-    "increment_total_pages_read",
-    { p_user_id: userId, p_delta: delta },
-  );
-  if (incrementError) throw incrementError;
 }
 
 export async function rateItem(

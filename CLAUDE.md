@@ -22,7 +22,7 @@ src/
     sheets/                # sheet/dialog page-local (es. AddBookSheet, BookMenuSheet)
     hooks/
       use<Name>Data.ts     # tutta la logica data/state per questa pagina
-  lib/                     # utility cross-cutting (format.ts, barcode.ts, ecc.)
+  lib/                     # utility cross-cutting (format.ts, goals.ts, badges.ts, ecc.)
   hooks/                   # hook globali (useAuth, useTheme, ecc.)
 ```
 
@@ -67,7 +67,7 @@ Quando un componente page-local è necessario in una seconda pagina, promuovilo 
 - `components/layout/` — solo app shell: bottom nav, route guard, layout wrapper.
   Niente di domain-specific.
 - `components/shared/` — componenti domain-agnostic riusabili (BookCard, StatusBadge,
-  RatingStars, ProgressBar, ecc.). Estendi un componente shared esistente prima di crearne uno nuovo.
+  ProgressBar, EmptyState, ecc.). Estendi un componente shared esistente prima di crearne uno nuovo.
 - `pages/<Name>Page/` — tutto ciò che è specifico a una pagina: composizione (`index.tsx`),
   schema di validazione (`schema.ts`), componenti page-local (`components/`), sheet/dialog
   page-local (`sheets/`) e la cartella `hooks/`.
@@ -85,6 +85,12 @@ Domini previsti:
 - `api/shelves/` — scaffali: lista, creazione, aggiunta/rimozione libri
 - `api/profile/` — profilo utente e preferenze tema
 - `api/stats/` — statistiche: libri per anno/mese, pagine lette, generi, attività
+- `api/goals/` — obiettivi di lettura (la chiusura come raggiunti passa dalla RPC `sync_goal_achievements`)
+- `api/badges/` — catalogo badge, sblocchi, badge in evidenza
+- `api/notifications/` — notifiche in-app (Realtime)
+- `api/releaseReminders/` — promemoria per le uscite dei libri
+- `api/spines/` — foto dei dorsi (bucket `spines`)
+- `api/imports/` — import Goodreads (Edge Function `import-goodreads`)
 
 Quando Supabase sostituisce eventuali mock, cambia solo il corpo delle funzioni in `api.ts` —
 le firme e i tipi restano invariati, così pages, hooks e mutations non toccano nulla.

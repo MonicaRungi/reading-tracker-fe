@@ -56,7 +56,7 @@ Il route guard vive in `components/layout/AuthGuard.tsx` — non nelle singole p
 - **lucide-react** per le icone, dimensione default `size-5` nei controlli mobile.
 - **i18next / react-i18next** per tutte le stringhe UI. `src/i18n/locales/it.ts` è la source of truth.
 - **sonner** per i toast.
-- **zxing-js** (o `html5-qrcode`) per la scansione barcode da fotocamera.
+- **zxing-js** (`@zxing/browser` + `@zxing/library`) per la scansione barcode da fotocamera.
 - **vite-plugin-pwa** per la PWA (manifest, service worker, installabilità).
 
 ---
@@ -70,17 +70,18 @@ src/
     ui/         primitivi shadcn (generati; non editare a mano)
     layout/     app shell (AppLayout, BottomNav, AuthGuard, AppErrorBoundary: al posto della pagina
                 bianca, in caso di errore di render, mostra "Ricarica" e i dettagli dell'errore)
-    shared/     componenti prodotto riusabili (BookCard, StatusBadge, RatingStars, …)
-  hooks/        hook globali (useAuth, useTheme, useBarcode)
+    shared/     componenti prodotto riusabili (BookCard, StatusBadge, Spine, …)
+  hooks/        hook globali (useAuth, useTheme, useNotificationsRealtime, …)
   i18n/         setup i18next + locales/it.ts (source of truth)
-  lib/          logica pura: supabase.ts, format.ts, barcode.ts, queryClient.ts
+  lib/          logica pura: supabase.ts, format.ts, queryClient.ts, goals.ts, spine/, …
   pages/        componenti route, una cartella per pagina
-  types/        tipi di dominio (mirroring tabelle Supabase)
+  types/        database.types.ts (generato da Supabase, alias per riga in fondo)
 ```
 
 - Le pagine compongono componenti shared; non definiscono primitive visive.
-- I tipi in `src/types/` rispecchiano le tabelle Supabase. Quando una tabella cambia, cambia
-  `src/types/` e `src/api/` — le pagine non toccano nulla.
+- `src/types/database.types.ts` rispecchia lo schema Supabase; i tipi di dominio stanno in
+  `src/api/<dominio>/types.ts` e partono dai suoi alias. Quando una tabella cambia si rigenera
+  `database.types.ts` e si adatta `src/api/` — le pagine non toccano nulla.
 
 ---
 
@@ -140,31 +141,24 @@ La firma visiva dell'app:
 
 ### 5.1 Token Tailwind
 
-Configurare in `tailwind.config.ts` / CSS variables:
+La palette è mappata sui token semantici shadcn in `src/index.css` (`:root` e `.dark`, esposti
+a Tailwind v4 con `@theme inline`; non c'è `tailwind.config.ts`):
 
-```css
-:root {
-  --accent:       #E0644A;
-  --accent-soft:  #FBE9E3;
-  --tx:           #1B1714;
-  --tx-sec:       #938C84;
-  --tx-hint:      #B7AFA7;
-  --bd:           #EFECE9;
-  --card:         #FAF8F6;
-}
-.dark {
-  --accent:       #E0644A;   /* invariato */
-  --accent-soft:  #3D1A12;   /* molto scuro */
-  --tx:           #F0EDE6;
-  --tx-sec:       #9A9AA2;
-  --tx-hint:      #5F5F68;
-  --bd:           #2A2C34;
-  --card:         #20222A;
-}
-```
+| Identità (§5.0) | Token | Chiaro | Scuro |
+|---|---|---|---|
+| Accento corallo | `--primary` (e `--ring`) | `#E0644A` | `#E0644A` |
+| Soft corallo | `--accent` (testo: `--accent-foreground` = corallo) | `#FBE9E3` | `#3D1A12` |
+| Testo primario | `--foreground` | `#1B1714` | `#F0EDE6` |
+| Testo secondario | `--muted-foreground` | `#938C84` | `#9A9AA2` |
+| Testo hint | `--hint` | `#B7AFA7` | `#5F5F68` |
+| Background | `--background` | `#FFFFFF` | `#15161B` |
+| Card/surface | `--card` | `#FAF8F6` | `#20222A` |
+| Bordo | `--border` | `#EFECE9` | `#2A2C34` |
+| Chip inattivo | `--chip` | `#F1EFEC` | `#20222A` |
 
-Usare i token nei componenti (`text-[var(--tx)]`, `bg-[var(--card)]`…). Mai hex hardcoded nei
-componenti tranne le copertine placeholder.
+Estensioni custom: `--hint`, `--chip`, `--status-<stato>-bg/-fg` (§5.2), `--card-shadow`.
+Usare le utility Tailwind dei token (`bg-primary`, `bg-accent`, `text-muted-foreground`,
+`text-hint`, `bg-card`…). Mai hex hardcoded nei componenti tranne le copertine placeholder.
 
 ### 5.2 Stati di lettura (palette riservata)
 
@@ -182,8 +176,10 @@ Un badge di stato non appare mai senza la sua label testuale.
 ### 5.3 Dark mode
 
 Class-based (`.dark` su `<html>`), togglato nella pagina Profilo, persistito in
-`localStorage['rt.theme']`. Il default è `auto` (segue `prefers-color-scheme`). Ogni colore
-custom deve definire entrambe le mode via CSS variables (sezione 5.1).
+`localStorage['rt.theme']` (applicato già da uno script in `index.html`, senza flash). Il
+default è `auto` (segue `prefers-color-scheme`). Il toggle scrive anche `profiles.theme`, che
+però non viene riletto: la fonte resta il dispositivo. Ogni colore custom deve definire
+entrambe le mode via CSS variables (sezione 5.1).
 
 ---
 
@@ -201,8 +197,11 @@ Il dettaglio libro segue un flusso guidato, non chip liberi:
 - Il voto (stelle) è disponibile **solo** se `status in ('read', 'abandoned')`.
 - "Abbandonato" e "reimposta stato" vivono nel menu ⋯ (fuori dal flusso principale).
 - Le date (`started_at`, `finished_at`) sono modificabili a mano (icona calendario → date picker).
-- Un libro aggiunto via bottom sheet con stato `read`/`abandoned` ha le date `null` di default
-  (l'utente le imposta a mano se vuole).
+- Un libro aggiunto via bottom sheet prende `started_at = today` se `reading` e
+  `finished_at = today` se `read`; con `to_read`/`abandoned` le date restano `null` (l'utente
+  le imposta a mano se vuole).
+- Passando a `read`, le pagine non ancora registrate contano come lette oggi
+  (`current_page` = totale, delta su `reading_log` via RPC `log_pages_read`).
 
 ---
 
@@ -214,9 +213,11 @@ Il bottom sheet di aggiunta è il punto unico per impostare stato e scaffali:
 - Mostra il libro selezionato (copertina + titolo + autore).
 - **Stato di lettura**: 4 card (Da leggere / In lettura / Letto / Abbandonato), selezione singola.
 - **Scaffali**: pill per ogni scaffale esistente (multi-select) + "Nuovo scaffale…".
+- **Promemoria di uscita** (`ReleaseReminderCard`): solo per libri con data di pubblicazione
+  completa nel futuro; crea una riga in `release_reminders`.
 - CTA: "Aggiungi alla mia libreria" (coral pieno).
-- Il sheet ricorda l'ultima scelta di stato per il backfill rapido.
-- Se si sceglie uno scaffale senza aver scelto uno stato, lo stato default è `to_read`.
+- A ogni apertura lo stato riparte da `to_read` (default anche se si sceglie solo uno scaffale).
+- Il libro va nel catalogo tramite la Edge Function `book-save` (§11), mai con insert diretto.
 
 ---
 
@@ -227,17 +228,17 @@ Il bottom sheet di aggiunta è il punto unico per impostare stato e scaffali:
 | Card libro in griglia | `BookCard` | copertina 2:3 + titolo + autore |
 | Card "In lettura" (banner) | `ReadingCard` | copertina + progress + % |
 | Badge stato | `StatusBadge` | mai solo colore, sempre con label |
-| Stelle voto | `RatingStars` | interattive o read-only, 1-5 |
+| Stelle voto | `RatingSection` (dettaglio libro) | interattive o bloccate, 1-5 |
 | Barra avanzamento | `ProgressBar` | colore accent, border-radius pieno |
 | Aggiunta libro | `AddBookSheet` | bottom sheet con stati + scaffali |
 | Dorso libro | `Spine` | foto del dorso o dorso generato (§16) |
 | Crea/modifica scaffale | `ShelfFormSheet` | nome + selettore tema (`ShelfThemePicker`) |
 | Date picker | `DatePickerSheet` | Calendar di shadcn in un bottom sheet; pillola "mese anno" che apre la griglia dei mesi (3×4) e da lì quella degli anni (12 per pagina); scegliere mese o anno torna ai giorni senza chiudere, si salva solo con Conferma |
-| Ricerca | `SearchBar` | campo unificato titolo/autore/ISBN |
+| Ricerca | `SearchField` | campo unificato titolo/autore/ISBN |
 | Scanner barcode | `BarcodeScanner` | full-width viewfinder + scan line |
-| Grafico attività | `ActivityChart` | bar chart pagine/giorno o settimana |
-| Grafico libri letti | `BooksChart` | bar chart per anno o mese |
-| Grafico generi | `GenresChart` | barre orizzontali con % |
+| Grafico attività | `ActivitySection` (Profilo, su `BarChart`) | pagine per giorno o settimana |
+| Grafico libri letti | `BooksReadSection` (Profilo, su `BarChart`) | per anno o mese |
+| Grafico generi | `GenresSection` (Profilo, `GenreRow`) | barre orizzontali con % |
 | Loading | `BookCardSkeleton`, `LoadingSpinner` | ogni query ha uno stato loading |
 | Vuoto | `EmptyState` | mai tabella/lista silenziosa vuota |
 | Errore | toast via sonner | ogni mutation dà feedback |
@@ -276,6 +277,12 @@ secondarie `variant="outline"`; azioni distruttive `variant="destructive"` + `Al
   `useQuery` / `useMutation`.
 - Mutazioni che cambiano la libreria invalidano `['library', userId]` e
   `['stats', userId]` (le stat dipendono dai dati).
+- Dopo ogni mutation che tocca libreria, avanzamento o obiettivi si chiama
+  `invalidateProgressQueries` (`lib/progressQueries.ts`): prima la RPC
+  `sync_goal_achievements` (il DB chiude come `achieved` gli obiettivi raggiunti e sblocca i
+  badge via trigger; il client non può farlo da solo), poi invalida obiettivi e badge.
+- Le pagine lette si registrano solo con la RPC `log_pages_read(p_log_date, p_delta)`: somma
+  atomica su `reading_log` e su `profiles.total_pages_read`.
 - **Ottimismo**: per cambio stato e aggiornamento avanzamento usare `onMutate` per aggiornare
   la cache localmente prima della risposta Supabase, con rollback su `onError`.
 
@@ -283,30 +290,41 @@ secondarie `variant="outline"`; azioni distruttive `variant="destructive"` + `Al
 
 ## 11. Edge Functions
 
-Le due Edge Function su Supabase sono chiamate via `supabase.functions.invoke(...)`:
+Cinque Edge Function su Supabase, tutte solo per utenti loggati (401 senza JWT valido),
+chiamate dai wrapper in `src/api/` via `supabase.functions.invoke(...)` (contratto completo in
+`CONTEXT.md`):
+
+| Function | Uso | Wrapper |
+|---|---|---|
+| `book-search` | ricerca titolo/autore/ISBN, catalogo locale prima delle fonti esterne | `api/books` `searchBooks` |
+| `book-lookup` | lookup ISBN dallo scanner | `api/books` `lookupBookByIsbn` |
+| `book-save` | unica scrittura del catalogo `books`: aggiunta (`{ book }`) e refresh (`{ bookId, refresh: true }`) | `api/books` `upsertBook`, `refreshBook` |
+| `cover-proxy` | copertine Google Books con CORS per il canvas (§16) | `api/books` `fetchCoverBlob` |
+| `import-goodreads` | import CSV (`{ csv }`) | `api/imports` → `importGoodreads` |
 
 ```ts
-// Ricerca libri
 const { data } = await supabase.functions.invoke('book-search', {
   body: { q: 'murakami' }
-})
-
-// Lookup ISBN (da scanner)
-const { data } = await supabase.functions.invoke('book-lookup', {
-  body: { isbn: '9788806219215' }
 })
 ```
 
 Il client supabase-js inietta automaticamente il JWT dell'utente nell'header. Mai chiamare
 le function con fetch diretto dal frontend — sempre via `supabase.functions.invoke`.
+**Unica eccezione**: `cover-proxy` risponde con un'immagine, che `invoke` leggerebbe come
+testo; `fetchCoverBlob` usa `fetch` con `Authorization: Bearer <token>` e `apikey`.
+Il client non scrive mai in `books`: oltre a `book-save` c'è solo la RPC
+`set_book_page_count` per correggere il numero di pagine.
 
 ---
 
 ## 12. PWA
 
 - `vite-plugin-pwa` genera manifest e service worker.
-- Manifest: `name: "Reading Tracker"`, `display: "standalone"`, `theme_color: "#E0644A"`.
-- Icone: almeno 192×192 e 512×512 + `apple-touch-icon` 180×180 per iOS.
+- Manifest (`vite.config.ts`): `name`/`short_name: "Shelfy"`, `lang: "it"`,
+  `display: "standalone"`, `theme_color: "#FBEDE8"`, `background_color: "#FFFFFF"`,
+  `registerType: "autoUpdate"`. Il `<meta name="theme-color">` segue il tema a runtime (soft
+  corallo `--accent`: `#FBE9E3` chiaro, `#3D1A12` scuro).
+- Icone: `pwa-192x192.png`, `pwa-512x512.png` + `apple-touch-icon.png` per iOS.
 - Installazione iOS: via Safari → Condividi → Aggiungi alla schermata Home.
 - Installazione Android: prompt automatico `beforeinstallprompt`.
 - La fotocamera funziona anche nella PWA installata (necessario per lo scanner).
@@ -340,13 +358,17 @@ le function con fetch diretto dal frontend — sempre via `supabase.functions.in
   Mai committare `.env` su Git (è in `.gitignore`).
 - **RLS**: le policy garantiscono l'isolamento per utente a livello DB. Il frontend non filtra
   mai per `user_id` nelle query — ci pensa Supabase automaticamente via `auth.uid()`.
-- **Realtime**: in uso per le notifiche (badge sbloccati, rinnovo obiettivi, uscite libri).
-  I subscription vivono in hook dedicati (`useNotificationsRealtime`) con cleanup su
-  `useEffect` return.
+- **Scritture riservate al DB**: il client non scrive `books` (§11), `notifications`,
+  sblocchi di `user_badges` (solo `is_featured`), `profiles.total_pages_read` (solo
+  `display_name`/`theme`), né lo stato `achieved` degli obiettivi (`sync_goal_achievements`).
+- **Realtime**: in uso per le notifiche (badge sbloccati, rinnovo obiettivi, uscite libri),
+  solo in-app: niente push né email. I subscription vivono in hook dedicati
+  (`useNotificationsRealtime`) con cleanup su `useEffect` return.
 - **Storage**: in uso solo per le foto dei dorsi (bucket privato `spines`, §16). Le
   copertine continuano ad arrivare dalle API esterne.
-- **Keep-alive**: GitHub Action nella repo backend che fa una query ogni ~5 giorni per evitare
-  la pausa del progetto free.
+- **Job pianificati**: GitHub Actions nella repo backend (chiusura obiettivi, promemoria di
+  uscita, pulizia dorsi orfani / `reading_log` / notifiche, keep-alive ogni 5 giorni per
+  evitare la pausa del progetto free). Elenco in `CONTEXT.md`.
 
 ---
 
@@ -444,7 +466,7 @@ con i libri in piedi mostrati come dorsi.
   mini-mensola (primi 12 libri, sempre come dorsi in piedi), nome, conteggio e menu ⋯ (modifica nome e tema, elimina).
   Dopo la creazione si apre il dettaglio dello scaffale.
 - **Selettore tema**: griglia a 2 colonne (3 righe con 6 temi) di anteprime (parete, dorsi, piano) con la label sotto; il
-  tema scelto ha bordo e testo corallo. Niente decorazioni finché non arriva la Fase 4.
+  tema scelto ha bordo e testo corallo. Le anteprime non mostrano decorazioni.
 - **Eliminazione**: `ConfirmDialog` con testo esplicito — i libri restano in libreria
   (`shelf_items` va in cascata, `library_items` no).
 - **Aggiunta libri**: sheet con la libreria paginata, ricerca server-side e multi-selezione;
