@@ -1,4 +1,4 @@
-import { enrichBookCover, updateBookPageCount } from "@/api/books";
+import { refreshBook, updateBookPageCount } from "@/api/books";
 import type { ReadingStatus } from "@/api/library";
 import {
   deleteLibraryItem,
@@ -15,10 +15,11 @@ import {
 } from "@/api/releaseReminders";
 import { removeSpineFile } from "@/api/spines";
 import { useAuth } from "@/hooks/useAuth";
+import { needsRefresh } from "@/lib/bookRefresh";
 import { upcomingReleaseDate } from "@/lib/releaseDate";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -153,13 +154,26 @@ export function useBookDetailData() {
     onError: () => toast.error("Errore nella rimozione del libro"),
   });
 
-  const { mutate: enrichCover } = useMutation({
-    mutationFn: () => enrichBookCover(item!.book.id, item!.book.isbn13!),
+  // --- Refresh dei metadati in background (vedi lib/bookRefresh) ---------
+  // Il dettaglio mostra subito i dati in cache; al termine si invalidano le
+  // query che mostrano il libro. Un errore resta silenzioso: si riprova alla
+  // prossima apertura. Una sola volta per libro finché la pagina è montata.
+  const { mutate: refresh } = useMutation({
+    mutationFn: (targetId: string) => refreshBook(targetId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["library", user?.id] });
+      void queryClient.invalidateQueries({ queryKey: ["library", user?.id] });
+      void queryClient.invalidateQueries({ queryKey: ["shelves", user?.id] });
+      void queryClient.invalidateQueries({ queryKey: ["shelf", user?.id] });
     },
-    // silenzioso su errore — non blocca nulla
   });
+  const refreshedBookId = useRef<string | null>(null);
+  const refreshTarget = item && needsRefresh(item.book) ? item.book.id : null;
+
+  useEffect(() => {
+    if (!refreshTarget || refreshedBookId.current === refreshTarget) return;
+    refreshedBookId.current = refreshTarget;
+    refresh(refreshTarget);
+  }, [refreshTarget, refresh]);
 
   return {
     data: {
@@ -183,7 +197,6 @@ export function useBookDetailData() {
       saveDate: (field: "started" | "finished", date: string) =>
         mutateDate({ field, date }),
       deleteItem: mutateDelete,
-      enrichCover,
       toggleReminder: () => toggleReminder(),
       isTogglingReminder,
       setProgressInput,

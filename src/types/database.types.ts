@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -59,6 +59,7 @@ export type Database = {
           cover_url: string | null
           created_at: string
           description: string | null
+          fetched_at: string
           genres: string[] | null
           id: string
           isbn13: string | null
@@ -74,6 +75,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           description?: string | null
+          fetched_at?: string
           genres?: string[] | null
           id?: string
           isbn13?: string | null
@@ -89,6 +91,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           description?: string | null
+          fetched_at?: string
           genres?: string[] | null
           id?: string
           isbn13?: string | null
@@ -432,6 +435,31 @@ export type Database = {
         Args: { p_item_ids: string[]; p_shelf_id: string }
         Returns: undefined
       }
+      search_books_catalog: {
+        Args: { p_limit?: number; p_terms: string[] }
+        Returns: {
+          authors: string[] | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          fetched_at: string
+          genres: string[] | null
+          id: string
+          isbn13: string | null
+          page_count: number | null
+          published_date: string | null
+          published_year: number | null
+          publisher: string | null
+          source: string | null
+          title: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "books"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       search_library: {
         Args: { p_query?: string; p_status?: string }
         Returns: {
@@ -453,6 +481,31 @@ export type Database = {
           to: "library_items"
           isOneToOne: false
           isSetofReturn: true
+        }
+      }
+      set_book_page_count: {
+        Args: { p_book_id: string; p_page_count: number }
+        Returns: {
+          authors: string[] | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          fetched_at: string
+          genres: string[] | null
+          id: string
+          isbn13: string | null
+          page_count: number | null
+          published_date: string | null
+          published_year: number | null
+          publisher: string | null
+          source: string | null
+          title: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "books"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       unlock_badge: {
@@ -591,6 +644,7 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
 
 // ---------------------------------------------------------------------------
 // Tutto quello che sta sopra è generato: `supabase gen types typescript

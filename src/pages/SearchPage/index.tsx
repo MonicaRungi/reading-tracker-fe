@@ -21,7 +21,7 @@ export default function SearchPage() {
       />
 
       <div className="flex-1 px-4">
-        {ui.tab === "scan" && ui.scannerOpen && (
+        {ui.tab === "scan" && (
           <div className="space-y-4">
             <BarcodeScanner
               key={ui.scanResetKey}

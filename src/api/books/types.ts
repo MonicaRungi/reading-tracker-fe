@@ -1,6 +1,7 @@
 import type { BookRow } from "@/types/database.types"
 
-export type BookSource = "google_books" | "open_library"
+/** goodreads: libri importati, arrivano solo dal catalogo locale. */
+export type BookSource = "google_books" | "open_library" | "goodreads"
 
 /**
  * Formato normalizzato restituito dalle Edge Function.
