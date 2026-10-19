@@ -98,7 +98,7 @@ export function useBookDetailData() {
 
   const { mutate: mutateProgress, isPending: isUpdatingProgress } = useMutation(
     {
-      mutationFn: (page: number) => updateProgress(user!.id, id!, page),
+      mutationFn: (page: number) => updateProgress(id!, page),
       onSuccess: async () => {
         await invalidate();
         setProgressInput(null);

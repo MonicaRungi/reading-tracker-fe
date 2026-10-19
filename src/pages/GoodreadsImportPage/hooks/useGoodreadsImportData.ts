@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Papa from "papaparse";
 import { useAuth } from "@/hooks/useAuth";
 import { listLibrary } from "@/api/library";
-import { supabase } from "@/lib/supabase";
+import { importGoodreads, type ImportResult } from "@/api/imports";
 import { invalidateProgressQueries } from "@/lib/progressQueries";
 
 export type ImportStep = "upload" | "preview" | "importing" | "done" | "error";
@@ -17,13 +17,6 @@ export interface ImportPreview {
   to_read: number;
   duplicates: number;
   rows: Papa.ParseResult<Record<string, string>>["data"];
-}
-
-export interface ImportResult {
-  imported: number;
-  skipped: number;
-  failed: number;
-  errors: { title: string; reason: string }[];
 }
 
 export function useGoodreadsImportData() {
@@ -128,13 +121,11 @@ export function useGoodreadsImportData() {
     setStep("importing");
 
     const csv = Papa.unparse(preview.rows);
-    const { data, error: fnError } =
-      await supabase.functions.invoke<ImportResult>("import-goodreads", {
-        body: { csv },
-      });
-
-    if (fnError || !data) {
-      setError(fnError?.message ?? t("common.error"));
+    let data: ImportResult;
+    try {
+      data = await importGoodreads(csv);
+    } catch (fnError) {
+      setError(fnError instanceof Error ? fnError.message : t("common.error"));
       setStep("error");
       return;
     }
