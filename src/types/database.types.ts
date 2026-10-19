@@ -422,6 +422,15 @@ export type Database = {
       close_expired_reading_goals: { Args: never; Returns: undefined }
       delete_old_notifications: { Args: never; Returns: undefined }
       fire_due_release_reminders: { Args: never; Returns: undefined }
+      goal_progress: {
+        Args: {
+          p_end: string
+          p_start: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: number
+      }
       increment_total_pages_read: {
         Args: { p_delta: number; p_user_id: string }
         Returns: undefined
@@ -431,6 +440,10 @@ export type Database = {
         Returns: boolean
       }
       list_orphan_spines: { Args: { p_min_age?: string }; Returns: string[] }
+      log_pages_read: {
+        Args: { p_delta: number; p_log_date: string }
+        Returns: undefined
+      }
       reorder_shelf: {
         Args: { p_item_ids: string[]; p_shelf_id: string }
         Returns: undefined
@@ -511,6 +524,30 @@ export type Database = {
       unlock_badge: {
         Args: { p_badge_key: string; p_user_id: string }
         Returns: undefined
+      }
+      sync_goal_achievements: {
+        Args: never
+        Returns: {
+          confirmed_at: string
+          created_at: string
+          id: string
+          is_locked: boolean
+          period: string
+          period_end: string
+          period_start: string
+          role: string
+          status: string
+          target: number
+          type: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "reading_goals"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
     }
     Enums: {

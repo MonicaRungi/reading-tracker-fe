@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { CheckCircle, SkipForward, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GoodreadsStatCard } from "./GoodreadsStatCard";
-import type { ImportResult } from "../hooks/useGoodreadsImportData";
+import type { ImportResult } from "@/api/imports";
 
 export function GoodreadsImportResult({
   result,
